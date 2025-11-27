@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Main Menu -->
+        <menuitem id="menu_commission_root"
+                  name="Commissions"
+                  web_icon="belgogreen_sales_commission,static/description/icon.png"
+                  sequence="75"/>
+
+        <!-- My Commission Menu (for users) -->
+        <menuitem id="menu_my_commission"
+                  name="My Commissions"
+                  parent="menu_commission_root"
+                  sequence="10"
+                  groups="belgogreen_sales_commission.group_commission_user"/>
+
+        <menuitem id="menu_my_commission_overview"
+                  name="Overview"
+                  parent="menu_my_commission"
+                  action="action_sale_commission_my"
+                  sequence="10"/>
+
+        <menuitem id="menu_my_commission_claims"
+                  name="My Claims"
+                  parent="menu_my_commission"
+                  action="action_sale_commission_claim_my"
+                  sequence="20"/>
+
+        <!-- Commission Management (for managers) -->
+        <menuitem id="menu_commission_management"
+                  name="Management"
+                  parent="menu_commission_root"
+                  sequence="20"
+                  groups="belgogreen_sales_commission.group_commission_manager"/>
+
+        <menuitem id="menu_commission_all"
+                  name="All Commissions"
+                  parent="menu_commission_management"
+                  action="action_sale_commission_all"
+                  sequence="10"/>
+
+        <menuitem id="menu_commission_unpaid"
+                  name="Unpaid Commissions"
+                  parent="menu_commission_management"
+                  action="action_sale_commission_unpaid"
+                  sequence="20"/>
+
+        <menuitem id="menu_commission_payments"
+                  name="Payments"
+                  parent="menu_commission_management"
+                  action="action_sale_commission_payment"
+                  sequence="30"/>
+
+        <menuitem id="menu_commission_claims"
+                  name="Claims"
+                  parent="menu_commission_management"
+                  action="action_sale_commission_claim_all"
+                  sequence="40"/>
+
+        <!-- Configuration Menu -->
+        <menuitem id="menu_commission_configuration"
+                  name="Configuration"
+                  parent="menu_commission_root"
+                  sequence="100"
+                  groups="belgogreen_sales_commission.group_commission_manager"/>
+
+        <menuitem id="menu_commission_plans"
+                  name="Commission Plans"
+                  parent="menu_commission_configuration"
+                  action="sale_commission.sale_commission_plan_action"
+                  sequence="10"/>
+
+        <menuitem id="menu_commission_role_config"
+                  name="Role Configuration"
+                  parent="menu_commission_configuration"
+                  action="action_hr_commission_role_config"
+                  sequence="20"/>
+
+    </data>
+</odoo>

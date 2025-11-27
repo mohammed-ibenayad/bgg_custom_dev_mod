@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit Form View to add hierarchical fields -->
+        <record id="view_sale_commission_plan_form_inherit" model="ir.ui.view">
+            <field name="name">sale.commission.plan.form.inherit</field>
+            <field name="model">sale.commission.plan</field>
+            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
+            <field name="arch" type="xml">
+                <!-- Add hierarchical configuration after the main fields -->
+                <xpath expr="//group[@name='main']" position="after">
+                    <group string="Hierarchical Configuration" name="hierarchical_config">
+                        <field name="is_hierarchical"/>
+                        <field name="require_invoice_paid"/>
+                    </group>
+                </xpath>
+
+                <!-- Add role configuration tab -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Role Percentages" name="role_config" invisible="not is_hierarchical">
+                        <field name="role_config_ids">
+                            <tree editable="bottom">
+                                <field name="role"/>
+                                <field name="default_percentage"/>
+                                <field name="active"/>
+                            </tree>
+                        </field>
+                        <group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>Note:</strong> Define the commission percentage for each role in the hierarchy.
+                                These percentages will be applied automatically when commissions are calculated.
+                            </div>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

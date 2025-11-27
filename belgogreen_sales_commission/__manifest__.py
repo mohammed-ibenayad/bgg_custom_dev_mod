@@ -1,35 +1,67 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "belgogreen_sales_commission",
+    'name': "Belgogreen Sales Commission",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "Hierarchical commission system for sales with multi-level calculation",
 
     'description': """
-Long description of module's purpose
+Belgogreen Sales Commission Module
+===================================
+
+This module provides a comprehensive hierarchical commission system that:
+
+* Automatically calculates commissions for salesperson, team leader, and sales director
+* Tracks commission payments and allows users to claim their commissions
+* Provides dedicated views for salespeople to see their commissions (wallet)
+* Includes admin tools for managing and processing commission payments
+* Supports manual adjustments and flexible configuration
+
+Main Features:
+--------------
+* Multi-level commission calculation (3 hierarchy levels)
+* Automatic commission creation when invoices are paid
+* Commission claims and approval workflow
+* Payment tracking and history
+* Role-based commission percentages
+* Integration with Odoo's existing commission and sales modules
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
+    'author': "Belgogreen",
+    'website': "https://www.belgogreen.com",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Sales/Sales',
+    'version': '17.0.1.0.0',
     'license': 'LGPL-3',
 
-    # any module necessary for this one to work correctly
-    'depends': ['base'],
+    # Dependencies - require Odoo sale_commission module
+    'depends': [
+        'base',
+        'sale_management',
+        'account',
+        'hr',
+        'mail',
+        'sale_commission',  # Odoo's commission module
+    ],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'security/commission_security.xml',
+        'security/ir.model.access.csv',
+        'data/sequence_data.xml',
+        'views/hr_commission_role_config_views.xml',
+        'views/sale_commission_plan_views.xml',
+        'views/res_users_views.xml',
+        'views/sale_commission_views.xml',
+        'views/sale_commission_payment_views.xml',
+        'views/sale_commission_claim_views.xml',
+        'views/account_move_views.xml',
+        'views/menu_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml',
     ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
 
