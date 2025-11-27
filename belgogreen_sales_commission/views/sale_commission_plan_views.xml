@@ -8,12 +8,10 @@
             <field name="model">sale.commission.plan</field>
             <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
             <field name="arch" type="xml">
-                <!-- Add hierarchical configuration after the main fields -->
-                <xpath expr="//group[@name='main']" position="after">
-                    <group string="Hierarchical Configuration" name="hierarchical_config">
-                        <field name="is_hierarchical"/>
-                        <field name="require_invoice_paid"/>
-                    </group>
+                <!-- Add hierarchical configuration fields -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="is_hierarchical"/>
+                    <field name="require_invoice_paid"/>
                 </xpath>
 
                 <!-- Add role configuration tab -->
