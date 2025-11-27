@@ -15,7 +15,6 @@
                     <field name="total_amount" sum="Total"/>
                     <field name="state"/>
                     <field name="processed_by"/>
-                    <field name="currency_id" column_invisible="True"/>
                 </list>
             </field>
         </record>
@@ -54,7 +53,6 @@
                             <group string="Claim Information">
                                 <field name="user_id" readonly="1"/>
                                 <field name="claim_date" readonly="1"/>
-                                <field name="currency_id" invisible="1"/>
                                 <field name="total_amount" class="oe_subtotal_footer_separator"/>
                             </group>
                             <group string="Processing">
@@ -74,7 +72,6 @@
                                         <field name="base_amount"/>
                                         <field name="commission_amount" sum="Total"/>
                                         <field name="payment_status"/>
-                                        <field name="currency_id" column_invisible="True"/>
                                     </list>
                                 </field>
                             </page>

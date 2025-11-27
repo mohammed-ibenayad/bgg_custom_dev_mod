@@ -58,10 +58,12 @@ class HrCommissionRoleConfig(models.Model):
                     _('Commission percentage must be between 0 and 100. Got: %s') % record.default_percentage
                 )
 
-    def name_get(self):
-        """Custom display name"""
-        result = []
+    def _compute_display_name(self):
+        """Custom display name for Odoo 18"""
         for record in self:
-            name = f"{record.plan_id.name} - {dict(record._fields['role'].selection).get(record.role)} ({record.default_percentage}%)"
-            result.append((record.id, name))
-        return result
+            role_label = dict(record._fields['role'].selection).get(record.role, record.role)
+            record.display_name = _('%(plan)s - %(role)s (%(percentage)s%%)') % {
+                'plan': record.plan_id.name,
+                'role': role_label,
+                'percentage': record.default_percentage
+            }
