@@ -21,7 +21,7 @@
                             </group>
                         </group>
                         <group string="Team Members" invisible="commission_role not in ['team_leader', 'sales_director']">
-                            <field name="team_member_ids" nolabel="1">
+                            <field name="team_member_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
                                     <field name="name"/>
                                     <field name="commission_role"/>
