@@ -20,11 +20,11 @@
                 <xpath expr="//notebook" position="inside">
                     <page string="Role Percentages" name="role_config" invisible="not is_hierarchical">
                         <field name="role_config_ids">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="role"/>
                                 <field name="default_percentage"/>
                                 <field name="active"/>
-                            </tree>
+                            </list>
                         </field>
                         <group>
                             <div class="alert alert-info" role="alert">

@@ -219,7 +219,7 @@ class SaleCommission(models.Model):
             claim = self.env['sale.commission.claim'].create({
                 'user_id': self.user_id.id,
                 'commission_ids': [(6, 0, [self.id])],
-                'notes': f'Claim for commission {self.name}'
+                'notes': _('Claim for commission %s') % self.name
             })
             return {
                 'type': 'ir.actions.act_window',
