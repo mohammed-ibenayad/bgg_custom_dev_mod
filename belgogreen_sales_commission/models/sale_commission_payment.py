@@ -82,12 +82,13 @@ class SaleCommissionPayment(models.Model):
         compute='_compute_commission_count'
     )
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate sequence for payment reference"""
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission.payment') or _('New')
-        return super(SaleCommissionPayment, self).create(vals)
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission.payment') or _('New')
+        return super(SaleCommissionPayment, self).create(vals_list)
 
     @api.depends('commission_ids', 'commission_ids.commission_amount')
     def _compute_total_amount(self):

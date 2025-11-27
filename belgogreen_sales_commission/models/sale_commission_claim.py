@@ -94,15 +94,17 @@ class SaleCommissionClaim(models.Model):
         compute='_compute_commission_count'
     )
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate sequence and notify admins"""
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission.claim') or _('New')
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission.claim') or _('New')
 
-        result = super(SaleCommissionClaim, self).create(vals)
-        result._notify_admins()
-        return result
+        results = super(SaleCommissionClaim, self).create(vals_list)
+        for result in results:
+            result._notify_admins()
+        return results
 
     @api.depends('commission_ids', 'commission_ids.commission_amount')
     def _compute_total_amount(self):
