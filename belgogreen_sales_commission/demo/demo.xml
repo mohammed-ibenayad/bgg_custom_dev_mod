@@ -1,166 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- ============================================ -->
-        <!-- DEMO USERS - Sales Hierarchy -->
-        <!-- ============================================ -->
+  <data noupdate="0">
 
-        <!-- Sales Director -->
-        <record id="user_sales_director_demo" model="res.users">
-            <field name="name">Robert Johnson</field>
-            <field name="login">director.demo</field>
-            <field name="password">demo</field>
-            <field name="commission_role">sales_director</field>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <!-- ============================================ -->
+    <!-- Demo partners (one per demo user)           -->
+    <!-- ============================================ -->
 
-        <!-- Team Leader - North -->
-        <record id="user_team_leader_north" model="res.users">
-            <field name="name">Mary Wilson - North TL</field>
-            <field name="login">teamleader.north</field>
-            <field name="password">demo</field>
-            <field name="commission_role">team_leader</field>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_robert_johnson" model="res.partner">
+      <field name="name">Robert Johnson</field>
+      <field name="email">robert.johnson@example.com</field>
+    </record>
 
-        <!-- Team Leader - South -->
-        <record id="user_team_leader_south" model="res.users">
-            <field name="name">Sarah Martinez - South TL</field>
-            <field name="login">teamleader.south</field>
-            <field name="password">demo</field>
-            <field name="commission_role">team_leader</field>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_mary_wilson" model="res.partner">
+      <field name="name">Mary Wilson</field>
+      <field name="email">mary.wilson@example.com</field>
+    </record>
 
-        <!-- Salespeople - North Team -->
-        <record id="user_salesperson_north_1" model="res.users">
-            <field name="name">John Anderson - North SP</field>
-            <field name="login">salesperson.north.1</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_north"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_sarah_martinez" model="res.partner">
+      <field name="name">Sarah Martinez</field>
+      <field name="email">sarah.martinez@example.com</field>
+    </record>
 
-        <record id="user_salesperson_north_2" model="res.users">
-            <field name="name">Emily Thompson - North SP</field>
-            <field name="login">salesperson.north.2</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_north"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_john_anderson" model="res.partner">
+      <field name="name">John Anderson</field>
+      <field name="email">john.anderson@example.com</field>
+    </record>
 
-        <record id="user_salesperson_north_3" model="res.users">
-            <field name="name">Michael Brown - North SP</field>
-            <field name="login">salesperson.north.3</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_north"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_emily_thompson" model="res.partner">
+      <field name="name">Emily Thompson</field>
+      <field name="email">emily.thompson@example.com</field>
+    </record>
 
-        <!-- Salespeople - South Team -->
-        <record id="user_salesperson_south_1" model="res.users">
-            <field name="name">Jennifer Davis - South SP</field>
-            <field name="login">salesperson.south.1</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_south"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_michael_brown" model="res.partner">
+      <field name="name">Michael Brown</field>
+      <field name="email">michael.brown@example.com</field>
+    </record>
 
-        <record id="user_salesperson_south_2" model="res.users">
-            <field name="name">David Garcia - South SP</field>
-            <field name="login">salesperson.south.2</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_south"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_jennifer_davis" model="res.partner">
+      <field name="name">Jennifer Davis</field>
+      <field name="email">jennifer.davis@example.com</field>
+    </record>
 
-        <record id="user_salesperson_south_3" model="res.users">
-            <field name="name">Lisa Rodriguez - South SP</field>
-            <field name="login">salesperson.south.3</field>
-            <field name="password">demo</field>
-            <field name="commission_role">salesperson</field>
-            <field name="team_leader_id" ref="user_team_leader_south"/>
-            <field name="sales_director_id" ref="user_sales_director_demo"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
-        </record>
+    <record id="demo_partner_david_garcia" model="res.partner">
+      <field name="name">David Garcia</field>
+      <field name="email">david.garcia@example.com</field>
+    </record>
 
-        <!-- ============================================ -->
-        <!-- DEMO COMMISSION PLANS -->
-        <!-- ============================================ -->
+    <record id="demo_partner_lisa_rodriguez" model="res.partner">
+      <field name="name">Lisa Rodriguez</field>
+      <field name="email">lisa.rodriguez@example.com</field>
+    </record>
 
-        <!-- Commission Plan - North Team -->
-        <record id="commission_plan_north" model="sale.commission.plan">
-            <field name="name">North Team Commission Plan</field>
-            <field name="is_hierarchical">True</field>
-            <field name="require_invoice_paid">True</field>
-        </record>
+    <!-- ============================================ -->
+    <!-- Demo users (sales hierarchy)                -->
+    <!-- Notes: - password in demo only.              -->
+    <!--        - ensure custom fields exist.        -->
+    <!-- ============================================ -->
 
-        <!-- Role Config - North Team - Salesperson -->
-        <record id="role_config_north_salesperson" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_north"/>
-            <field name="role">salesperson</field>
-            <field name="default_percentage">5.00</field>
-            <field name="active">True</field>
-        </record>
+    <!-- Sales Director -->
+    <record id="user_sales_director_demo" model="res.users">
+      <field name="name">Robert Johnson</field>
+      <field name="login">director.demo</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_robert_johnson"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <!-- Custom fields used by commission module - verify they exist -->
+      <field name="commission_role">sales_director</field>
+    </record>
 
-        <!-- Role Config - North Team - Team Leader -->
-        <record id="role_config_north_team_leader" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_north"/>
-            <field name="role">team_leader</field>
-            <field name="default_percentage">3.00</field>
-            <field name="active">True</field>
-        </record>
+    <!-- Team Leader - North -->
+    <record id="user_team_leader_north" model="res.users">
+      <field name="name">Mary Wilson - North TL</field>
+      <field name="login">teamleader.north</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_mary_wilson"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">team_leader</field>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-        <!-- Role Config - North Team - Sales Director -->
-        <record id="role_config_north_sales_director" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_north"/>
-            <field name="role">sales_director</field>
-            <field name="default_percentage">2.00</field>
-            <field name="active">True</field>
-        </record>
+    <!-- Team Leader - South -->
+    <record id="user_team_leader_south" model="res.users">
+      <field name="name">Sarah Martinez - South TL</field>
+      <field name="login">teamleader.south</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_sarah_martinez"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">team_leader</field>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-        <!-- Commission Plan - South Team -->
-        <record id="commission_plan_south" model="sale.commission.plan">
-            <field name="name">South Team Commission Plan</field>
-            <field name="is_hierarchical">True</field>
-            <field name="require_invoice_paid">True</field>
-        </record>
+    <!-- Salespeople - North Team -->
+    <record id="user_salesperson_north_1" model="res.users">
+      <field name="name">John Anderson - North SP</field>
+      <field name="login">salesperson.north.1</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_john_anderson"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_north"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-        <!-- Role Config - South Team - Salesperson -->
-        <record id="role_config_south_salesperson" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_south"/>
-            <field name="role">salesperson</field>
-            <field name="default_percentage">6.00</field>
-            <field name="active">True</field>
-        </record>
+    <record id="user_salesperson_north_2" model="res.users">
+      <field name="name">Emily Thompson - North SP</field>
+      <field name="login">salesperson.north.2</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_emily_thompson"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_north"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-        <!-- Role Config - South Team - Team Leader -->
-        <record id="role_config_south_team_leader" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_south"/>
-            <field name="role">team_leader</field>
-            <field name="default_percentage">2.50</field>
-            <field name="active">True</field>
-        </record>
+    <record id="user_salesperson_north_3" model="res.users">
+      <field name="name">Michael Brown - North SP</field>
+      <field name="login">salesperson.north.3</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_michael_brown"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_north"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-        <!-- Role Config - South Team - Sales Director -->
-        <record id="role_config_south_sales_director" model="hr.commission.role.config">
-            <field name="plan_id" ref="commission_plan_south"/>
-            <field name="role">sales_director</field>
-            <field name="default_percentage">1.50</field>
-            <field name="active">True</field>
-        </record>
+    <!-- Salespeople - South Team -->
+    <record id="user_salesperson_south_1" model="res.users">
+      <field name="name">Jennifer Davis - South SP</field>
+      <field name="login">salesperson.south.1</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_jennifer_davis"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_south"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
 
-    </data>
+    <record id="user_salesperson_south_2" model="res.users">
+      <field name="name">David Garcia - South SP</field>
+      <field name="login">salesperson.south.2</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_david_garcia"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_south"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
+
+    <record id="user_salesperson_south_3" model="res.users">
+      <field name="name">Lisa Rodriguez - South SP</field>
+      <field name="login">salesperson.south.3</field>
+      <field name="password">demo</field>
+      <field name="partner_id" ref="demo_partner_lisa_rodriguez"/>
+      <field name="groups_id" eval="[
+        (4, ref('base.group_user')),
+        (4, ref('sales_team.group_sale_salesman'))
+      ]"/>
+      <field name="commission_role">salesperson</field>
+      <field name="team_leader_id" ref="user_team_leader_south"/>
+      <field name="sales_director_id" ref="user_sales_director_demo"/>
+    </record>
+
+    <!-- ============================================ -->
+    <!-- Demo Commission Plans & Role Configs        -->
+    <!-- Make sure the module providing these models  -->
+    <!-- is declared in your manifest `depends`.     -->
+    <!-- ============================================ -->
+
+    <!-- Commission Plan - North Team -->
+    <record id="commission_plan_north" model="sale.commission.plan">
+      <field name="name">North Team Commission Plan</field>
+      <field name="is_hierarchical">True</field>
+      <field name="require_invoice_paid">True</field>
+    </record>
+
+    <!-- Role Config - North Team - Salesperson -->
+    <record id="role_config_north_salesperson" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_north"/>
+      <field name="role">salesperson</field>
+      <field name="default_percentage">5.00</field>
+      <field name="active">True</field>
+    </record>
+
+    <!-- Role Config - North Team - Team Leader -->
+    <record id="role_config_north_team_leader" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_north"/>
+      <field name="role">team_leader</field>
+      <field name="default_percentage">3.00</field>
+      <field name="active">True</field>
+    </record>
+
+    <!-- Role Config - North Team - Sales Director -->
+    <record id="role_config_north_sales_director" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_north"/>
+      <field name="role">sales_director</field>
+      <field name="default_percentage">2.00</field>
+      <field name="active">True</field>
+    </record>
+
+    <!-- Commission Plan - South Team -->
+    <record id="commission_plan_south" model="sale.commission.plan">
+      <field name="name">South Team Commission Plan</field>
+      <field name="is_hierarchical">True</field>
+      <field name="require_invoice_paid">True</field>
+    </record>
+
+    <!-- Role Config - South Team - Salesperson -->
+    <record id="role_config_south_salesperson" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_south"/>
+      <field name="role">salesperson</field>
+      <field name="default_percentage">6.00</field>
+      <field name="active">True</field>
+    </record>
+
+    <!-- Role Config - South Team - Team Leader -->
+    <record id="role_config_south_team_leader" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_south"/>
+      <field name="role">team_leader</field>
+      <field name="default_percentage">2.50</field>
+      <field name="active">True</field>
+    </record>
+
+    <!-- Role Config - South Team - Sales Director -->
+    <record id="role_config_south_sales_director" model="hr.commission.role.config">
+      <field name="plan_id" ref="commission_plan_south"/>
+      <field name="role">sales_director</field>
+      <field name="default_percentage">1.50</field>
+      <field name="active">True</field>
+    </record>
+
+  </data>
 </odoo>
