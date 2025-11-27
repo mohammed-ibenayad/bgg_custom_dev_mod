@@ -10,8 +10,12 @@
             <field name="arch" type="xml">
                 <!-- Add hierarchical configuration fields -->
                 <xpath expr="//field[@name='name']" position="after">
-                    <field name="is_hierarchical"/>
-                    <field name="require_invoice_paid"/>
+                    <group string="Configuration">
+                        <group>
+                            <field name="is_hierarchical"/>
+                            <field name="require_invoice_paid"/>
+                        </group>
+                    </group>
                 </xpath>
 
                 <!-- Add role configuration tab -->
