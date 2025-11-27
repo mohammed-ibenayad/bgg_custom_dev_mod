@@ -15,7 +15,6 @@
                     <field name="total_amount" sum="Total"/>
                     <field name="payment_method"/>
                     <field name="state"/>
-                    <field name="currency_id" column_invisible="True"/>
                 </list>
             </field>
         </record>
@@ -53,7 +52,6 @@
                                 <field name="payment_method" readonly="state == 'paid'"/>
                             </group>
                             <group string="Amount">
-                                <field name="currency_id" invisible="1"/>
                                 <field name="total_amount" class="oe_subtotal_footer_separator"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
@@ -69,8 +67,6 @@
                                         <field name="base_amount"/>
                                         <field name="commission_amount" sum="Total"/>
                                         <field name="payment_status"/>
-                                        <field name="can_be_paid" column_invisible="True"/>
-                                        <field name="currency_id" column_invisible="True"/>
                                     </list>
                                 </field>
                             </page>
