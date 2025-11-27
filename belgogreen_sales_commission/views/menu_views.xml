@@ -68,7 +68,7 @@
         <menuitem id="menu_commission_plans"
                   name="Commission Plans"
                   parent="menu_commission_configuration"
-                  action="sale_commission.sale_commission_plan_action"
+                  action="action_sale_commission_plan"
                   sequence="10"/>
 
         <menuitem id="menu_commission_role_config"
