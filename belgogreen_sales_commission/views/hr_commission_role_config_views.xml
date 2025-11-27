@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Tree View -->
+        <record id="view_hr_commission_role_config_tree" model="ir.ui.view">
+            <field name="name">hr.commission.role.config.tree</field>
+            <field name="model">hr.commission.role.config</field>
+            <field name="arch" type="xml">
+                <tree string="Role Configurations" editable="bottom">
+                    <field name="plan_id"/>
+                    <field name="role"/>
+                    <field name="default_percentage"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_hr_commission_role_config_form" model="ir.ui.view">
+            <field name="name">hr.commission.role.config.form</field>
+            <field name="model">hr.commission.role.config</field>
+            <field name="arch" type="xml">
+                <form string="Role Configuration">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="plan_id"/>
+                                <field name="role"/>
+                            </group>
+                            <group>
+                                <field name="default_percentage"/>
+                                <field name="active"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_hr_commission_role_config_search" model="ir.ui.view">
+            <field name="name">hr.commission.role.config.search</field>
+            <field name="model">hr.commission.role.config</field>
+            <field name="arch" type="xml">
+                <search string="Role Configuration">
+                    <field name="plan_id"/>
+                    <field name="role"/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
+                        <filter string="Role" name="group_role" context="{'group_by': 'role'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_hr_commission_role_config" model="ir.actions.act_window">
+            <field name="name">Commission Role Configuration</field>
+            <field name="res_model">hr.commission.role.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a commission role configuration
+                </p>
+                <p>
+                    Define commission percentages for each role (Salesperson, Team Leader, Sales Director) within a commission plan.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

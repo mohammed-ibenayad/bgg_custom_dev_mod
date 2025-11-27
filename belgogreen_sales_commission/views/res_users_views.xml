@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit User Form View -->
+        <record id="view_users_form_inherit_commission" model="ir.ui.view">
+            <field name="name">res.users.form.inherit.commission</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <!-- Add commission fields in Preferences notebook -->
+                <xpath expr="//page[@name='preferences']" position="after">
+                    <page string="Commission Hierarchy" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
+                        <group>
+                            <group string="Commission Role">
+                                <field name="commission_role"/>
+                            </group>
+                            <group string="Hierarchy">
+                                <field name="team_leader_id" invisible="commission_role == 'sales_director'"/>
+                                <field name="sales_director_id"/>
+                            </group>
+                        </group>
+                        <group string="Team Members" invisible="commission_role not in ['team_leader', 'sales_director']">
+                            <field name="team_member_ids" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="commission_role"/>
+                                    <field name="commission_unpaid_total"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Commission Statistics">
+                            <group>
+                                <field name="commission_count"/>
+                                <field name="commission_unpaid_total"/>
+                            </group>
+                            <group>
+                                <field name="commission_paid_total"/>
+                                <field name="company_currency_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_my_commissions"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-money"
+                                    invisible="commission_count == 0">
+                                <field name="commission_count" widget="statinfo" string="Commissions"/>
+                            </button>
+                        </div>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
