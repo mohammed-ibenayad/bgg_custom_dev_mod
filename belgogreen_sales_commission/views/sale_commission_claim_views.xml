@@ -7,7 +7,7 @@
             <field name="name">sale.commission.claim.tree</field>
             <field name="model">sale.commission.claim</field>
             <field name="arch" type="xml">
-                <tree string="Commission Claims" decoration-success="state == 'paid'" decoration-warning="state == 'pending'" decoration-info="state == 'approved'" decoration-danger="state == 'rejected'">
+                <list string="Commission Claims" decoration-success="state == 'paid'" decoration-warning="state == 'pending'" decoration-info="state == 'approved'" decoration-danger="state == 'rejected'">
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="claim_date"/>
@@ -16,7 +16,7 @@
                     <field name="state"/>
                     <field name="processed_by"/>
                     <field name="currency_id" column_invisible="True"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -66,7 +66,7 @@
                         <notebook>
                             <page string="Commissions" name="commissions">
                                 <field name="commission_ids" readonly="state != 'pending'">
-                                    <tree decoration-success="payment_status == 'paid'">
+                                    <list decoration-success="payment_status == 'paid'">
                                         <field name="name"/>
                                         <field name="date"/>
                                         <field name="role"/>
@@ -75,7 +75,7 @@
                                         <field name="commission_amount" sum="Total"/>
                                         <field name="payment_status"/>
                                         <field name="currency_id" column_invisible="True"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Claimant Notes" name="notes">
@@ -163,7 +163,7 @@
         <record id="action_sale_commission_claim_all" model="ir.actions.act_window">
             <field name="name">Commission Claims</field>
             <field name="res_model">sale.commission.claim</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
             <field name="context">{'search_default_pending': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
@@ -179,7 +179,7 @@
         <record id="action_sale_commission_claim_my" model="ir.actions.act_window">
             <field name="name">My Claims</field>
             <field name="res_model">sale.commission.claim</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
             <field name="context">{'search_default_my_claims': 1}</field>
             <field name="domain">[('user_id', '=', uid)]</field>
             <field name="help" type="html">

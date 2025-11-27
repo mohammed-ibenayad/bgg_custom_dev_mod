@@ -22,11 +22,11 @@
                         </group>
                         <group string="Team Members" invisible="commission_role not in ['team_leader', 'sales_director']">
                             <field name="team_member_ids" nolabel="1">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="commission_role"/>
                                     <field name="commission_unpaid_total"/>
-                                </tree>
+                                </list>
                             </field>
                         </group>
                         <group string="Commission Statistics">

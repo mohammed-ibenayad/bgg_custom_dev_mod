@@ -2,18 +2,18 @@
 <odoo>
     <data>
 
-        <!-- Tree View -->
-        <record id="view_hr_commission_role_config_tree" model="ir.ui.view">
-            <field name="name">hr.commission.role.config.tree</field>
+        <!-- List View -->
+        <record id="view_hr_commission_role_config_list" model="ir.ui.view">
+            <field name="name">hr.commission.role.config.list</field>
             <field name="model">hr.commission.role.config</field>
             <field name="arch" type="xml">
-                <tree string="Role Configurations" editable="bottom">
+                <list string="Role Configurations" editable="bottom">
                     <field name="plan_id"/>
                     <field name="role"/>
                     <field name="default_percentage"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="active"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -62,7 +62,7 @@
         <record id="action_hr_commission_role_config" model="ir.actions.act_window">
             <field name="name">Commission Role Configuration</field>
             <field name="res_model">hr.commission.role.config</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="context">{'search_default_active': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
