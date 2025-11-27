@@ -17,7 +17,7 @@
                             </group>
                             <group string="Hierarchy">
                                 <field name="team_leader_id" invisible="commission_role == 'sales_director'"/>
-                                <field name="sales_director_id"/>
+                                <field name="sales_director_id" invisible="commission_role == 'sales_director'"/>
                             </group>
                         </group>
                         <group string="Team Members" invisible="commission_role not in ['team_leader', 'sales_director']">
