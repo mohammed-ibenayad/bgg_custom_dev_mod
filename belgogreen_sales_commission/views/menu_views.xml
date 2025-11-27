@@ -5,7 +5,7 @@
         <!-- Main Menu -->
         <menuitem id="menu_commission_root"
                   name="Commissions"
-                  web_icon="belgogreen_sales_commission,static/description/icon.png"
+                  web_icon="fa-money"
                   sequence="75"/>
 
         <!-- My Commission Menu (for users) -->
