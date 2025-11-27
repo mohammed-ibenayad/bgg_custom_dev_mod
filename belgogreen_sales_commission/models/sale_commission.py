@@ -155,12 +155,13 @@ class SaleCommission(models.Model):
         ('cancelled', 'Cancelled')
     ], string='State', default='draft', tracking=True)
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Generate sequence for commission reference"""
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission') or _('New')
-        return super(SaleCommission, self).create(vals)
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission') or _('New')
+        return super(SaleCommission, self).create(vals_list)
 
     @api.depends('percentage_override', 'plan_id', 'role')
     def _compute_commission_percentage(self):
