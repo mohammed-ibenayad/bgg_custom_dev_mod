@@ -153,8 +153,13 @@ class SaleCommissionClaim(models.Model):
                 self.activity_schedule(
                     'mail.mail_activity_data_todo',
                     user_id=admin.id,
-                    summary=f'New commission claim: {self.name}',
-                    note=f'User {self.user_id.name} has claimed {self.commission_count} commission(s) totaling {self.total_amount} {self.currency_id.name}'
+                    summary=_('New commission claim: %s') % self.name,
+                    note=_('User %(user)s has claimed %(count)s commission(s) totaling %(amount)s %(currency)s') % {
+                        'user': self.user_id.name,
+                        'count': self.commission_count,
+                        'amount': self.total_amount,
+                        'currency': self.currency_id.name
+                    }
                 )
         except Exception:
             # If group doesn't exist or other error, continue without notification

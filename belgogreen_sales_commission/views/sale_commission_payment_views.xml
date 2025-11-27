@@ -7,7 +7,7 @@
             <field name="name">sale.commission.payment.tree</field>
             <field name="model">sale.commission.payment</field>
             <field name="arch" type="xml">
-                <tree string="Commission Payments" decoration-success="state == 'paid'" decoration-info="state == 'confirmed'" decoration-muted="state == 'cancelled'">
+                <list string="Commission Payments" decoration-success="state == 'paid'" decoration-info="state == 'confirmed'" decoration-muted="state == 'cancelled'">
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="payment_date"/>
@@ -16,7 +16,7 @@
                     <field name="payment_method"/>
                     <field name="state"/>
                     <field name="currency_id" column_invisible="True"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -61,7 +61,7 @@
                         <notebook>
                             <page string="Commissions" name="commissions">
                                 <field name="commission_ids" readonly="state != 'draft'" context="{'default_user_id': user_id}">
-                                    <tree decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'claimed'">
+                                    <list decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'claimed'">
                                         <field name="name"/>
                                         <field name="date"/>
                                         <field name="role"/>
@@ -71,7 +71,7 @@
                                         <field name="payment_status"/>
                                         <field name="can_be_paid" column_invisible="True"/>
                                         <field name="currency_id" column_invisible="True"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Notes" name="notes">
@@ -163,7 +163,7 @@
         <record id="action_sale_commission_payment" model="ir.actions.act_window">
             <field name="name">Commission Payments</field>
             <field name="res_model">sale.commission.payment</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
