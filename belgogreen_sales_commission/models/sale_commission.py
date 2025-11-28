@@ -183,7 +183,7 @@ class SaleCommission(models.Model):
         for commission in self:
             commission.commission_amount = (commission.base_amount * commission.commission_percentage) / 100.0
 
-    @api.depends('invoice_id.payment_state', 'payment_status')
+    @api.depends('invoice_id.payment_state', 'payment_status', 'state')
     def _compute_can_be_paid(self):
         """Check if commission can be paid"""
         for commission in self:
@@ -191,12 +191,12 @@ class SaleCommission(models.Model):
                 commission.can_be_paid = (
                     commission.invoice_id and
                     commission.invoice_id.payment_state in ['paid', 'in_payment'] and
-                    commission.payment_status == 'unpaid' and
+                    commission.payment_status in ['unpaid', 'claimed', 'processing'] and
                     commission.state == 'confirmed'
                 )
             else:
                 commission.can_be_paid = (
-                    commission.payment_status == 'unpaid' and
+                    commission.payment_status in ['unpaid', 'claimed', 'processing'] and
                     commission.state == 'confirmed'
                 )
 
