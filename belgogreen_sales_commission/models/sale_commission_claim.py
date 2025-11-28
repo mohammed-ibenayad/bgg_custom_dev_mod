@@ -187,7 +187,7 @@ class SaleCommissionClaim(models.Model):
             'name': _('Claimed Commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('id', 'in', self.commission_ids.ids)],
             'context': {'default_user_id': self.user_id.id}
         }

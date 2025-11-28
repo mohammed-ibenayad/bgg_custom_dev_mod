@@ -152,7 +152,7 @@ class AccountMove(models.Model):
             'name': _('Commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('invoice_id', '=', self.id)],
             'context': {'default_invoice_id': self.id}
         }
