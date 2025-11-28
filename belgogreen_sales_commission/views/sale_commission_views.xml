@@ -53,30 +53,30 @@
                             </h1>
                         </div>
                         <group>
-                            <group string="Basic Information">
+                            <group string="Commission Information">
                                 <field name="user_id"/>
                                 <field name="role"/>
-                                <field name="plan_id"/>
                                 <field name="date"/>
                                 <field name="period"/>
                             </group>
-                            <group string="Related Documents">
-                                <field name="sale_order_id"/>
-                                <field name="invoice_id"/>
-                                <field name="company_id" groups="base.group_multi_company"/>
-                            </group>
-                        </group>
-                        <group>
-                            <group string="Amounts">
+                            <group string="Calculation">
+                                <field name="plan_id"/>
                                 <field name="base_amount"/>
                                 <field name="percentage_override" groups="belgogreen_sales_commission.group_commission_manager"/>
                                 <field name="commission_percentage"/>
                                 <field name="commission_amount" class="oe_subtotal_footer_separator"/>
                             </group>
-                            <group string="Payment">
+                        </group>
+                        <group>
+                            <group string="Payment Status">
                                 <field name="payment_status"/>
                                 <field name="payment_date" readonly="payment_status != 'paid'"/>
                                 <field name="payment_id" readonly="1"/>
+                            </group>
+                            <group string="References" groups="belgogreen_sales_commission.group_commission_manager">
+                                <field name="sale_order_id"/>
+                                <field name="invoice_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
                         <group string="Notes">
