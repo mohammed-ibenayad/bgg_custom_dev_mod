@@ -48,9 +48,11 @@ Main Features:
         'security/commission_security.xml',
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
+        'data/cron_data.xml',
         'views/hr_commission_role_config_views.xml',
         'views/sale_commission_plan_views.xml',
         'views/res_users_views.xml',
+        'views/sale_order_views.xml',
         'views/sale_commission_payment_views.xml',  # Must load BEFORE sale_commission_views
         'views/sale_commission_claim_views.xml',
         'views/sale_commission_views.xml',
