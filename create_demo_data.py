@@ -34,7 +34,10 @@ else:
         'login': 'director.demo',
         'password': 'demo',
         'commission_role': 'sales_director',
-        'groups_id': [(4, env.ref('sales_team.group_sale_salesman').id)],
+        'groups_id': [
+            (4, env.ref('sales_team.group_sale_salesman').id),
+            (4, env.ref('belgogreen_sales_commission.group_commission_user').id),
+        ],
     })
     print(f"  ✓ Created Sales Director: {director.name}")
 
@@ -54,7 +57,10 @@ else:
         'password': 'demo',
         'commission_role': 'team_leader',
         'sales_director_id': director.id,
-        'groups_id': [(4, env.ref('sales_team.group_sale_salesman').id)],
+        'groups_id': [
+            (4, env.ref('sales_team.group_sale_salesman').id),
+            (4, env.ref('belgogreen_sales_commission.group_commission_user').id),
+        ],
     })
     print(f"  ✓ Created North Team Leader: {tl_north.name}")
 
@@ -69,7 +75,10 @@ else:
         'password': 'demo',
         'commission_role': 'team_leader',
         'sales_director_id': director.id,
-        'groups_id': [(4, env.ref('sales_team.group_sale_salesman').id)],
+        'groups_id': [
+            (4, env.ref('sales_team.group_sale_salesman').id),
+            (4, env.ref('belgogreen_sales_commission.group_commission_user').id),
+        ],
     })
     print(f"  ✓ Created South Team Leader: {tl_south.name}")
 
@@ -98,7 +107,10 @@ for sp_data in north_salespeople:
             'commission_role': 'salesperson',
             'team_leader_id': tl_north.id,
             'sales_director_id': director.id,
-            'groups_id': [(4, env.ref('sales_team.group_sale_salesman').id)],
+            'groups_id': [
+                (4, env.ref('sales_team.group_sale_salesman').id),
+                (4, env.ref('belgogreen_sales_commission.group_commission_user').id),
+            ],
         })
         print(f"  ✓ Created Salesperson: {sp.name}")
         north_sp_records.append(sp)
@@ -128,7 +140,10 @@ for sp_data in south_salespeople:
             'commission_role': 'salesperson',
             'team_leader_id': tl_south.id,
             'sales_director_id': director.id,
-            'groups_id': [(4, env.ref('sales_team.group_sale_salesman').id)],
+            'groups_id': [
+                (4, env.ref('sales_team.group_sale_salesman').id),
+                (4, env.ref('belgogreen_sales_commission.group_commission_user').id),
+            ],
         })
         print(f"  ✓ Created Salesperson: {sp.name}")
         south_sp_records.append(sp)
@@ -148,8 +163,14 @@ else:
         'name': 'North Team Commission Plan',
         'is_hierarchical': True,
         'require_invoice_paid': True,
+        'state': 'approved',
     })
     print(f"  ✓ Created North Team Commission Plan")
+
+# Ensure plan is approved
+if hasattr(plan_north, 'state') and plan_north.state != 'approved':
+    plan_north.state = 'approved'
+    print(f"  ✓ Approved North Team Commission Plan")
 
 # Create role configurations for North Team
 role_configs_north = [
@@ -182,8 +203,14 @@ else:
         'name': 'South Team Commission Plan',
         'is_hierarchical': True,
         'require_invoice_paid': True,
+        'state': 'approved',
     })
     print(f"  ✓ Created South Team Commission Plan")
+
+# Ensure plan is approved
+if hasattr(plan_south, 'state') and plan_south.state != 'approved':
+    plan_south.state = 'approved'
+    print(f"  ✓ Approved South Team Commission Plan")
 
 # Create role configurations for South Team
 role_configs_south = [

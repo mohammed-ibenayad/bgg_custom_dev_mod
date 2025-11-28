@@ -40,7 +40,26 @@ class SaleOrder(models.Model):
         Can be called from a button or scheduled action
         """
         self.ensure_one()
-        return self._generate_commissions()
+        result = self._generate_commissions()
+
+        # Show notification to user
+        if result['success']:
+            message_type = 'success'
+            title = _('Commissions Generated')
+        else:
+            message_type = 'warning'
+            title = _('Commission Generation')
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': result['message'],
+                'type': message_type,
+                'sticky': False,
+            }
+        }
 
     def _generate_commissions(self):
         """
