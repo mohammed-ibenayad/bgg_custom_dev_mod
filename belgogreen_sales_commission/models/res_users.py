@@ -83,7 +83,7 @@ class ResUsers(models.Model):
             'name': 'My Commissions',
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('user_id', '=', self.id)],
             'context': {'default_user_id': self.id}
         }

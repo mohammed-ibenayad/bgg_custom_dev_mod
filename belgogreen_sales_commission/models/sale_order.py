@@ -197,7 +197,7 @@ class SaleOrder(models.Model):
             'name': _('Commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('sale_order_id', '=', self.id)],
             'context': {'default_sale_order_id': self.id}
         }

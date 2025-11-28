@@ -142,7 +142,7 @@ class SaleCommissionPayment(models.Model):
             'name': _('Commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('id', 'in', self.commission_ids.ids)],
             'context': {'default_payment_id': self.id}
         }
