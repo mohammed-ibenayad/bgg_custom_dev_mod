@@ -1,0 +1,789 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* belgogreen_sales_commission
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-29 12:00:00\n"
+"PO-Revision-Date: 2025-01-29 12:00:00\n"
+"Last-Translator: Belgogreen\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__name
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__name
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__name
+msgid "Reference"
+msgstr "Référence"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__user_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__user_id
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__user_id
+msgid "The user receiving this commission"
+msgstr "L'utilisateur recevant cette commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__role
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_hr_commission_role_config__role
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__commission_role
+msgid "Role"
+msgstr "Rôle"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__role
+msgid "The role of the user in this commission"
+msgstr "Le rôle de l'utilisateur dans cette commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__role__salesperson
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__hr_commission_role_config__role__salesperson
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__res_users__commission_role__salesperson
+msgid "Salesperson"
+msgstr "Commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__role__team_leader
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__hr_commission_role_config__role__team_leader
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__res_users__commission_role__team_leader
+msgid "Team Leader"
+msgstr "Chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__role__sales_director
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__hr_commission_role_config__role__sales_director
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__res_users__commission_role__sales_director
+msgid "Sales Director"
+msgstr "Directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__sale_order_id
+msgid "Sale Order"
+msgstr "Commande de vente"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__sale_order_id
+msgid "The sale order this commission is based on"
+msgstr "La commande de vente sur laquelle cette commission est basée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__invoice_id
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__invoice_id
+msgid "The invoice this commission is based on"
+msgstr "La facture sur laquelle cette commission est basée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__plan_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_hr_commission_role_config__plan_id
+msgid "Commission Plan"
+msgstr "Plan de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_hr_commission_role_config__plan_id
+msgid "The commission plan this configuration applies to"
+msgstr "Le plan de commission auquel cette configuration s'applique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__date
+msgid "Commission Date"
+msgstr "Date de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__period
+msgid "Period"
+msgstr "Période"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__period
+msgid "Period this commission belongs to (e.g., 2025-Q1, 2025-11)"
+msgstr "Période à laquelle cette commission appartient (par exemple, 2025-T1, 2025-11)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__base_amount
+msgid "Base Amount"
+msgstr "Montant de base"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__base_amount
+msgid "The amount on which commission is calculated"
+msgstr "Le montant sur lequel la commission est calculée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__commission_percentage
+msgid "Commission %"
+msgstr "Commission %"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__commission_percentage
+msgid "The effective commission percentage applied"
+msgstr "Le pourcentage de commission effectif appliqué"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__percentage_override
+msgid "Manual % Override"
+msgstr "Remplacement manuel du %"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__percentage_override
+msgid "Set a custom percentage for this commission (leave empty to use default)"
+msgstr "Définir un pourcentage personnalisé pour cette commission (laisser vide pour utiliser la valeur par défaut)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__commission_amount
+msgid "Commission Amount"
+msgstr "Montant de la commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__currency_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__currency_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__payment_status
+msgid "Payment Status"
+msgstr "Statut de paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__payment_status__unpaid
+msgid "Unpaid"
+msgstr "Non payé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__payment_status__claimed
+msgid "Claimed"
+msgstr "Réclamé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__payment_status__processing
+msgid "Processing"
+msgstr "En traitement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__payment_status__paid
+msgid "Paid"
+msgstr "Payé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__payment_status__cancelled
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__state__cancelled
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__state__cancelled
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__payment_date
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__payment_date
+msgid "Payment Date"
+msgstr "Date de paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__payment_id
+msgid "Payment Record"
+msgstr "Enregistrement de paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__payment_id
+msgid "The payment batch this commission belongs to"
+msgstr "Le lot de paiement auquel cette commission appartient"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__can_be_paid
+msgid "Can Be Paid"
+msgstr "Peut être payé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__can_be_paid
+msgid "True if invoice is paid and commission is unpaid"
+msgstr "Vrai si la facture est payée et la commission non payée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__notes
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__notes
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__notes
+msgid "Notes"
+msgstr "Notes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__is_adjustment
+msgid "Is Adjustment"
+msgstr "Est un ajustement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission__is_adjustment
+msgid "True if this is a manual adjustment commission"
+msgstr "Vrai s'il s'agit d'une commission d'ajustement manuel"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__company_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__company_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__company_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_hr_commission_role_config__company_id
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__company_currency_id
+msgid "Company"
+msgstr "Société"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission__state
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__state
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__state
+msgid "State"
+msgstr "État"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__state__draft
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission__state__confirmed
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__state__confirmed
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission.py:0
+#, python-format
+msgid "New"
+msgstr "Nouveau"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission.py:0
+#, python-format
+msgid "This commission cannot be paid yet."
+msgstr "Cette commission ne peut pas encore être payée."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission.py:0
+#, python-format
+msgid "Claim for commission %s"
+msgstr "Réclamation pour la commission %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission.py:0
+#: code:addons/belgogreen_sales_commission/models/sale_commission_plan.py:0
+#: code:addons/belgogreen_sales_commission/models/sale_commission_payment.py:0
+#: code:addons/belgogreen_sales_commission/models/account_move.py:0
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_root
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_plan__is_hierarchical
+msgid "Hierarchical Plan"
+msgstr "Plan hiérarchique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_plan__is_hierarchical
+msgid "If enabled, calculates commissions for salesperson + team leader + sales director"
+msgstr "Si activé, calcule les commissions pour le commercial + chef d'équipe + directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_plan__role_config_ids
+msgid "Role Configuration"
+msgstr "Configuration des rôles"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_plan__role_config_ids
+msgid "Define commission percentages for each role in the hierarchy"
+msgstr "Définir les pourcentages de commission pour chaque rôle dans la hiérarchie"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_plan__require_invoice_paid
+msgid "Require Paid Invoice"
+msgstr "Nécessite une facture payée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_plan__require_invoice_paid
+msgid "Only calculate commissions when the invoice is fully paid"
+msgstr "Ne calculer les commissions que lorsque la facture est entièrement payée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_plan__commission_count
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_order__commission_count
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_account_move__commission_count
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__commission_count
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__commission_count
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__commission_count
+msgid "Commission Count"
+msgstr "Nombre de commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__commission_ids
+msgid "Claimed Commissions"
+msgstr "Commissions réclamées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__commission_ids
+msgid "Commissions being claimed for payment"
+msgstr "Commissions réclamées pour paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__user_id
+msgid "Claimant"
+msgstr "Demandeur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__user_id
+msgid "The user claiming the commissions"
+msgstr "L'utilisateur réclamant les commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__claim_date
+msgid "Claim Date"
+msgstr "Date de réclamation"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__total_amount
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__total_amount
+msgid "Total Amount"
+msgstr "Montant total"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_claim__state__pending
+msgid "Pending"
+msgstr "En attente"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_claim__state__approved
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_claim__state__rejected
+msgid "Rejected"
+msgstr "Rejeté"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__state
+msgid "Pending: Awaiting review | Approved: Ready to pay | Rejected: Denied"
+msgstr "En attente : En cours d'examen | Approuvé : Prêt à payer | Rejeté : Refusé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__notes
+msgid "Claimant Notes"
+msgstr "Notes du demandeur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__notes
+msgid "Notes from the salesperson about this claim"
+msgstr "Notes du commercial concernant cette réclamation"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__admin_notes
+msgid "Admin Notes"
+msgstr "Notes administratives"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__admin_notes
+msgid "Internal notes from the administrator"
+msgstr "Notes internes de l'administrateur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__processed_by
+msgid "Processed By"
+msgstr "Traité par"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__processed_by
+msgid "The admin who processed this claim"
+msgstr "L'administrateur qui a traité cette réclamation"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__processed_date
+msgid "Processed Date"
+msgstr "Date de traitement"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "New commission claim: %s"
+msgstr "Nouvelle réclamation de commission : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "User %(user)s has claimed %(count)s commission(s) totaling %(amount)s %(currency)s"
+msgstr "L'utilisateur %(user)s a réclamé %(count)s commission(s) pour un total de %(amount)s %(currency)s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Your commission claim %s has been %s."
+msgstr "Votre réclamation de commission %s a été %s."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "\n\nAdmin notes: %s"
+msgstr "\n\nNotes administratives : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Commission Claim %s"
+msgstr "Réclamation de commission %s"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__commission_ids
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__commission_ids
+msgid "Commissions included in this payment"
+msgstr "Commissions incluses dans ce paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__user_id
+msgid "Beneficiary"
+msgstr "Bénéficiaire"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__user_id
+msgid "The user receiving this payment"
+msgstr "L'utilisateur recevant ce paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__payment_method
+msgid "Payment Method"
+msgstr "Mode de paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__payment_method__bank_transfer
+msgid "Bank Transfer"
+msgstr "Virement bancaire"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__payment_method__check
+msgid "Check"
+msgstr "Chèque"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__payment_method__cash
+msgid "Cash"
+msgstr "Espèces"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_payment__payment_method__other
+msgid "Other"
+msgstr "Autre"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_payment.py:0
+#, python-format
+msgid "Please add at least one commission to this payment."
+msgstr "Veuillez ajouter au moins une commission à ce paiement."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_payment.py:0
+#, python-format
+msgid "Only confirmed payments can be marked as paid."
+msgstr "Seuls les paiements confirmés peuvent être marqués comme payés."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_payment.py:0
+#, python-format
+msgid "Cannot cancel a payment that is already marked as paid."
+msgstr "Impossible d'annuler un paiement déjà marqué comme payé."
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_hr_commission_role_config__role
+msgid "The role this percentage applies to"
+msgstr "Le rôle auquel ce pourcentage s'applique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_hr_commission_role_config__default_percentage
+msgid "Default Percentage"
+msgstr "Pourcentage par défaut"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_hr_commission_role_config__default_percentage
+msgid "Default commission percentage for this role (e.g., 5.00 for 5%)"
+msgstr "Pourcentage de commission par défaut pour ce rôle (par exemple, 5,00 pour 5 %)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_hr_commission_role_config__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/hr_commission_role_config.py:0
+#, python-format
+msgid "Commission percentage must be between 0 and 100. Got: %s"
+msgstr "Le pourcentage de commission doit être entre 0 et 100. Obtenu : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/hr_commission_role_config.py:0
+#, python-format
+msgid "%(plan)s - %(role)s (%(percentage)s%%)"
+msgstr "%(plan)s - %(role)s (%(percentage)s%%)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__commission_role
+msgid "Role in the commission hierarchy"
+msgstr "Rôle dans la hiérarchie des commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_leader_id
+msgid "Team Leader"
+msgstr "Chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_leader_id
+msgid "The team leader for this salesperson"
+msgstr "Le chef d'équipe pour ce commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__sales_director_id
+msgid "Sales Director"
+msgstr "Directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__sales_director_id
+msgid "The sales director for this user"
+msgstr "Le directeur commercial pour cet utilisateur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_member_ids
+msgid "Team Members"
+msgstr "Membres de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_member_ids
+msgid "Salespeople reporting to this team leader"
+msgstr "Commerciaux rattachés à ce chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__my_commission_ids
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_my_commission
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__commission_unpaid_total
+msgid "Unpaid Commissions"
+msgstr "Commissions non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__commission_paid_total
+msgid "Paid Commissions"
+msgstr "Commissions payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__company_currency_id
+msgid "Company Currency"
+msgstr "Devise de la société"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_order__commission_ids
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_account_move__commission_ids
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_order__commission_ids
+msgid "Commissions generated from this sale order"
+msgstr "Commissions générées à partir de cette commande de vente"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_account_move__commission_ids
+msgid "Commissions generated from this invoice"
+msgstr "Commissions générées à partir de cette facture"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_order__commissions_generated
+msgid "Commissions Generated"
+msgstr "Commissions générées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_order__commissions_generated
+msgid "Indicates if commissions have been generated for this order"
+msgstr "Indique si des commissions ont été générées pour cette commande"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Commissions Generated"
+msgstr "Commissions générées"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Commission Generation"
+msgstr "Génération de commissions"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Order %s is not confirmed (state: %s)"
+msgstr "La commande %s n'est pas confirmée (état : %s)"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "No salesperson assigned to order %s"
+msgstr "Aucun commercial assigné à la commande %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Salesperson %s has no commission role set"
+msgstr "Le commercial %s n'a pas de rôle de commission défini"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "No paid invoices found for order %s"
+msgstr "Aucune facture payée trouvée pour la commande %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "No approved hierarchical commission plan found"
+msgstr "Aucun plan de commission hiérarchique approuvé trouvé"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Commission plan requires paid invoices, but none found for order %s"
+msgstr "Le plan de commission nécessite des factures payées, mais aucune n'a été trouvée pour la commande %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Successfully created %s commission(s) for order %s"
+msgstr "%s commission(s) créée(s) avec succès pour la commande %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "No new commissions created for order %s (may already exist)"
+msgstr "Aucune nouvelle commission créée pour la commande %s (peut déjà exister)"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Commissions already exist for invoice %s and order %s"
+msgstr "Des commissions existent déjà pour la facture %s et la commande %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Skipping %s (%s) - not in plan's user list"
+msgstr "Ignorer %s (%s) - pas dans la liste des utilisateurs du plan"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "No active role config found for %s in plan %s"
+msgstr "Aucune configuration de rôle active trouvée pour %s dans le plan %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Created commission for %s (%s) - Order: %s, Invoice: %s"
+msgstr "Commission créée pour %s (%s) - Commande : %s, Facture : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Error creating commission for %s: %s"
+msgstr "Erreur lors de la création de la commission pour %s : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Processed order %s: %s"
+msgstr "Commande traitée %s : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Skipped order %s: %s"
+msgstr "Commande ignorée %s : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Error processing order %s: %s"
+msgstr "Erreur lors du traitement de la commande %s : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Scheduled commission generation completed. Processed %s orders, created %s commissions."
+msgstr "Génération de commissions planifiée terminée. %s commandes traitées, %s commissions créées."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_order.py:0
+#, python-format
+msgid "Encountered %s errors during commission generation"
+msgstr "%s erreurs rencontrées lors de la génération des commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_my_commission_overview
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_my_commission_claims
+msgid "My Claims"
+msgstr "Mes réclamations"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_management
+msgid "Management"
+msgstr "Gestion"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_all
+msgid "All Commissions"
+msgstr "Toutes les commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_unpaid
+msgid "Unpaid Commissions"
+msgstr "Commissions non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_payments
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_claims
+msgid "Claims"
+msgstr "Réclamations"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_configuration
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_plans
+msgid "Commission Plans"
+msgstr "Plans de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_role_config
+msgid "Role Configuration"
+msgstr "Configuration des rôles"

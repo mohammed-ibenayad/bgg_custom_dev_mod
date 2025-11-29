@@ -9,12 +9,12 @@ class AccountMove(models.Model):
     commission_ids = fields.One2many(
         'sale.commission',
         'invoice_id',
-        string='Commissions',
-        help='Commissions generated from this invoice'
+        string=_('Commissions'),
+        help=_('Commissions generated from this invoice')
     )
 
     commission_count = fields.Integer(
-        string='Commission Count',
+        string=_('Commission Count'),
         compute='_compute_commission_count'
     )
 
