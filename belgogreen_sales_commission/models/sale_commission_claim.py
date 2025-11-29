@@ -10,7 +10,7 @@ class SaleCommissionClaim(models.Model):
     _order = 'claim_date desc, id desc'
 
     name = fields.Char(
-        string='Reference',
+        string=_('Reference'),
         required=True,
         copy=False,
         readonly=True,
@@ -19,28 +19,28 @@ class SaleCommissionClaim(models.Model):
 
     commission_ids = fields.Many2many(
         'sale.commission',
-        string='Claimed Commissions',
-        help='Commissions being claimed for payment'
+        string=_('Claimed Commissions'),
+        help=_('Commissions being claimed for payment')
     )
 
     user_id = fields.Many2one(
         'res.users',
-        string='Claimant',
+        string=_('Claimant'),
         required=True,
         default=lambda self: self.env.user,
         readonly=True,
-        help='The user claiming the commissions'
+        help=_('The user claiming the commissions')
     )
 
     claim_date = fields.Datetime(
-        string='Claim Date',
+        string=_('Claim Date'),
         required=True,
         default=fields.Datetime.now,
         readonly=True
     )
 
     total_amount = fields.Monetary(
-        string='Total Amount',
+        string=_('Total Amount'),
         compute='_compute_total_amount',
         store=True,
         currency_field='currency_id'
@@ -48,49 +48,49 @@ class SaleCommissionClaim(models.Model):
 
     currency_id = fields.Many2one(
         'res.currency',
-        string='Currency',
+        string=_('Currency'),
         default=lambda self: self.env.company.currency_id
     )
 
     state = fields.Selection([
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected')
-    ], string='State', default='pending', required=True, tracking=True,
-       help='Pending: Awaiting review | Approved: Ready to pay | Rejected: Denied')
+        ('pending', _('Pending')),
+        ('approved', _('Approved')),
+        ('rejected', _('Rejected'))
+    ], string=_('State'), default='pending', required=True, tracking=True,
+       help=_('Pending: Awaiting review | Approved: Ready to pay | Rejected: Denied'))
 
     notes = fields.Text(
-        string='Claimant Notes',
-        help='Notes from the salesperson about this claim'
+        string=_('Claimant Notes'),
+        help=_('Notes from the salesperson about this claim')
     )
 
     admin_notes = fields.Text(
-        string='Admin Notes',
+        string=_('Admin Notes'),
         tracking=True,
-        help='Internal notes from the administrator'
+        help=_('Internal notes from the administrator')
     )
 
     processed_by = fields.Many2one(
         'res.users',
-        string='Processed By',
+        string=_('Processed By'),
         readonly=True,
-        help='The admin who processed this claim'
+        help=_('The admin who processed this claim')
     )
 
     processed_date = fields.Datetime(
-        string='Processed Date',
+        string=_('Processed Date'),
         readonly=True
     )
 
     company_id = fields.Many2one(
         'res.company',
-        string='Company',
+        string=_('Company'),
         required=True,
         default=lambda self: self.env.company
     )
 
     commission_count = fields.Integer(
-        string='Commission Count',
+        string=_('Commission Count'),
         compute='_compute_commission_count'
     )
 

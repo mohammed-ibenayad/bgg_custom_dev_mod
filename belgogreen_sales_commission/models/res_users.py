@@ -1,64 +1,64 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
     commission_role = fields.Selection([
-        ('salesperson', 'Salesperson'),
-        ('team_leader', 'Team Leader'),
-        ('sales_director', 'Sales Director')
-    ], string='Commission Role', help='Role in the commission hierarchy')
+        ('salesperson', _('Salesperson')),
+        ('team_leader', _('Team Leader')),
+        ('sales_director', _('Sales Director'))
+    ], string=_('Commission Role'), help=_('Role in the commission hierarchy'))
 
     team_leader_id = fields.Many2one(
         'res.users',
-        string='Team Leader',
+        string=_('Team Leader'),
         domain=[('commission_role', '=', 'team_leader')],
-        help='The team leader for this salesperson'
+        help=_('The team leader for this salesperson')
     )
 
     sales_director_id = fields.Many2one(
         'res.users',
-        string='Sales Director',
+        string=_('Sales Director'),
         domain=[('commission_role', '=', 'sales_director')],
-        help='The sales director for this user'
+        help=_('The sales director for this user')
     )
 
     team_member_ids = fields.One2many(
         'res.users',
         'team_leader_id',
-        string='Team Members',
-        help='Salespeople reporting to this team leader'
+        string=_('Team Members'),
+        help=_('Salespeople reporting to this team leader')
     )
 
     my_commission_ids = fields.One2many(
         'sale.commission',
         'user_id',
-        string='My Commissions'
+        string=_('My Commissions')
     )
 
     commission_count = fields.Integer(
-        string='Commission Count',
+        string=_('Commission Count'),
         compute='_compute_commission_stats'
     )
 
     commission_unpaid_total = fields.Monetary(
-        string='Unpaid Commissions',
+        string=_('Unpaid Commissions'),
         compute='_compute_commission_stats',
         currency_field='company_currency_id'
     )
 
     commission_paid_total = fields.Monetary(
-        string='Paid Commissions',
+        string=_('Paid Commissions'),
         compute='_compute_commission_stats',
         currency_field='company_currency_id'
     )
 
     company_currency_id = fields.Many2one(
         'res.currency',
-        string='Company Currency',
+        string=_('Company Currency'),
         related='company_id.currency_id',
         readonly=True
     )
@@ -80,7 +80,7 @@ class ResUsers(models.Model):
         """Open the user's commissions"""
         self.ensure_one()
         return {
-            'name': 'My Commissions',
+            'name': _('My Commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
             'view_mode': 'list,form',

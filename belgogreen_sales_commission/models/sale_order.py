@@ -13,19 +13,19 @@ class SaleOrder(models.Model):
     commission_ids = fields.One2many(
         'sale.commission',
         'sale_order_id',
-        string='Commissions',
-        help='Commissions generated from this sale order'
+        string=_('Commissions'),
+        help=_('Commissions generated from this sale order')
     )
 
     commission_count = fields.Integer(
-        string='Commission Count',
+        string=_('Commission Count'),
         compute='_compute_commission_count'
     )
 
     commissions_generated = fields.Boolean(
-        string='Commissions Generated',
+        string=_('Commissions Generated'),
         default=False,
-        help='Indicates if commissions have been generated for this order'
+        help=_('Indicates if commissions have been generated for this order')
     )
 
     @api.depends('commission_ids')
@@ -76,17 +76,17 @@ class SaleOrder(models.Model):
 
         # Check if order is confirmed
         if self.state not in ['sale', 'done']:
-            result['message'] = f"Order {self.name} is not confirmed (state: {self.state})"
+            result['message'] = _("Order %s is not confirmed (state: %s)") % (self.name, self.state)
             return result
 
         # Check if salesperson is assigned
         if not self.user_id:
-            result['message'] = f"No salesperson assigned to order {self.name}"
+            result['message'] = _("No salesperson assigned to order %s") % self.name
             return result
 
         # Check if salesperson has commission role
         if not self.user_id.commission_role:
-            result['message'] = f"Salesperson {self.user_id.name} has no commission role set"
+            result['message'] = _("Salesperson %s has no commission role set") % self.user_id.name
             return result
 
         # Get paid invoices for this sale order
@@ -97,7 +97,7 @@ class SaleOrder(models.Model):
         )
 
         if not paid_invoices:
-            result['message'] = f"No paid invoices found for order {self.name}"
+            result['message'] = _("No paid invoices found for order %s") % self.name
             return result
 
         # Find applicable commission plan
@@ -108,12 +108,12 @@ class SaleOrder(models.Model):
         ], limit=1)
 
         if not commission_plan:
-            result['message'] = "No approved hierarchical commission plan found"
+            result['message'] = _("No approved hierarchical commission plan found")
             return result
 
         # Check if plan requires paid invoice
         if commission_plan.require_invoice_paid and not paid_invoices:
-            result['message'] = f"Commission plan requires paid invoices, but none found for order {self.name}"
+            result['message'] = _("Commission plan requires paid invoices, but none found for order %s") % self.name
             return result
 
         # Process each paid invoice
@@ -125,10 +125,10 @@ class SaleOrder(models.Model):
         if commissions_created > 0:
             self.commissions_generated = True
             result['success'] = True
-            result['message'] = f"Successfully created {commissions_created} commission(s) for order {self.name}"
+            result['message'] = _("Successfully created %s commission(s) for order %s") % (commissions_created, self.name)
             result['commissions_created'] = commissions_created
         else:
-            result['message'] = f"No new commissions created for order {self.name} (may already exist)"
+            result['message'] = _("No new commissions created for order %s (may already exist)") % self.name
 
         return result
 
@@ -146,7 +146,7 @@ class SaleOrder(models.Model):
         ])
 
         if existing:
-            _logger.info(f"Commissions already exist for invoice {invoice.name} and order {self.name}")
+            _logger.info(_("Commissions already exist for invoice %s and order %s") % (invoice.name, self.name))
             return 0
 
         salesperson = self.user_id
@@ -178,7 +178,7 @@ class SaleOrder(models.Model):
             # Check if user is in the plan's allowed users list
             if commission_plan.user_ids and user not in commission_plan.user_ids:
                 # User not in plan's user list, skip
-                _logger.info(f"Skipping {user.name} ({role}) - not in plan's user list")
+                _logger.info(_("Skipping %s (%s) - not in plan's user list") % (user.name, role))
                 continue
 
             # Get role configuration
@@ -189,7 +189,7 @@ class SaleOrder(models.Model):
             ], limit=1)
 
             if not role_config:
-                _logger.warning(f"No active role config found for {role} in plan {commission_plan.name}")
+                _logger.warning(_("No active role config found for %s in plan %s") % (role, commission_plan.name))
                 continue
 
             # Create commission record
@@ -209,9 +209,9 @@ class SaleOrder(models.Model):
                     'currency_id': self.currency_id.id,
                 })
                 commissions_created += 1
-                _logger.info(f"Created commission for {user.name} ({role}) - Order: {self.name}, Invoice: {invoice.name}")
+                _logger.info(_("Created commission for %s (%s) - Order: %s, Invoice: %s") % (user.name, role, self.name, invoice.name))
             except Exception as e:
-                _logger.error(f"Error creating commission for {user.name}: {str(e)}")
+                _logger.error(_("Error creating commission for %s: %s") % (user.name, str(e)))
 
         return commissions_created
 
@@ -259,24 +259,22 @@ class SaleOrder(models.Model):
                     if result['success']:
                         total_orders_processed += 1
                         total_commissions_created += result['commissions_created']
-                        _logger.info(f"Processed order {order.name}: {result['message']}")
+                        _logger.info(_("Processed order %s: %s") % (order.name, result['message']))
                     elif result['message'] and 'already exist' not in result['message']:
                         # Only log if it's not about existing commissions
-                        _logger.debug(f"Skipped order {order.name}: {result['message']}")
+                        _logger.debug(_("Skipped order %s: %s") % (order.name, result['message']))
 
             except Exception as e:
-                error_msg = f"Error processing order {order.name}: {str(e)}"
+                error_msg = _("Error processing order %s: %s") % (order.name, str(e))
                 _logger.error(error_msg)
                 errors.append(error_msg)
 
         _logger.info(
-            f"Scheduled commission generation completed. "
-            f"Processed {total_orders_processed} orders, "
-            f"created {total_commissions_created} commissions."
+            _("Scheduled commission generation completed. Processed %s orders, created %s commissions.") % (total_orders_processed, total_commissions_created)
         )
 
         if errors:
-            _logger.warning(f"Encountered {len(errors)} errors during commission generation")
+            _logger.warning(_("Encountered %s errors during commission generation") % len(errors))
 
         return {
             'orders_processed': total_orders_processed,

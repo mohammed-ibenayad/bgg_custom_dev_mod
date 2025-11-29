@@ -11,7 +11,7 @@ class SaleCommissionPayment(models.Model):
     _order = 'payment_date desc, id desc'
 
     name = fields.Char(
-        string='Reference',
+        string=_('Reference'),
         required=True,
         copy=False,
         readonly=True,
@@ -20,28 +20,28 @@ class SaleCommissionPayment(models.Model):
 
     commission_ids = fields.Many2many(
         'sale.commission',
-        string='Commissions',
+        string=_('Commissions'),
         domain="[('payment_status', 'in', ['unpaid', 'claimed', 'processing']), ('can_be_paid', '=', True), ('user_id', '=', user_id)]",
-        help='Commissions included in this payment'
+        help=_('Commissions included in this payment')
     )
 
     user_id = fields.Many2one(
         'res.users',
-        string='Beneficiary',
+        string=_('Beneficiary'),
         required=True,
         tracking=True,
-        help='The user receiving this payment'
+        help=_('The user receiving this payment')
     )
 
     payment_date = fields.Date(
-        string='Payment Date',
+        string=_('Payment Date'),
         required=True,
         default=fields.Date.context_today,
         tracking=True
     )
 
     total_amount = fields.Monetary(
-        string='Total Amount',
+        string=_('Total Amount'),
         compute='_compute_total_amount',
         store=True,
         currency_field='currency_id'
@@ -49,36 +49,36 @@ class SaleCommissionPayment(models.Model):
 
     currency_id = fields.Many2one(
         'res.currency',
-        string='Currency',
+        string=_('Currency'),
         required=True,
         default=lambda self: self.env.company.currency_id
     )
 
     payment_method = fields.Selection([
-        ('bank_transfer', 'Bank Transfer'),
-        ('check', 'Check'),
-        ('cash', 'Cash'),
-        ('other', 'Other')
-    ], string='Payment Method', required=True, default='bank_transfer', tracking=True)
+        ('bank_transfer', _('Bank Transfer')),
+        ('check', _('Check')),
+        ('cash', _('Cash')),
+        ('other', _('Other'))
+    ], string=_('Payment Method'), required=True, default='bank_transfer', tracking=True)
 
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('confirmed', 'Confirmed'),
-        ('paid', 'Paid'),
-        ('cancelled', 'Cancelled')
-    ], string='State', default='draft', required=True, tracking=True)
+        ('draft', _('Draft')),
+        ('confirmed', _('Confirmed')),
+        ('paid', _('Paid')),
+        ('cancelled', _('Cancelled'))
+    ], string=_('State'), default='draft', required=True, tracking=True)
 
-    notes = fields.Text(string='Notes')
+    notes = fields.Text(string=_('Notes'))
 
     company_id = fields.Many2one(
         'res.company',
-        string='Company',
+        string=_('Company'),
         required=True,
         default=lambda self: self.env.company
     )
 
     commission_count = fields.Integer(
-        string='Commission Count',
+        string=_('Commission Count'),
         compute='_compute_commission_count'
     )
 
