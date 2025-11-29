@@ -7,7 +7,7 @@
             <field name="name">sale.commission.claim.tree</field>
             <field name="model">sale.commission.claim</field>
             <field name="arch" type="xml">
-                <list string="Commission Claims" decoration-success="state == 'paid'" decoration-warning="state == 'pending'" decoration-info="state == 'approved'" decoration-danger="state == 'rejected'">
+                <list string="Commission Claims" decoration-success="state == 'approved'" decoration-warning="state == 'pending'" decoration-danger="state == 'rejected'">
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="claim_date"/>
@@ -33,7 +33,7 @@
                                 invisible="state != 'pending'"
                                 groups="belgogreen_sales_commission.group_commission_manager"
                                 confirm="Are you sure you want to reject this claim?"/>
-                        <field name="state" widget="statusbar" statusbar_visible="pending,approved,paid"/>
+                        <field name="state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -106,7 +106,6 @@
                     <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
                     <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                     <filter string="Rejected" name="rejected" domain="[('state', '=', 'rejected')]"/>
-                    <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
                     <group expand="0" string="Group By">
                         <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
                         <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
