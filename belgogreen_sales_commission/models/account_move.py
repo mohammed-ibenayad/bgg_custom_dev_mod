@@ -109,7 +109,7 @@ class AccountMove(models.Model):
         # Create commission records for each user in the hierarchy
         for user, role in users_to_commission:
             # Check if user is in the plan's allowed users list
-            if commission_plan.user_ids and user not in commission_plan.user_ids:
+            if commission_plan.user_ids and user.id not in commission_plan.user_ids.ids:
                 # User not in plan's user list, skip
                 continue
 
