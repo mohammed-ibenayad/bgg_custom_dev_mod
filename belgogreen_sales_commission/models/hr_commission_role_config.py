@@ -11,35 +11,35 @@ class HrCommissionRoleConfig(models.Model):
 
     plan_id = fields.Many2one(
         'sale.commission.plan',
-        string=_('Commission Plan'),
+        string='Commission Plan',
         required=True,
         ondelete='cascade',
-        help=_('The commission plan this configuration applies to')
+        help='The commission plan this configuration applies to'
     )
 
     role = fields.Selection([
-        ('salesperson', _('Salesperson')),
-        ('team_leader', _('Team Leader')),
-        ('sales_director', _('Sales Director'))
-    ], string=_('Role'), required=True, help=_('The role this percentage applies to'))
+        ('salesperson', 'Salesperson'),
+        ('team_leader', 'Team Leader'),
+        ('sales_director', 'Sales Director')
+    ], string='Role', required=True, help='The role this percentage applies to')
 
     default_percentage = fields.Float(
-        string=_('Default Percentage'),
+        string='Default Percentage',
         required=True,
         digits=(5, 2),
-        help=_('Default commission percentage for this role (e.g., 5.00 for 5%)')
+        help='Default commission percentage for this role (e.g., 5.00 for 5%)'
     )
 
     company_id = fields.Many2one(
         'res.company',
-        string=_('Company'),
+        string='Company',
         related='plan_id.company_id',
         store=True,
         readonly=True
     )
 
     active = fields.Boolean(
-        string=_('Active'),
+        string='Active',
         default=True
     )
 

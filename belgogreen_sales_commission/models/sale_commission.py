@@ -11,7 +11,7 @@ class SaleCommission(models.Model):
     _order = 'date desc, id desc'
 
     name = fields.Char(
-        string=_('Reference'),
+        string='Reference',
         required=True,
         copy=False,
         readonly=True,
@@ -21,79 +21,79 @@ class SaleCommission(models.Model):
     # Basic Information
     user_id = fields.Many2one(
         'res.users',
-        string=_('User'),
+        string='User',
         required=True,
         tracking=True,
-        help=_('The user receiving this commission')
+        help='The user receiving this commission'
     )
 
     role = fields.Selection([
-        ('salesperson', _('Salesperson')),
-        ('team_leader', _('Team Leader')),
-        ('sales_director', _('Sales Director'))
-    ], string=_('Role'), required=True, tracking=True,
-       help=_('The role of the user in this commission'))
+        ('salesperson', 'Salesperson'),
+        ('team_leader', 'Team Leader'),
+        ('sales_director', 'Sales Director')
+    ], string='Role', required=True, tracking=True,
+       help='The role of the user in this commission')
 
     # Related Sale and Invoice
     sale_order_id = fields.Many2one(
         'sale.order',
-        string=_('Sale Order'),
+        string='Sale Order',
         ondelete='cascade',
-        help=_('The sale order this commission is based on')
+        help='The sale order this commission is based on'
     )
 
     invoice_id = fields.Many2one(
         'account.move',
-        string=_('Invoice'),
+        string='Invoice',
         domain=[('move_type', '=', 'out_invoice')],
-        help=_('The invoice this commission is based on')
+        help='The invoice this commission is based on'
     )
 
     # Commission Plan
     plan_id = fields.Many2one(
         'sale.commission.plan',
-        string=_('Commission Plan'),
+        string='Commission Plan',
         required=True
     )
 
     # Dates
     date = fields.Date(
-        string=_('Commission Date'),
+        string='Commission Date',
         required=True,
         default=fields.Date.context_today,
         tracking=True
     )
 
     period = fields.Char(
-        string=_('Period'),
-        help=_('Period this commission belongs to (e.g., 2025-Q1, 2025-11)')
+        string='Period',
+        help='Period this commission belongs to (e.g., 2025-Q1, 2025-11)'
     )
 
     # Amounts
     base_amount = fields.Monetary(
-        string=_('Base Amount'),
+        string='Base Amount',
         required=True,
         currency_field='currency_id',
-        help=_('The amount on which commission is calculated')
+        help='The amount on which commission is calculated'
     )
 
     commission_percentage = fields.Float(
-        string=_('Commission %'),
+        string='Commission %',
         compute='_compute_commission_percentage',
         store=True,
         digits=(5, 2),
-        help=_('The effective commission percentage applied')
+        help='The effective commission percentage applied'
     )
 
     percentage_override = fields.Float(
-        string=_('Manual % Override'),
+        string='Manual % Override',
         digits=(5, 2),
         tracking=True,
-        help=_('Set a custom percentage for this commission (leave empty to use default)')
+        help='Set a custom percentage for this commission (leave empty to use default)'
     )
 
     commission_amount = fields.Monetary(
-        string=_('Commission Amount'),
+        string='Commission Amount',
         compute='_compute_commission_amount',
         store=True,
         currency_field='currency_id',
@@ -102,59 +102,59 @@ class SaleCommission(models.Model):
 
     currency_id = fields.Many2one(
         'res.currency',
-        string=_('Currency'),
+        string='Currency',
         required=True,
         default=lambda self: self.env.company.currency_id
     )
 
     # Payment Status
     payment_status = fields.Selection([
-        ('unpaid', _('Unpaid')),
-        ('claimed', _('Claimed')),
-        ('processing', _('Processing')),
-        ('paid', _('Paid')),
-        ('cancelled', _('Cancelled'))
-    ], string=_('Payment Status'), default='unpaid', required=True, tracking=True)
+        ('unpaid', 'Unpaid'),
+        ('claimed', 'Claimed'),
+        ('processing', 'Processing'),
+        ('paid', 'Paid'),
+        ('cancelled', 'Cancelled')
+    ], string='Payment Status', default='unpaid', required=True, tracking=True)
 
     payment_date = fields.Date(
-        string=_('Payment Date'),
+        string='Payment Date',
         tracking=True
     )
 
     payment_id = fields.Many2one(
         'sale.commission.payment',
-        string=_('Payment Record'),
-        help=_('The payment batch this commission belongs to')
+        string='Payment Record',
+        help='The payment batch this commission belongs to'
     )
 
     can_be_paid = fields.Boolean(
-        string=_('Can Be Paid'),
+        string='Can Be Paid',
         compute='_compute_can_be_paid',
         store=True,
-        help=_('True if invoice is paid and commission is unpaid')
+        help='True if invoice is paid and commission is unpaid'
     )
 
     # Additional Info
-    notes = fields.Text(string=_('Notes'))
+    notes = fields.Text(string='Notes')
 
     is_adjustment = fields.Boolean(
-        string=_('Is Adjustment'),
+        string='Is Adjustment',
         default=False,
-        help=_('True if this is a manual adjustment commission')
+        help='True if this is a manual adjustment commission'
     )
 
     company_id = fields.Many2one(
         'res.company',
-        string=_('Company'),
+        string='Company',
         required=True,
         default=lambda self: self.env.company
     )
 
     state = fields.Selection([
-        ('draft', _('Draft')),
-        ('confirmed', _('Confirmed')),
-        ('cancelled', _('Cancelled'))
-    ], string=_('State'), default='draft', tracking=True)
+        ('draft', 'Draft'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled')
+    ], string='State', default='draft', tracking=True)
 
     @api.model_create_multi
     def create(self, vals_list):
