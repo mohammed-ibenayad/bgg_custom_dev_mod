@@ -8,6 +8,17 @@
             <field name="model">sale.commission.plan</field>
             <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
             <field name="arch" type="xml">
+                <!-- Add smart button for commissions -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_commissions"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-sitemap"
+                            groups="belgogreen_sales_commission.group_commission_user">
+                        <field name="commission_count" widget="statinfo" string="Commissions"/>
+                    </button>
+                </xpath>
+
                 <!-- Add configuration tab -->
                 <xpath expr="//notebook" position="inside">
                     <page string="Configuration" name="configuration">
