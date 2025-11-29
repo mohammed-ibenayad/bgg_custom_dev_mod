@@ -196,6 +196,13 @@
       <field name="name">North Team Commission Plan</field>
       <field name="is_hierarchical">True</field>
       <field name="require_invoice_paid">True</field>
+      <field name="user_ids" eval="[(6, 0, [
+        ref('user_salesperson_north_1'),
+        ref('user_salesperson_north_2'),
+        ref('user_salesperson_north_3'),
+        ref('user_team_leader_north'),
+        ref('user_sales_director_demo')
+      ])]"/>
     </record>
 
     <!-- Role Config - North Team - Salesperson -->
@@ -227,6 +234,13 @@
       <field name="name">South Team Commission Plan</field>
       <field name="is_hierarchical">True</field>
       <field name="require_invoice_paid">True</field>
+      <field name="user_ids" eval="[(6, 0, [
+        ref('user_salesperson_south_1'),
+        ref('user_salesperson_south_2'),
+        ref('user_salesperson_south_3'),
+        ref('user_team_leader_south'),
+        ref('user_sales_director_demo')
+      ])]"/>
     </record>
 
     <!-- Role Config - South Team - Salesperson -->
