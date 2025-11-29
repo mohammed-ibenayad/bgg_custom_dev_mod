@@ -13,7 +13,7 @@
                     <button name="action_view_commissions"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-money"
+                            icon="fa-sitemap"
                             invisible="commission_count == 0"
                             groups="belgogreen_sales_commission.group_commission_user">
                         <field name="commission_count" widget="statinfo" string="Commissions"/>

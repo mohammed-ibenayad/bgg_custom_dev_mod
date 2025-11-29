@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 
 class SaleCommissionPlan(models.Model):
@@ -25,6 +25,19 @@ class SaleCommissionPlan(models.Model):
         help='Only calculate commissions when the invoice is fully paid'
     )
 
+    commission_count = fields.Integer(
+        string='Commission Count',
+        compute='_compute_commission_count'
+    )
+
+    @api.depends('role_config_ids')
+    def _compute_commission_count(self):
+        """Count commissions for this plan"""
+        for plan in self:
+            plan.commission_count = self.env['sale.commission'].search_count([
+                ('plan_id', '=', plan.id)
+            ])
+
     @api.constrains('is_hierarchical', 'role_config_ids')
     def _check_hierarchical_config(self):
         """Ensure hierarchical plans have role configurations"""
@@ -33,3 +46,15 @@ class SaleCommissionPlan(models.Model):
                 # This is a warning, not a hard constraint
                 # Users might want to configure roles after creation
                 pass
+
+    def action_view_commissions(self):
+        """View all commissions for this plan"""
+        self.ensure_one()
+        return {
+            'name': _('Commissions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.commission',
+            'view_mode': 'list,form',
+            'domain': [('plan_id', '=', self.id)],
+            'context': {'default_plan_id': self.id}
+        }
