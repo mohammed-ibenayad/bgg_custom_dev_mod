@@ -55,9 +55,9 @@ class SaleCommissionClaim(models.Model):
     state = fields.Selection([
         ('pending', 'Pending'),
         ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-        ('paid', 'Paid')
-    ], string='State', default='pending', required=True, tracking=True)
+        ('rejected', 'Rejected')
+    ], string='State', default='pending', required=True, tracking=True,
+       help='Pending: Awaiting review | Approved: Ready to pay | Rejected: Denied')
 
     notes = fields.Text(
         string='Claimant Notes',
