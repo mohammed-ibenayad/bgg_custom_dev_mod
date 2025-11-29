@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class SaleCommission(models.Model):
@@ -229,3 +230,23 @@ class SaleCommission(models.Model):
                 'view_mode': 'form',
                 'target': 'current',
             }
+
+    def action_create_payment(self):
+        """Create a payment record for this commission"""
+        self.ensure_one()
+        if not self.can_be_paid:
+            raise UserError(_('This commission cannot be paid yet.'))
+
+        # Create a payment record with this commission
+        payment = self.env['sale.commission.payment'].create({
+            'user_id': self.user_id.id,
+            'commission_ids': [(6, 0, [self.id])],
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.commission.payment',
+            'res_id': payment.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }

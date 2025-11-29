@@ -34,6 +34,9 @@
                         <button name="action_claim_payment" string="Claim Payment" type="object" class="oe_highlight"
                                 invisible="payment_status != 'unpaid' or state != 'confirmed'"
                                 groups="belgogreen_sales_commission.group_commission_user"/>
+                        <button name="action_create_payment" string="Create Payment" type="object" class="oe_highlight"
+                                invisible="not can_be_paid"
+                                groups="belgogreen_sales_commission.group_commission_manager"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                     </header>
                     <sheet>
