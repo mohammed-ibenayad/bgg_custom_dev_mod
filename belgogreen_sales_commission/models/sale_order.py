@@ -175,6 +175,12 @@ class SaleOrder(models.Model):
         # Create commission records
         commissions_created = 0
         for user, role in users_to_commission:
+            # Check if user is in the plan's allowed users list
+            if commission_plan.user_ids and user not in commission_plan.user_ids:
+                # User not in plan's user list, skip
+                _logger.info(f"Skipping {user.name} ({role}) - not in plan's user list")
+                continue
+
             # Get role configuration
             role_config = self.env['hr.commission.role.config'].search([
                 ('plan_id', '=', commission_plan.id),
