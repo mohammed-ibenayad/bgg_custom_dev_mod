@@ -13,19 +13,19 @@ class SaleOrder(models.Model):
     commission_ids = fields.One2many(
         'sale.commission',
         'sale_order_id',
-        string=_('Commissions'),
-        help=_('Commissions generated from this sale order')
+        string='Commissions',
+        help='Commissions generated from this sale order'
     )
 
     commission_count = fields.Integer(
-        string=_('Commission Count'),
+        string='Commission Count',
         compute='_compute_commission_count'
     )
 
     commissions_generated = fields.Boolean(
-        string=_('Commissions Generated'),
+        string='Commissions Generated',
         default=False,
-        help=_('Indicates if commissions have been generated for this order')
+        help='Indicates if commissions have been generated for this order'
     )
 
     @api.depends('commission_ids')
@@ -176,7 +176,7 @@ class SaleOrder(models.Model):
         commissions_created = 0
         for user, role in users_to_commission:
             # Check if user is in the plan's allowed users list
-            if commission_plan.user_ids and user not in commission_plan.user_ids:
+            if commission_plan.user_ids and user.id not in commission_plan.user_ids.ids:
                 # User not in plan's user list, skip
                 _logger.info(_("Skipping %s (%s) - not in plan's user list") % (user.name, role))
                 continue

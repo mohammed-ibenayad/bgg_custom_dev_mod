@@ -7,58 +7,58 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
 
     commission_role = fields.Selection([
-        ('salesperson', _('Salesperson')),
-        ('team_leader', _('Team Leader')),
-        ('sales_director', _('Sales Director'))
-    ], string=_('Commission Role'), help=_('Role in the commission hierarchy'))
+        ('salesperson', 'Salesperson'),
+        ('team_leader', 'Team Leader'),
+        ('sales_director', 'Sales Director')
+    ], string='Commission Role', help='Role in the commission hierarchy')
 
     team_leader_id = fields.Many2one(
         'res.users',
-        string=_('Team Leader'),
+        string='Team Leader',
         domain=[('commission_role', '=', 'team_leader')],
-        help=_('The team leader for this salesperson')
+        help='The team leader for this salesperson'
     )
 
     sales_director_id = fields.Many2one(
         'res.users',
-        string=_('Sales Director'),
+        string='Sales Director',
         domain=[('commission_role', '=', 'sales_director')],
-        help=_('The sales director for this user')
+        help='The sales director for this user'
     )
 
     team_member_ids = fields.One2many(
         'res.users',
         'team_leader_id',
-        string=_('Team Members'),
-        help=_('Salespeople reporting to this team leader')
+        string='Team Members',
+        help='Salespeople reporting to this team leader'
     )
 
     my_commission_ids = fields.One2many(
         'sale.commission',
         'user_id',
-        string=_('My Commissions')
+        string='My Commissions'
     )
 
     commission_count = fields.Integer(
-        string=_('Commission Count'),
+        string='Commission Count',
         compute='_compute_commission_stats'
     )
 
     commission_unpaid_total = fields.Monetary(
-        string=_('Unpaid Commissions'),
+        string='Unpaid Commissions',
         compute='_compute_commission_stats',
         currency_field='company_currency_id'
     )
 
     commission_paid_total = fields.Monetary(
-        string=_('Paid Commissions'),
+        string='Paid Commissions',
         compute='_compute_commission_stats',
         currency_field='company_currency_id'
     )
 
     company_currency_id = fields.Many2one(
         'res.currency',
-        string=_('Company Currency'),
+        string='Company Currency',
         related='company_id.currency_id',
         readonly=True
     )
