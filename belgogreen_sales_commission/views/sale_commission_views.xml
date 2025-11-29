@@ -44,10 +44,7 @@
                                     icon="fa-money"
                                     context="{'search_default_user_id': user_id}"
                                     invisible="not payment_id">
-                                <div class="o_stat_info">
-                                    <span class="o_stat_text">Payment</span>
-                                    <field name="payment_status" readonly="1" class="o_stat_value"/>
-                                </div>
+                                <field name="payment_status" widget="label"/>
                             </button>
                         </div>
                         <div class="oe_title">
@@ -211,12 +208,6 @@
             <field name="res_model">sale.commission</field>
             <field name="view_mode">list,form,kanban,pivot,graph</field>
             <field name="context">{'search_default_confirmed': 1}</field>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('view_sale_commission_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('view_sale_commission_form')}),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_sale_commission_kanban')}),
-                (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_sale_commission_pivot')}),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('view_sale_commission_graph')})]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No commissions found
@@ -234,12 +225,6 @@
             <field name="view_mode">list,form,kanban,pivot,graph</field>
             <field name="context">{'search_default_my_commissions': 1}</field>
             <field name="domain">[('user_id', '=', uid)]</field>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('view_sale_commission_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('view_sale_commission_form')}),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_sale_commission_kanban')}),
-                (0, 0, {'view_mode': 'pivot', 'view_id': ref('view_sale_commission_pivot')}),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('view_sale_commission_graph')})]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     You don't have any commissions yet
@@ -256,9 +241,6 @@
             <field name="res_model">sale.commission</field>
             <field name="view_mode">list,form</field>
             <field name="context">{'search_default_unpaid': 1, 'search_default_can_be_paid': 1}</field>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('view_sale_commission_tree')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('view_sale_commission_form')})]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No unpaid commissions
