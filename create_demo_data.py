@@ -172,6 +172,11 @@ if hasattr(plan_north, 'state') and plan_north.state != 'approved':
     plan_north.state = 'approved'
     print(f"  ✓ Approved North Team Commission Plan")
 
+# Add users to North Team plan
+north_team_users = north_sp_records + [tl_north, director]
+plan_north.user_ids = [(6, 0, [u.id for u in north_team_users])]
+print(f"  ✓ Added {len(north_team_users)} users to plan")
+
 # Create role configurations for North Team
 role_configs_north = [
     {'role': 'salesperson', 'percentage': 5.00, 'label': 'Salesperson'},
@@ -212,6 +217,11 @@ if hasattr(plan_south, 'state') and plan_south.state != 'approved':
     plan_south.state = 'approved'
     print(f"  ✓ Approved South Team Commission Plan")
 
+# Add users to South Team plan
+south_team_users = south_sp_records + [tl_south, director]
+plan_south.user_ids = [(6, 0, [u.id for u in south_team_users])]
+print(f"  ✓ Added {len(south_team_users)} users to plan")
+
 # Create role configurations for South Team
 role_configs_south = [
     {'role': 'salesperson', 'percentage': 6.00, 'label': 'Salesperson'},
@@ -249,8 +259,10 @@ for sp in south_sp_records:
 print("\n📈 Commission Plans Created:")
 print(f"  • {plan_north.name}")
 print(f"    - Salesperson: 5% | Team Leader: 3% | Sales Director: 2%")
+print(f"    - Restricted to: {len(north_team_users)} users")
 print(f"  • {plan_south.name}")
 print(f"    - Salesperson: 6% | Team Leader: 2.5% | Sales Director: 1.5%")
+print(f"    - Restricted to: {len(south_team_users)} users")
 
 print("\n🔑 All passwords: demo")
 
