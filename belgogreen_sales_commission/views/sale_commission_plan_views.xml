@@ -31,23 +31,6 @@
                     <attribute name="readonly">type == 'hierarchical'</attribute>
                 </xpath>
 
-                <!-- Hide base Odoo tabs for hierarchical plans -->
-                <xpath expr="//page[@string='Commissions']" position="attributes">
-                    <attribute name="invisible">type == 'hierarchical'</attribute>
-                </xpath>
-
-                <xpath expr="//page[@string='Targets']" position="attributes">
-                    <attribute name="invisible">type == 'hierarchical'</attribute>
-                </xpath>
-
-                <xpath expr="//page[@string='Achievements']" position="attributes">
-                    <attribute name="invisible">type == 'hierarchical'</attribute>
-                </xpath>
-
-                <xpath expr="//page[@string='Periods']" position="attributes">
-                    <attribute name="invisible">type == 'hierarchical'</attribute>
-                </xpath>
-
                 <!-- Add custom hierarchical tabs -->
                 <xpath expr="//notebook" position="inside">
 
