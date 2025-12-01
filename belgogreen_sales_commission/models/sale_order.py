@@ -177,6 +177,7 @@ class SaleOrder(models.Model):
         for user, role in users_to_commission:
             # Check if user is in the plan's allowed users list
             if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
+            if commission_plan.user_ids and user.id not in commission_plan.user_ids.ids:
                 # User not in plan's user list, skip
                 _logger.info(_("Skipping %s (%s) - not in plan's user list") % (user.name, role))
                 continue
