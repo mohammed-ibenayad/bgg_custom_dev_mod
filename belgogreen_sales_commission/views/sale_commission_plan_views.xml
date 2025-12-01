@@ -80,13 +80,14 @@
             </field>
         </record>
 
-        <!-- Inherit tree view to add type badges -->
+        <!-- Tree view - Standalone with low priority (base module view takes precedence if exists) -->
         <record id="view_sale_commission_plan_tree_hierarchical" model="ir.ui.view">
             <field name="name">sale.commission.plan.tree.hierarchical</field>
             <field name="model">sale.commission.plan</field>
-            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_tree"/>
+            <field name="priority">20</field>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='name']" position="after">
+                <list string="Commission Plans">
+                    <field name="name"/>
                     <field name="type"
                            widget="badge"
                            decoration-info="type == 'target'"
@@ -96,27 +97,40 @@
                     <field name="periodicity"
                            optional="show"
                            decoration-muted="periodicity == 'not_applicable'"/>
-                </xpath>
+                    <field name="state"
+                           widget="badge"
+                           decoration-success="state == 'approved'"
+                           decoration-info="state == 'draft'"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
             </field>
         </record>
 
-        <!-- Inherit search view to add hierarchical filters -->
+        <!-- Search view - Standalone with low priority -->
         <record id="view_sale_commission_plan_search_hierarchical" model="ir.ui.view">
             <field name="name">sale.commission.plan.search.hierarchical</field>
             <field name="model">sale.commission.plan</field>
-            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_search"/>
+            <field name="priority">20</field>
             <field name="arch" type="xml">
-                <xpath expr="//filter[@name='approved']" position="after">
+                <search string="Commission Plans">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="periodicity"/>
+
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+
                     <separator/>
-                    <filter string="Hierarchical Plans"
-                            name="filter_hierarchical"
-                            domain="[('type', '=', 'hierarchical')]"/>
-                </xpath>
-                <xpath expr="//group[@name='group_by']" position="inside">
-                    <filter string="Type"
-                            name="group_by_type"
-                            context="{'group_by': 'type'}"/>
-                </xpath>
+                    <filter string="Target Plans" name="filter_target" domain="[('type', '=', 'target')]"/>
+                    <filter string="Achievement Plans" name="filter_achievement" domain="[('type', '=', 'achievement')]"/>
+                    <filter string="Hierarchical Plans" name="filter_hierarchical" domain="[('type', '=', 'hierarchical')]"/>
+
+                    <group expand="0" string="Group By" name="group_by">
+                        <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                        <filter string="Periodicity" name="group_by_periodicity" context="{'group_by': 'periodicity'}"/>
+                        <filter string="State" name="group_by_state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
