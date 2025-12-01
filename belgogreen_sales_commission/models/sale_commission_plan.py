@@ -111,6 +111,22 @@ class SaleCommissionPlan(models.Model):
                 vals['periodicity'] = 'not_applicable'
         return super().write(vals)
 
+    def action_approve(self):
+        """Approve commission plan"""
+        for plan in self:
+            if plan.type == 'hierarchical' and not plan.role_config_ids:
+                raise ValidationError(_(
+                    'Cannot approve hierarchical plan without role configurations. '
+                    'Please add role percentages in the "Role Percentages" tab.'
+                ))
+            plan.state = 'approved'
+        return True
+
+    def action_draft(self):
+        """Reset commission plan to draft"""
+        self.write({'state': 'draft'})
+        return True
+
     def action_view_commissions(self):
         """View all commissions for this plan"""
         self.ensure_one()
