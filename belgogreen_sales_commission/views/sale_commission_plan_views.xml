@@ -2,63 +2,165 @@
 <odoo>
     <data>
 
-        <!-- Inherit Form View to add hierarchical fields -->
-        <record id="view_sale_commission_plan_form_inherit" model="ir.ui.view">
-            <field name="name">sale.commission.plan.form.inherit</field>
+        <!-- Tree/List View for Commission Plans -->
+        <record id="view_sale_commission_plan_tree" model="ir.ui.view">
+            <field name="name">sale.commission.plan.tree</field>
             <field name="model">sale.commission.plan</field>
-            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
+            <field name="priority">15</field>
             <field name="arch" type="xml">
-                <!-- Add smart button for commissions -->
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <button name="action_view_commissions"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-sitemap"
-                            groups="belgogreen_sales_commission.group_commission_user">
-                        <field name="commission_count" widget="statinfo" string="Commissions"/>
-                    </button>
-                </xpath>
+                <list string="Commission Plans">
+                    <field name="name"/>
+                    <field name="type"
+                           widget="badge"
+                           decoration-info="type == 'target'"
+                           decoration-success="type == 'achievement'"
+                           decoration-warning="type == 'hierarchical'"
+                           optional="show"/>
+                    <field name="periodicity"
+                           optional="show"
+                           decoration-muted="periodicity == 'not_applicable'"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="commission_count"
+                           string="Commissions"
+                           optional="hide"
+                           widget="integer"
+                           invisible="type != 'hierarchical'"/>
+                    <field name="state"
+                           widget="badge"
+                           decoration-success="state == 'approved'"
+                           decoration-info="state == 'draft'"/>
+                </list>
+            </field>
+        </record>
 
-                <!-- Add configuration tab -->
-                <xpath expr="//notebook" position="inside">
-                    <page string="Configuration" name="configuration">
+        <!-- Form View for Commission Plans -->
+        <record id="view_sale_commission_plan_form" model="ir.ui.view">
+            <field name="name">sale.commission.plan.form</field>
+            <field name="model">sale.commission.plan</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <form string="Commission Plan">
+                    <header>
+                        <button name="action_approve" string="Approve" type="object"
+                                invisible="state != 'draft'" class="oe_highlight"/>
+                        <button name="action_draft" string="Reset to Draft" type="object"
+                                invisible="state != 'approved'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                    </header>
+                    <sheet>
+                        <!-- Smart Buttons -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_commissions"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-sitemap"
+                                    invisible="type != 'hierarchical'"
+                                    groups="belgogreen_sales_commission.group_commission_user">
+                                <field name="commission_count" widget="statinfo" string="Commissions"/>
+                            </button>
+                        </div>
+
+                        <!-- Hidden fields for backward compatibility -->
+                        <field name="is_hierarchical" invisible="1"/>
+
                         <group>
-                            <group string="Commission Calculation Settings">
-                                <field name="is_hierarchical"/>
-                                <div class="text-muted" style="margin-left: 20px;">
-                                    Enable this option to automatically calculate commissions for the entire sales hierarchy.
-                                    When enabled, commissions will be distributed across Salesperson, Team Leader, and Sales Director
-                                    based on the percentages defined in the "Role Percentages" tab.
-                                </div>
+                            <group>
+                                <field name="name" placeholder="e.g., Q1 2025 Sales Commission"/>
+                                <field name="type"/>
+                                <field name="periodicity"
+                                       readonly="type == 'hierarchical'"/>
                             </group>
-                            <group string="Payment Requirements">
-                                <field name="require_invoice_paid"/>
-                                <div class="text-muted" style="margin-left: 20px;">
-                                    If enabled, commissions will only be generated when the customer invoice is fully paid.
-                                    If disabled, commissions will be created as soon as the invoice is posted/confirmed,
-                                    regardless of payment status.
-                                </div>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
-                    </page>
 
-                    <!-- Add role configuration tab -->
-                    <page string="Role Percentages" name="role_config" invisible="not is_hierarchical">
-                        <field name="role_config_ids">
-                            <list editable="bottom">
-                                <field name="role"/>
-                                <field name="default_percentage"/>
-                                <field name="active"/>
-                            </list>
-                        </field>
-                        <group>
-                            <div class="alert alert-info" role="alert">
-                                <strong>Note:</strong> Define the commission percentage for each role in the hierarchy.
-                                These percentages will be applied automatically when commissions are calculated.
-                            </div>
-                        </group>
-                    </page>
-                </xpath>
+                        <notebook>
+                            <!-- Hierarchical Configuration Tab (only for hierarchical type) -->
+                            <page string="Hierarchical Configuration"
+                                  name="hierarchical_config"
+                                  invisible="type != 'hierarchical'">
+                                <group>
+                                    <group string="Payment Requirements">
+                                        <field name="require_invoice_paid"/>
+                                        <div class="text-muted" style="margin-left: 20px;">
+                                            If enabled, commissions will only be generated when the customer invoice is fully paid.
+                                            If disabled, commissions will be created as soon as the invoice is posted/confirmed,
+                                            regardless of payment status.
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- Role Percentages Tab (only for hierarchical type) -->
+                            <page string="Role Percentages"
+                                  name="role_config"
+                                  invisible="type != 'hierarchical'">
+                                <field name="role_config_ids">
+                                    <list editable="bottom">
+                                        <field name="role"/>
+                                        <field name="default_percentage"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                                <group>
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>Note:</strong> Define the commission percentage for each role in the hierarchy.
+                                        These percentages will be applied automatically when commissions are calculated.
+                                        <br/><br/>
+                                        <strong>Typical setup:</strong>
+                                        <ul>
+                                            <li>Salesperson: 3-5%</li>
+                                            <li>Team Leader: 1-2%</li>
+                                            <li>Sales Director: 0.5-1%</li>
+                                        </ul>
+                                    </div>
+                                </group>
+                            </page>
+
+                            <!-- Users Tab (for assigning plans to users) -->
+                            <page string="Users"
+                                  name="users">
+                                <field name="user_ids">
+                                    <list>
+                                        <field name="user_id"/>
+                                        <field name="date_from"/>
+                                        <field name="date_to"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View for Commission Plans -->
+        <record id="view_sale_commission_plan_search" model="ir.ui.view">
+            <field name="name">sale.commission.plan.search</field>
+            <field name="model">sale.commission.plan</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <search string="Commission Plans">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="periodicity"/>
+
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+
+                    <separator/>
+                    <filter string="Target Plans" name="filter_target" domain="[('type', '=', 'target')]"/>
+                    <filter string="Achievement Plans" name="filter_achievement" domain="[('type', '=', 'achievement')]"/>
+                    <filter string="Hierarchical Plans" name="filter_hierarchical" domain="[('type', '=', 'hierarchical')]"/>
+
+                    <group expand="0" string="Group By" name="group_by">
+                        <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                        <filter string="Periodicity" name="group_by_periodicity" context="{'group_by': 'periodicity'}"/>
+                        <filter string="State" name="group_by_state" context="{'group_by': 'state'}"/>
+                        <filter string="Company" name="group_by_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
             </field>
         </record>
 
@@ -72,8 +174,13 @@
                     Create a commission plan
                 </p>
                 <p>
-                    Define commission plans with hierarchical percentages for different roles.
+                    Define commission plans with different calculation methods:
                 </p>
+                <ul>
+                    <li><strong>Target:</strong> Based on sales targets with progressive rates</li>
+                    <li><strong>Achievement:</strong> Based on performance metrics</li>
+                    <li><strong>Hierarchical:</strong> Fixed percentages across sales hierarchy</li>
+                </ul>
             </field>
         </record>
 

@@ -1,15 +1,36 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class SaleCommissionPlan(models.Model):
     _inherit = 'sale.commission.plan'
 
+    # Extend the 'type' field to add 'hierarchical' option
+    type = fields.Selection(
+        selection_add=[('hierarchical', 'Hierarchical')],
+        ondelete={'hierarchical': 'set default'},
+        help="Commission plan type:\n"
+             "- Target: Based on sales targets with progressive rates\n"
+             "- Achievement: Based on performance metrics\n"
+             "- Hierarchical: Fixed percentages split across sales hierarchy (Salesperson/Team Leader/Director)"
+    )
+
+    # Extend periodicity to add 'not_applicable' option
+    periodicity = fields.Selection(
+        selection_add=[('not_applicable', 'Not Applicable')],
+        ondelete={'not_applicable': 'set default'},
+        help="Periodicity for tracking commission performance.\n"
+             "For hierarchical plans, select 'Not Applicable' as commissions are event-based (triggered by paid invoices)."
+    )
+
+    # Keep is_hierarchical as computed field for backward compatibility
     is_hierarchical = fields.Boolean(
-        string='Hierarchical Plan',
-        default=False,
-        help='If enabled, calculates commissions for salesperson + team leader + sales director'
+        string='Is Hierarchical',
+        compute='_compute_is_hierarchical',
+        store=True,
+        help='Computed field: True if type is hierarchical'
     )
 
     role_config_ids = fields.One2many(
@@ -30,6 +51,12 @@ class SaleCommissionPlan(models.Model):
         compute='_compute_commission_count'
     )
 
+    @api.depends('type')
+    def _compute_is_hierarchical(self):
+        """Compute is_hierarchical based on type"""
+        for plan in self:
+            plan.is_hierarchical = (plan.type == 'hierarchical')
+
     @api.depends('role_config_ids')
     def _compute_commission_count(self):
         """Count commissions for this plan"""
@@ -38,14 +65,67 @@ class SaleCommissionPlan(models.Model):
                 ('plan_id', '=', plan.id)
             ])
 
-    @api.constrains('is_hierarchical', 'role_config_ids')
+    @api.constrains('type', 'role_config_ids')
     def _check_hierarchical_config(self):
         """Ensure hierarchical plans have role configurations"""
         for record in self:
-            if record.is_hierarchical and not record.role_config_ids:
-                # This is a warning, not a hard constraint
-                # Users might want to configure roles after creation
+            if record.type == 'hierarchical' and not record.role_config_ids:
+                # This is a soft warning - users can configure roles after creation
                 pass
+
+    @api.onchange('type')
+    def _onchange_type(self):
+        """Auto-set periodicity to 'not_applicable' when type is hierarchical"""
+        if self.type == 'hierarchical':
+            self.periodicity = 'not_applicable'
+            return {
+                'warning': {
+                    'title': _('Hierarchical Plan Type Selected'),
+                    'message': _(
+                        'You have selected Hierarchical commission type.\n\n'
+                        'Key differences from standard plans:\n'
+                        '• Commissions are triggered by PAID INVOICES (event-based)\n'
+                        '• Fixed percentages for 3 roles: Salesperson, Team Leader, Sales Director\n'
+                        '• No targets or achievement metrics needed\n'
+                        '• Periodicity set to "Not Applicable"\n\n'
+                        'Please configure role percentages in the "Role Percentages" tab.'
+                    )
+                }
+            }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Set smart defaults for hierarchical plans"""
+        for vals in vals_list:
+            if vals.get('type') == 'hierarchical':
+                # Auto-set periodicity to not_applicable
+                if 'periodicity' not in vals:
+                    vals['periodicity'] = 'not_applicable'
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """Handle changes to plan type"""
+        # If switching to hierarchical, auto-set periodicity
+        if vals.get('type') == 'hierarchical':
+            if 'periodicity' not in vals:
+                vals['periodicity'] = 'not_applicable'
+        return super().write(vals)
+
+    def action_approve(self):
+        """Approve commission plan"""
+        for plan in self:
+            if plan.type == 'hierarchical' and not plan.role_config_ids:
+                raise ValidationError(_(
+                    'Cannot approve hierarchical plan without role configurations. '
+                    'Please add role percentages in the "Role Percentages" tab.'
+                ))
+            plan.state = 'approved'
+        return True
+
+    def action_draft(self):
+        """Reset commission plan to draft"""
+        self.write({'state': 'draft'})
+        return True
 
     def action_view_commissions(self):
         """View all commissions for this plan"""
@@ -56,5 +136,8 @@ class SaleCommissionPlan(models.Model):
             'res_model': 'sale.commission',
             'view_mode': 'list,form',
             'domain': [('plan_id', '=', self.id)],
-            'context': {'default_plan_id': self.id}
+            'context': {
+                'default_plan_id': self.id,
+                'search_default_group_by_role': 1,
+            }
         }
