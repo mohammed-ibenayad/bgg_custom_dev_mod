@@ -6,6 +6,9 @@ __pycache__/
 .Python
 *.pyc
 
+# Development/inspection scripts
+inspect_*.py
+
 # Odoo
 *.pot
 *.mo
