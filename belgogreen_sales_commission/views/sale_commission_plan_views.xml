@@ -72,9 +72,6 @@
 
                                 <!-- Base fields for Target/Achievement plans -->
                                 <field name="user_type" invisible="type == 'hierarchical'"/>
-                                <field name="commission_on_target"
-                                       invisible="type == 'hierarchical'"
-                                       string="Commission at 100%"/>
                             </group>
                             <group>
                                 <field name="company_id" groups="base.group_multi_company"/>
