@@ -139,16 +139,6 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
 
-        # Check if commissions already exist for this invoice and sale order
-        existing = self.env['sale.commission'].search([
-            ('invoice_id', '=', invoice.id),
-            ('sale_order_id', '=', self.id)
-        ])
-
-        if existing:
-            _logger.info(_("Commissions already exist for invoice %s and order %s") % (invoice.name, self.name))
-            return 0
-
         salesperson = self.user_id
         base_amount = invoice.amount_total
 
@@ -179,6 +169,18 @@ class SaleOrder(models.Model):
             if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
                 # User not in plan's user list, skip
                 _logger.info(_("Skipping %s (%s) - not in plan's user list") % (user.name, role))
+                continue
+
+            # Check if commission already exists for this specific user
+            existing_commission = self.env['sale.commission'].search([
+                ('invoice_id', '=', invoice.id),
+                ('sale_order_id', '=', self.id),
+                ('user_id', '=', user.id),
+                ('role', '=', role)
+            ], limit=1)
+
+            if existing_commission:
+                _logger.info(_("Commission already exists for %s (%s) on order %s") % (user.name, role, self.name))
                 continue
 
             # Get role configuration
