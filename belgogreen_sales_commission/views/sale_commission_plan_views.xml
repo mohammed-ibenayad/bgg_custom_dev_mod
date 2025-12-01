@@ -2,35 +2,68 @@
 <odoo>
     <data>
 
+        <!-- Inherit List/Tree View to show plan types clearly -->
+        <record id="view_sale_commission_plan_tree_inherit" model="ir.ui.view">
+            <field name="name">sale.commission.plan.tree.inherit</field>
+            <field name="model">sale.commission.plan</field>
+            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_tree"/>
+            <field name="arch" type="xml">
+                <!-- Add type field with badges -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="type"
+                           widget="badge"
+                           decoration-info="type == 'target'"
+                           decoration-success="type == 'achievement'"
+                           decoration-warning="type == 'hierarchical'"
+                           optional="show"/>
+                </xpath>
+
+                <!-- Add periodicity field -->
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="periodicity"
+                           optional="show"
+                           decoration-muted="periodicity == 'not_applicable'"/>
+                </xpath>
+
+                <!-- Add commission count for hierarchical plans -->
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="commission_count"
+                           string="Commissions"
+                           optional="hide"
+                           widget="integer"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Inherit Form View to add hierarchical fields -->
         <record id="view_sale_commission_plan_form_inherit" model="ir.ui.view">
             <field name="name">sale.commission.plan.form.inherit</field>
             <field name="model">sale.commission.plan</field>
             <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
             <field name="arch" type="xml">
-                <!-- Add smart button for commissions -->
+                <!-- Add smart button for commissions (only for hierarchical) -->
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_commissions"
                             type="object"
                             class="oe_stat_button"
                             icon="fa-sitemap"
+                            invisible="type != 'hierarchical'"
                             groups="belgogreen_sales_commission.group_commission_user">
                         <field name="commission_count" widget="statinfo" string="Commissions"/>
                     </button>
                 </xpath>
 
+                <!-- Make periodicity readonly for hierarchical type -->
+                <xpath expr="//field[@name='periodicity']" position="attributes">
+                    <attribute name="readonly">type == 'hierarchical'</attribute>
+                </xpath>
+
                 <!-- Add configuration tab -->
                 <xpath expr="//notebook" position="inside">
-                    <page string="Configuration" name="configuration">
+                    <page string="Hierarchical Configuration"
+                          name="hierarchical_config"
+                          invisible="type != 'hierarchical'">
                         <group>
-                            <group string="Commission Calculation Settings">
-                                <field name="is_hierarchical"/>
-                                <div class="text-muted" style="margin-left: 20px;">
-                                    Enable this option to automatically calculate commissions for the entire sales hierarchy.
-                                    When enabled, commissions will be distributed across Salesperson, Team Leader, and Sales Director
-                                    based on the percentages defined in the "Role Percentages" tab.
-                                </div>
-                            </group>
                             <group string="Payment Requirements">
                                 <field name="require_invoice_paid"/>
                                 <div class="text-muted" style="margin-left: 20px;">
@@ -43,7 +76,9 @@
                     </page>
 
                     <!-- Add role configuration tab -->
-                    <page string="Role Percentages" name="role_config" invisible="not is_hierarchical">
+                    <page string="Role Percentages"
+                          name="role_config"
+                          invisible="type != 'hierarchical'">
                         <field name="role_config_ids">
                             <list editable="bottom">
                                 <field name="role"/>
@@ -55,9 +90,40 @@
                             <div class="alert alert-info" role="alert">
                                 <strong>Note:</strong> Define the commission percentage for each role in the hierarchy.
                                 These percentages will be applied automatically when commissions are calculated.
+                                <br/><br/>
+                                <strong>Typical setup:</strong>
+                                <ul>
+                                    <li>Salesperson: 3-5%</li>
+                                    <li>Team Leader: 1-2%</li>
+                                    <li>Sales Director: 0.5-1%</li>
+                                </ul>
                             </div>
                         </group>
                     </page>
+                </xpath>
+
+                <!-- Add computed field is_hierarchical (hidden, for backward compatibility) -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="is_hierarchical" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Add search filters for plan types -->
+        <record id="view_sale_commission_plan_search_inherit" model="ir.ui.view">
+            <field name="name">sale.commission.plan.search.inherit</field>
+            <field name="model">sale.commission.plan</field>
+            <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='approved']" position="after">
+                    <separator/>
+                    <filter string="Target Plans" name="filter_target" domain="[('type', '=', 'target')]"/>
+                    <filter string="Achievement Plans" name="filter_achievement" domain="[('type', '=', 'achievement')]"/>
+                    <filter string="Hierarchical Plans" name="filter_hierarchical" domain="[('type', '=', 'hierarchical')]"/>
+                </xpath>
+                <xpath expr="//group[@name='group_by']" position="inside">
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                    <filter string="Periodicity" name="group_by_periodicity" context="{'group_by': 'periodicity'}"/>
                 </xpath>
             </field>
         </record>
@@ -72,8 +138,13 @@
                     Create a commission plan
                 </p>
                 <p>
-                    Define commission plans with hierarchical percentages for different roles.
+                    Define commission plans with different calculation methods:
                 </p>
+                <ul>
+                    <li><strong>Target:</strong> Based on sales targets with progressive rates</li>
+                    <li><strong>Achievement:</strong> Based on performance metrics</li>
+                    <li><strong>Hierarchical:</strong> Fixed percentages across sales hierarchy</li>
+                </ul>
             </field>
         </record>
 
