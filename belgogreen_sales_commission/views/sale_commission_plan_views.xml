@@ -72,6 +72,10 @@
 
                                 <!-- Base fields for Target/Achievement plans -->
                                 <field name="user_type" invisible="type == 'hierarchical'"/>
+                                <field name="team_id" invisible="type == 'hierarchical'"/>
+                                <field name="commission_amount"
+                                       invisible="type == 'hierarchical'"
+                                       string="On Target Commission"/>
                             </group>
                             <group>
                                 <field name="company_id" groups="base.group_multi_company"/>
@@ -129,6 +133,59 @@
                                 <field name="user_ids">
                                     <list>
                                         <field name="user_id"/>
+                                        <field name="date_from"/>
+                                        <field name="date_to"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <!-- BASE ODOO TABS: Achievement Metrics (for Achievement type) -->
+                            <page string="Achievement Metrics"
+                                  name="achievement"
+                                  invisible="type != 'achievement'">
+                                <field name="achievement_ids">
+                                    <list editable="bottom">
+                                        <field name="type"/>
+                                        <field name="rate"/>
+                                        <field name="product_id" optional="hide"/>
+                                        <field name="product_categ_id" optional="hide"/>
+                                    </list>
+                                </field>
+                                <group>
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>Achievement Metrics:</strong> Define which sales metrics
+                                        (amount sold, invoiced, margin, etc.) contribute to commission calculation.
+                                    </div>
+                                </group>
+                            </page>
+
+                            <!-- BASE ODOO TABS: Target Commission Levels (for Target type) -->
+                            <page string="Target Commission"
+                                  name="target_commission"
+                                  invisible="type != 'target'">
+                                <field name="target_commission_ids">
+                                    <list editable="bottom">
+                                        <field name="target_rate" string="Target %"/>
+                                        <field name="amount" string="Commission"/>
+                                        <field name="amount_rate" string="OTC %" optional="show"/>
+                                    </list>
+                                </field>
+                                <group>
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>Target Commission Levels:</strong> Define commission rates
+                                        based on target achievement percentage (e.g., 50%, 100%, 150%).
+                                    </div>
+                                </group>
+                            </page>
+
+                            <!-- BASE ODOO TABS: Targets (for Target type) -->
+                            <page string="Targets"
+                                  name="targets"
+                                  invisible="type != 'target'">
+                                <field name="target_ids">
+                                    <list editable="bottom">
+                                        <field name="name" string="Period"/>
+                                        <field name="amount" string="Target Amount"/>
                                         <field name="date_from"/>
                                         <field name="date_to"/>
                                     </list>
