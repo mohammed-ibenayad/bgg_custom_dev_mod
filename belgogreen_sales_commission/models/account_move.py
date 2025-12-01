@@ -76,16 +76,6 @@ class AccountMove(models.Model):
         # This could be total, margin, etc. - for now using invoice total
         base_amount = self.amount_total
 
-        # Check if commissions already exist for this invoice and sale order
-        existing = self.env['sale.commission'].search([
-            ('invoice_id', '=', self.id),
-            ('sale_order_id', '=', sale_order.id)
-        ])
-
-        if existing:
-            # Commissions already created
-            return
-
         # Create commission hierarchy
         users_to_commission = []
 
@@ -111,6 +101,18 @@ class AccountMove(models.Model):
             # Check if user is in the plan's allowed users list
             if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
                 # User not in plan's user list, skip
+                continue
+
+            # Check if commission already exists for this specific user
+            existing_commission = self.env['sale.commission'].search([
+                ('invoice_id', '=', self.id),
+                ('sale_order_id', '=', sale_order.id),
+                ('user_id', '=', user.id),
+                ('role', '=', role)
+            ], limit=1)
+
+            if existing_commission:
+                # Commission already exists for this user, skip
                 continue
 
             # Check if there's a role configuration
