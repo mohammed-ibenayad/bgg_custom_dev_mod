@@ -72,7 +72,7 @@
                         <group>
                             <div class="alert alert-info" role="alert">
                                 <strong>Note:</strong> Hierarchical commissions are event-based (triggered by paid invoices),
-                                not period-based. The periodicity field is set to "Monthly" automatically but is not used
+                                not period-based. The periodicity field is set to "Month" automatically but is not used
                                 for commission calculations. You can safely ignore the Periods tab.
                             </div>
                         </group>

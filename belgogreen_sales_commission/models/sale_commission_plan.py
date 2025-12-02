@@ -75,19 +75,19 @@ class SaleCommissionPlan(models.Model):
 
     @api.onchange('type')
     def _onchange_type(self):
-        """Auto-set periodicity to 'monthly' when type is hierarchical"""
+        """Auto-set periodicity to 'month' when type is hierarchical"""
         if self.type == 'hierarchical':
-            # Set monthly as default (periods are hidden in view anyway)
-            self.periodicity = 'monthly'
+            # Set month as default (periods are hidden in view anyway)
+            self.periodicity = 'month'
 
     @api.model_create_multi
     def create(self, vals_list):
         """Set smart defaults for hierarchical plans"""
         for vals in vals_list:
             if vals.get('type') == 'hierarchical':
-                # Auto-set periodicity to monthly (periods are hidden in view anyway)
+                # Auto-set periodicity to month (periods are hidden in view anyway)
                 if 'periodicity' not in vals:
-                    vals['periodicity'] = 'monthly'
+                    vals['periodicity'] = 'month'
         return super().create(vals_list)
 
     def write(self, vals):
@@ -95,7 +95,7 @@ class SaleCommissionPlan(models.Model):
         # If switching to hierarchical, auto-set periodicity
         if vals.get('type') == 'hierarchical':
             if 'periodicity' not in vals:
-                vals['periodicity'] = 'monthly'
+                vals['periodicity'] = 'month'
         return super().write(vals)
 
     def action_approve(self):
