@@ -31,6 +31,26 @@
                     <attribute name="readonly">type == 'hierarchical'</attribute>
                 </xpath>
 
+                <!-- Hide the "per" text and user_type field for hierarchical plans -->
+                <xpath expr="//label[@for='type']/following-sibling::div[1]" position="replace">
+                    <div>
+                        <field name="type" class="oe_inline" readonly="state != 'draft'"/>
+                        <span invisible="type == 'hierarchical'">
+                            per <field name="user_type" class="oe_inline" readonly="state != 'draft'"/>
+                        </span>
+                    </div>
+                </xpath>
+
+                <!-- Hide team_id field for hierarchical plans -->
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="invisible">user_type == 'person' or type == 'hierarchical'</attribute>
+                </xpath>
+
+                <!-- Hide commission_amount field for hierarchical plans -->
+                <xpath expr="//field[@name='commission_amount']" position="attributes">
+                    <attribute name="invisible">type == 'achieve' or type == 'hierarchical'</attribute>
+                </xpath>
+
                 <!-- Hide base tabs for hierarchical type by modifying existing invisible conditions -->
                 <!-- Page 1: Commissions (already has invisible="type == 'achieve'") -->
                 <xpath expr="//notebook[@name='main_book']/page[1]" position="attributes">
