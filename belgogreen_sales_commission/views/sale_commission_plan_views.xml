@@ -31,6 +31,27 @@
                     <attribute name="readonly">type == 'hierarchical'</attribute>
                 </xpath>
 
+                <!-- Hide base tabs for hierarchical type by modifying existing invisible conditions -->
+                <!-- Page 1: Commissions (already has invisible="type == 'achieve'") -->
+                <xpath expr="//notebook[@name='main_book']/page[1]" position="attributes">
+                    <attribute name="invisible">type == 'achieve' or type == 'hierarchical'</attribute>
+                </xpath>
+
+                <!-- Page 2: Targets (already has invisible="type == 'achieve'") -->
+                <xpath expr="//notebook[@name='main_book']/page[2]" position="attributes">
+                    <attribute name="invisible">type == 'achieve' or type == 'hierarchical'</attribute>
+                </xpath>
+
+                <!-- Page 3: Achievements (always visible, now hide for hierarchical) -->
+                <xpath expr="//notebook[@name='main_book']/page[3]" position="attributes">
+                    <attribute name="invisible">type == 'hierarchical'</attribute>
+                </xpath>
+
+                <!-- Page 4: Periods (already has invisible="type == 'target'") -->
+                <xpath expr="//notebook[@name='main_book']/page[4]" position="attributes">
+                    <attribute name="invisible">type == 'target' or type == 'hierarchical'</attribute>
+                </xpath>
+
                 <!-- Add custom hierarchical tabs -->
                 <xpath expr="//notebook" position="inside">
 
