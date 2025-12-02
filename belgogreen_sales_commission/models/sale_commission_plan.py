@@ -78,20 +78,6 @@ class SaleCommissionPlan(models.Model):
         """Auto-set periodicity to 'not_applicable' when type is hierarchical"""
         if self.type == 'hierarchical':
             self.periodicity = 'not_applicable'
-            return {
-                'warning': {
-                    'title': _('Hierarchical Plan Type Selected'),
-                    'message': _(
-                        'You have selected Hierarchical commission type.\n\n'
-                        'Key differences from standard plans:\n'
-                        '• Commissions are triggered by PAID INVOICES (event-based)\n'
-                        '• Fixed percentages for 3 roles: Salesperson, Team Leader, Sales Director\n'
-                        '• No targets or achievement metrics needed\n'
-                        '• Periodicity set to "Not Applicable"\n\n'
-                        'Please configure role percentages in the "Role Percentages" tab.'
-                    )
-                }
-            }
 
     @api.model_create_multi
     def create(self, vals_list):
