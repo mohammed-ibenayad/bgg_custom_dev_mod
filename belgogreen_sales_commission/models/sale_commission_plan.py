@@ -65,6 +65,14 @@ class SaleCommissionPlan(models.Model):
                 ('plan_id', '=', plan.id)
             ])
 
+    def _compute_targets(self):
+        """Override base method to skip target computation for hierarchical plans"""
+        # Only compute targets for non-hierarchical plans
+        non_hierarchical_plans = self.filtered(lambda p: p.type != 'hierarchical')
+        if non_hierarchical_plans:
+            # Call parent method only for non-hierarchical plans
+            super(SaleCommissionPlan, non_hierarchical_plans)._compute_targets()
+
     @api.constrains('type', 'role_config_ids')
     def _check_hierarchical_config(self):
         """Ensure hierarchical plans have role configurations"""
