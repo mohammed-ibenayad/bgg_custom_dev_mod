@@ -17,14 +17,6 @@ class SaleCommissionPlan(models.Model):
              "- Hierarchical: Fixed percentages split across sales hierarchy (Salesperson/Team Leader/Director)"
     )
 
-    # Extend periodicity to add 'not_applicable' option
-    periodicity = fields.Selection(
-        selection_add=[('not_applicable', 'Not Applicable')],
-        ondelete={'not_applicable': 'set default'},
-        help="Periodicity for tracking commission performance.\n"
-             "For hierarchical plans, select 'Not Applicable' as commissions are event-based (triggered by paid invoices)."
-    )
-
     # Keep is_hierarchical as computed field for backward compatibility
     is_hierarchical = fields.Boolean(
         string='Is Hierarchical',
@@ -83,18 +75,19 @@ class SaleCommissionPlan(models.Model):
 
     @api.onchange('type')
     def _onchange_type(self):
-        """Auto-set periodicity to 'not_applicable' when type is hierarchical"""
+        """Auto-set periodicity to 'monthly' when type is hierarchical"""
         if self.type == 'hierarchical':
-            self.periodicity = 'not_applicable'
+            # Set monthly as default (periods are hidden in view anyway)
+            self.periodicity = 'monthly'
 
     @api.model_create_multi
     def create(self, vals_list):
         """Set smart defaults for hierarchical plans"""
         for vals in vals_list:
             if vals.get('type') == 'hierarchical':
-                # Auto-set periodicity to not_applicable
+                # Auto-set periodicity to monthly (periods are hidden in view anyway)
                 if 'periodicity' not in vals:
-                    vals['periodicity'] = 'not_applicable'
+                    vals['periodicity'] = 'monthly'
         return super().create(vals_list)
 
     def write(self, vals):
@@ -102,7 +95,7 @@ class SaleCommissionPlan(models.Model):
         # If switching to hierarchical, auto-set periodicity
         if vals.get('type') == 'hierarchical':
             if 'periodicity' not in vals:
-                vals['periodicity'] = 'not_applicable'
+                vals['periodicity'] = 'monthly'
         return super().write(vals)
 
     def action_approve(self):

@@ -69,6 +69,13 @@
                                 </div>
                             </group>
                         </group>
+                        <group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>Note:</strong> Hierarchical commissions are event-based (triggered by paid invoices),
+                                not period-based. The periodicity field is set to "Monthly" automatically but is not used
+                                for commission calculations. You can safely ignore the Periods tab.
+                            </div>
+                        </group>
                     </page>
 
                     <!-- Role Percentages Tab -->
@@ -116,8 +123,7 @@
                            decoration-warning="type == 'hierarchical'"
                            optional="show"/>
                     <field name="periodicity"
-                           optional="show"
-                           decoration-muted="periodicity == 'not_applicable'"/>
+                           optional="show"/>
                     <field name="state"
                            widget="badge"
                            decoration-success="state == 'approved'"
