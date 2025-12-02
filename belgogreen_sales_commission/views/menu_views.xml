@@ -5,7 +5,7 @@
         <!-- Main Menu -->
         <menuitem id="menu_commission_root"
                   name="Commissions"
-                  web_icon="fa-money"
+                  web_icon="fa-wallet"
                   sequence="75"/>
 
         <!-- My Commission Menu (for users) -->
