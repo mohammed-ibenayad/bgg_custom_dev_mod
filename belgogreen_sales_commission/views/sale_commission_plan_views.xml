@@ -26,6 +26,11 @@
                     </button>
                 </xpath>
 
+                <!-- Hide base commission button (dollar icon) for hierarchical plans to avoid duplication -->
+                <xpath expr="//button[@name='action_open_commission']" position="attributes">
+                    <attribute name="invisible">state in ['draft', 'cancel'] or type == 'hierarchical'</attribute>
+                </xpath>
+
                 <!-- Make periodicity readonly for hierarchical plans -->
                 <xpath expr="//field[@name='periodicity']" position="attributes">
                     <attribute name="readonly">type == 'hierarchical'</attribute>
