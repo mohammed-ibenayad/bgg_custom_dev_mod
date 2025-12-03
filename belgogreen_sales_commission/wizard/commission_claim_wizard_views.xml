@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Commission Claim Wizard Form -->
+    <record id="view_commission_claim_wizard_form" model="ir.ui.view">
+        <field name="name">commission.claim.wizard.form</field>
+        <field name="model">commission.claim.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Claim Commission Payment">
+                <group>
+                    <group>
+                        <field name="commission_count" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"
+                               class="oe_subtotal_footer_separator"/>
+                    </group>
+                </group>
+
+                <group string="Selected Commissions">
+                    <field name="commission_ids" nolabel="1" readonly="1">
+                        <tree decoration-success="payment_status=='paid'"
+                              decoration-warning="payment_status=='claimed'"
+                              decoration-muted="payment_status=='cancelled'">
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="sale_order_id"/>
+                            <field name="commission_percentage"/>
+                            <field name="commission_amount" sum="Total" widget="monetary"/>
+                            <field name="payment_status" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+
+                <group string="Additional Information">
+                    <field name="notes" placeholder="Optional notes about this claim..." nolabel="1"/>
+                </group>
+
+                <div class="alert alert-info" role="alert">
+                    <p><strong>Important:</strong></p>
+                    <ul>
+                        <li>You are about to submit a claim for <strong><field name="commission_count" readonly="1" nolabel="1" class="oe_inline"/> commission(s)</strong></li>
+                        <li>Total amount to be claimed: <strong><field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1" nolabel="1" class="oe_inline"/></strong></li>
+                        <li>Once submitted, your claim will be reviewed by management</li>
+                        <li>You will be notified when your claim is approved or rejected</li>
+                    </ul>
+                </div>
+
+                <footer>
+                    <button name="action_confirm_claim" string="Submit Claim" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Commission Claim Wizard Action -->
+    <record id="action_commission_claim_wizard" model="ir.actions.act_window">
+        <field name="name">Claim Commission Payment</field>
+        <field name="res_model">commission.claim.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_sale_commission"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>

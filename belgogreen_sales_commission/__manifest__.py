@@ -49,6 +49,7 @@ Main Features:
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
         'data/cron_data.xml',
+        'wizard/commission_claim_wizard_views.xml',
         'views/hr_commission_role_config_views.xml',
         'views/sale_commission_plan_views.xml',
         'views/res_users_views.xml',
