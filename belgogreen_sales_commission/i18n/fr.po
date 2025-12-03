@@ -958,3 +958,135 @@ msgstr "Créer un plan de commission"
 msgid "Define commission plans with hierarchical percentages for different roles."
 msgstr "Définir des plans de commission avec des pourcentages hiérarchiques pour différents rôles."
 
+#. module: belgogreen_sales_commission
+#: model:ir.model,name:belgogreen_sales_commission.model_commission_claim_wizard
+msgid "Commission Claim Wizard"
+msgstr "Assistant de réclamation de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_claim_wizard__commission_ids
+msgid "Commissions to Claim"
+msgstr "Commissions à réclamer"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_claim_wizard__commission_count
+msgid "Number of Commissions"
+msgstr "Nombre de commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_claim_wizard__total_amount
+msgid "Total Commission Amount"
+msgstr "Montant total des commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_claim_wizard__notes
+msgid "Notes"
+msgstr "Notes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_claim_wizard__notes
+msgid "Optional notes about this claim"
+msgstr "Notes facultatives concernant cette réclamation"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_claim_wizard__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_commission_claim_wizard
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Claim Commission Payment"
+msgstr "Réclamer le paiement de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Selected Commissions"
+msgstr "Commissions sélectionnées"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Additional Information"
+msgstr "Informations supplémentaires"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Optional notes about this claim..."
+msgstr "Notes facultatives concernant cette réclamation..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Important:"
+msgstr "Important :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "You are about to submit a claim for"
+msgstr "Vous êtes sur le point de soumettre une réclamation pour"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "commission(s)"
+msgstr "commission(s)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Total amount to be claimed:"
+msgstr "Montant total à réclamer :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Once submitted, your claim will be reviewed by management"
+msgstr "Une fois soumise, votre réclamation sera examinée par la direction"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "You will be notified when your claim is approved or rejected"
+msgstr "Vous serez notifié lorsque votre réclamation sera approuvée ou rejetée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Submit Claim"
+msgstr "Soumettre la réclamation"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "Please select at least one commission to claim."
+msgstr "Veuillez sélectionner au moins une commission à réclamer."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "Only unpaid and confirmed commissions can be claimed.\\nPlease remove the following commissions:\\n%s"
+msgstr "Seules les commissions impayées et confirmées peuvent être réclamées.\\nVeuillez retirer les commissions suivantes :\\n%s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "You can only claim your own commissions."
+msgstr "Vous ne pouvez réclamer que vos propres commissions."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "No commissions selected."
+msgstr "Aucune commission sélectionnée."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "Claim Submitted"
+msgstr "Réclamation soumise"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/wizard/commission_claim_wizard.py:0
+#, python-format
+msgid "Your claim %s for %s commissions totaling %s has been submitted successfully."
+msgstr "Votre réclamation %s pour %s commissions d'un montant total de %s a été soumise avec succès."
+
