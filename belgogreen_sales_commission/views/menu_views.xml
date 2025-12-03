@@ -83,5 +83,17 @@
                   action="action_hr_commission_role_config"
                   sequence="20"/>
 
+        <menuitem id="menu_team_hierarchy"
+                  name="Team Hierarchy"
+                  parent="menu_commission_configuration"
+                  action="action_team_hierarchy"
+                  sequence="30"/>
+
+        <menuitem id="menu_team_management_dashboard"
+                  name="Team Management"
+                  parent="menu_commission_configuration"
+                  action="action_team_management_dashboard"
+                  sequence="40"/>
+
     </data>
 </odoo>
