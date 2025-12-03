@@ -11,9 +11,20 @@
                 <!-- Add commission fields in Preferences notebook -->
                 <xpath expr="//page[@name='preferences']" position="after">
                     <page string="Commission Hierarchy" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
+                        <!-- Hidden fields for computation -->
+                        <field name="has_subordinates" invisible="1"/>
+
+                        <!-- Hierarchy Warnings Alert -->
+                        <div class="alert alert-warning" role="alert" invisible="not hierarchy_warnings">
+                            <strong>⚠️ Hierarchy Issues:</strong>
+                            <field name="hierarchy_warnings" nolabel="1" readonly="1"/>
+                        </div>
+
                         <group>
                             <group string="Commission Role">
                                 <field name="commission_role"/>
+                                <field name="active_commission_count" readonly="1"/>
+                                <field name="subordinate_count" readonly="1" invisible="subordinate_count == 0"/>
                             </group>
                             <group string="Hierarchy">
                                 <field name="team_leader_id" invisible="commission_role == 'sales_director'"/>

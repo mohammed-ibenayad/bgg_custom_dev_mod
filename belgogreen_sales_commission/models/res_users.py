@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class ResUsers(models.Model):
@@ -81,6 +82,30 @@ class ResUsers(models.Model):
         compute='_compute_team_commission_stats',
         currency_field='company_currency_id',
         help='Total unpaid commissions for all subordinates'
+    )
+
+    active_commission_count = fields.Integer(
+        string='Active Commissions',
+        compute='_compute_active_commissions',
+        help='Number of unpaid or claimed commissions'
+    )
+
+    has_subordinates = fields.Boolean(
+        string='Has Subordinates',
+        compute='_compute_has_subordinates',
+        help='True if user has team members reporting to them'
+    )
+
+    subordinate_count = fields.Integer(
+        string='Number of Subordinates',
+        compute='_compute_has_subordinates',
+        help='Total number of subordinates (direct and indirect)'
+    )
+
+    hierarchy_warnings = fields.Text(
+        string='Hierarchy Warnings',
+        compute='_compute_hierarchy_warnings',
+        help='Warnings about hierarchy structure issues'
     )
 
     @api.depends('my_commission_ids', 'my_commission_ids.payment_status', 'my_commission_ids.commission_amount')
@@ -176,3 +201,136 @@ class ResUsers(models.Model):
                 'search_default_group_by_user': 1,
             }
         }
+
+    @api.depends('my_commission_ids', 'my_commission_ids.payment_status')
+    def _compute_active_commissions(self):
+        """Compute count of active (unpaid/claimed) commissions"""
+        for user in self:
+            active_commissions = user.my_commission_ids.filtered(
+                lambda c: c.payment_status in ['unpaid', 'claimed', 'processing']
+            )
+            user.active_commission_count = len(active_commissions)
+
+    @api.depends('team_member_ids', 'director_team_ids')
+    def _compute_has_subordinates(self):
+        """Check if user has any subordinates"""
+        for user in self:
+            subordinate_ids = user._get_all_subordinate_ids()
+            user.has_subordinates = bool(subordinate_ids)
+            user.subordinate_count = len(subordinate_ids)
+
+    @api.depends('commission_role', 'team_leader_id', 'sales_director_id', 'team_member_ids', 'director_team_ids')
+    def _compute_hierarchy_warnings(self):
+        """Generate warnings about hierarchy issues"""
+        for user in self:
+            warnings = []
+
+            # Check if role matches hierarchy position
+            if user.commission_role == 'salesperson':
+                if user.team_member_ids or user.director_team_ids:
+                    warnings.append(_("Warning: Salesperson has team members assigned"))
+                if not user.team_leader_id:
+                    warnings.append(_("Warning: Salesperson should have a team leader"))
+
+            elif user.commission_role == 'team_leader':
+                if user.team_leader_id:
+                    warnings.append(_("Warning: Team leader shouldn't have a team leader assigned"))
+                if not user.sales_director_id:
+                    warnings.append(_("Warning: Team leader should have a sales director"))
+                if user.director_team_ids:
+                    warnings.append(_("Warning: Team leader has director team members (should use team_member_ids)"))
+
+            elif user.commission_role == 'sales_director':
+                if user.team_leader_id or user.sales_director_id:
+                    warnings.append(_("Warning: Sales director shouldn't report to anyone"))
+                if user.team_member_ids:
+                    warnings.append(_("Warning: Sales director has team members (should use director_team_ids)"))
+
+            user.hierarchy_warnings = '\n'.join(warnings) if warnings else ''
+
+    def write(self, vals):
+        """Override write to validate role changes"""
+        # Check if commission_role is being changed
+        if 'commission_role' in vals:
+            for user in self:
+                old_role = user.commission_role
+                new_role = vals['commission_role']
+
+                # Skip if role is not actually changing
+                if old_role == new_role:
+                    continue
+
+                # Build warning message
+                warnings = []
+                blocking_issues = []
+
+                # Check for active commissions
+                if user.active_commission_count > 0:
+                    warnings.append(
+                        _("• User has %s active commission(s) with role '%s'") % (
+                            user.active_commission_count,
+                            dict(user._fields['commission_role'].selection).get(old_role, old_role)
+                        )
+                    )
+
+                # Check for subordinates
+                if user.has_subordinates:
+                    subordinate_count = user.subordinate_count
+                    if new_role == 'salesperson':
+                        # Blocking: Can't change to salesperson if has subordinates
+                        blocking_issues.append(
+                            _("• Cannot change to Salesperson: User has %s subordinate(s) who would be orphaned") % subordinate_count
+                        )
+                    else:
+                        warnings.append(
+                            _("• User manages %s subordinate(s) in the hierarchy") % subordinate_count
+                        )
+
+                # Check for team members pointing to this user
+                if new_role == 'salesperson':
+                    # Check if anyone has this user as team_leader_id
+                    team_members = self.env['res.users'].search([('team_leader_id', '=', user.id)])
+                    if team_members:
+                        blocking_issues.append(
+                            _("• Cannot change to Salesperson: %s user(s) have this user as their team leader") % len(team_members)
+                        )
+
+                    # Check if anyone has this user as sales_director_id
+                    director_members = self.env['res.users'].search([('sales_director_id', '=', user.id)])
+                    if director_members:
+                        blocking_issues.append(
+                            _("• Cannot change to Salesperson: %s user(s) have this user as their sales director") % len(director_members)
+                        )
+
+                elif new_role == 'team_leader':
+                    # Check if anyone has this user as sales_director_id
+                    director_members = self.env['res.users'].search([('sales_director_id', '=', user.id)])
+                    if director_members:
+                        blocking_issues.append(
+                            _("• Cannot change to Team Leader: %s user(s) have this user as their sales director") % len(director_members)
+                        )
+
+                # If there are blocking issues, prevent the change
+                if blocking_issues:
+                    raise UserError(
+                        _("Cannot change commission role from '%s' to '%s' for user %s:\n\n%s\n\nPlease reassign subordinates first.") % (
+                            dict(user._fields['commission_role'].selection).get(old_role, old_role),
+                            dict(user._fields['commission_role'].selection).get(new_role, new_role),
+                            user.name,
+                            '\n'.join(blocking_issues)
+                        )
+                    )
+
+                # If there are warnings (but not blocking), log them
+                if warnings:
+                    # In Odoo, we can't show a confirmation dialog in write(),
+                    # but we can log a warning message
+                    message = _("Changing commission role from '%s' to '%s':\n\n%s\n\nPlease ensure commission plans are updated accordingly.") % (
+                        dict(user._fields['commission_role'].selection).get(old_role, old_role),
+                        dict(user._fields['commission_role'].selection).get(new_role, new_role),
+                        '\n'.join(warnings)
+                    )
+                    # Post message to user's chatter
+                    user.message_post(body=message, subject=_("Commission Role Changed"))
+
+        return super(ResUsers, self).write(vals)
