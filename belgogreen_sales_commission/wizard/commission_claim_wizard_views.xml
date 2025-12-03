@@ -18,8 +18,9 @@
                 </group>
 
                 <group string="Selected Commissions">
-                    <field name="commission_ids" nolabel="1" readonly="1">
-                        <tree decoration-success="payment_status=='paid'"
+                    <field name="commission_ids" nolabel="1">
+                        <tree create="false" delete="false" edit="false"
+                              decoration-success="payment_status=='paid'"
                               decoration-warning="payment_status=='claimed'"
                               decoration-muted="payment_status=='cancelled'">
                             <field name="name"/>
