@@ -7,3 +7,5 @@ access_sale_commission_claim_user,sale.commission.claim.user,model_sale_commissi
 access_sale_commission_claim_manager,sale.commission.claim.manager,model_sale_commission_claim,group_commission_manager,1,1,1,1
 access_hr_commission_role_config_user,hr.commission.role.config.user,model_hr_commission_role_config,group_commission_user,1,0,0,0
 access_hr_commission_role_config_manager,hr.commission.role.config.manager,model_hr_commission_role_config,group_commission_manager,1,1,1,1
+access_commission_claim_wizard_user,commission.claim.wizard.user,model_commission_claim_wizard,group_commission_user,1,1,1,1
+access_commission_claim_wizard_manager,commission.claim.wizard.manager,model_commission_claim_wizard,group_commission_manager,1,1,1,1
