@@ -1685,3 +1685,80 @@ msgstr "Commissions"
 msgid "Commissions"
 msgstr "Commissions"
 
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__director_team_ids
+msgid "Director Team"
+msgstr "Équipe du directeur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__director_team_ids
+msgid "Team leaders and salespeople reporting to this sales director"
+msgstr "Chefs d'équipe et commerciaux rattachés à ce directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_commission_count
+msgid "Team Commission Count"
+msgstr "Nombre de commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_commission_count
+msgid "Total commissions for all subordinates"
+msgstr "Total des commissions pour tous les subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_unpaid_total
+msgid "Team Unpaid Commissions"
+msgstr "Commissions d'équipe non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_unpaid_total
+msgid "Total unpaid commissions for all subordinates"
+msgstr "Total des commissions non payées pour tous les subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Team Members (Salespeople)"
+msgstr "Membres de l'équipe (Commerciaux)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Director Team (All Reports)"
+msgstr "Équipe du directeur (Tous les rapports)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_commissions
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_team
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "No team commissions found"
+msgstr "Aucune commission d'équipe trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "Your team's commissions will appear here once sales orders are invoiced and paid."
+msgstr "Les commissions de votre équipe apparaîtront ici une fois que les commandes de vente seront facturées et payées."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "You will see commissions for all users in your hierarchy."
+msgstr "Vous verrez les commissions de tous les utilisateurs de votre hiérarchie."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
