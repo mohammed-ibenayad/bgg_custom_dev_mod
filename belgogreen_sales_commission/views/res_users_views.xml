@@ -20,8 +20,17 @@
                                 <field name="sales_director_id" invisible="commission_role == 'sales_director'"/>
                             </group>
                         </group>
-                        <group string="Team Members" invisible="commission_role not in ['team_leader', 'sales_director']">
+                        <group string="Team Members (Salespeople)" invisible="commission_role != 'team_leader'">
                             <field name="team_member_ids" nolabel="1" options="{'no_create': True}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="commission_role"/>
+                                    <field name="commission_unpaid_total"/>
+                                </list>
+                            </field>
+                        </group>
+                        <group string="Director Team (All Reports)" invisible="commission_role != 'sales_director'">
+                            <field name="director_team_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
                                     <field name="name"/>
                                     <field name="commission_role"/>

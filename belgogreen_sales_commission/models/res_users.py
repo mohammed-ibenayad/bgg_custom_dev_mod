@@ -33,6 +33,13 @@ class ResUsers(models.Model):
         help='Salespeople reporting to this team leader'
     )
 
+    director_team_ids = fields.One2many(
+        'res.users',
+        'sales_director_id',
+        string='Director Team',
+        help='Team leaders and salespeople reporting to this sales director'
+    )
+
     my_commission_ids = fields.One2many(
         'sale.commission',
         'user_id',
@@ -108,20 +115,29 @@ class ResUsers(models.Model):
         This method traverses the hierarchy tree downwards to find all users
         who report to this user, directly or indirectly.
 
+        For Team Leaders: Returns salespeople (via team_member_ids)
+        For Sales Directors: Returns team leaders + their salespeople (via director_team_ids)
+
         Returns:
             list: List of user IDs for all subordinates
         """
         self.ensure_one()
         subordinate_ids = []
 
-        # Get direct reports (team members)
+        # Get direct reports via team_leader_id (for Team Leaders → Salespeople)
         direct_reports = self.team_member_ids
 
+        # Get direct reports via sales_director_id (for Sales Directors → Team Leaders/Salespeople)
+        director_reports = self.director_team_ids
+
+        # Combine both types of direct reports
+        all_direct_reports = direct_reports | director_reports
+
         # Add direct reports to the list
-        subordinate_ids.extend(direct_reports.ids)
+        subordinate_ids.extend(all_direct_reports.ids)
 
         # Recursively get subordinates of direct reports
-        for member in direct_reports:
+        for member in all_direct_reports:
             subordinate_ids.extend(member._get_all_subordinate_ids())
 
         return subordinate_ids
