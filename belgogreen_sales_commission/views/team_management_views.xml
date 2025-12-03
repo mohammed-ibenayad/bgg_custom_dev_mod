@@ -37,8 +37,8 @@
                     <field name="commission_unpaid_total"/>
                     <field name="team_unpaid_total"/>
                     <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                        <t t-name="card">
+                            <div class="oe_kanban_global_click">
                                 <div class="o_kanban_record_top">
                                     <div class="o_kanban_record_headings">
                                         <strong class="o_kanban_record_title"><field name="name"/></strong>
@@ -93,10 +93,6 @@
                     <filter string="Team Leaders" name="team_leaders" domain="[('commission_role', '=', 'team_leader')]"/>
                     <filter string="Salespeople" name="salespeople" domain="[('commission_role', '=', 'salesperson')]"/>
                     <separator/>
-                    <filter string="Has Subordinates" name="has_subordinates" domain="[('subordinate_count', '>', 0)]"/>
-                    <filter string="Has Active Commissions" name="has_active" domain="[('active_commission_count', '>', 0)]"/>
-                    <filter string="Has Hierarchy Issues" name="has_warnings" domain="[('hierarchy_warnings', '!=', False)]"/>
-                    <separator/>
                     <group expand="0" string="Group By">
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role'}"/>
                         <filter string="Sales Director" name="group_director" context="{'group_by': 'sales_director_id'}"/>
@@ -142,8 +138,8 @@
             <field name="name">Team Management Dashboard</field>
             <field name="res_model">res.users</field>
             <field name="view_mode">kanban,list,graph,form</field>
-            <field name="domain">[('commission_role', '!=', False)]</field>
-            <field name="context">{'search_default_has_subordinates': 1}</field>
+            <field name="domain">[('commission_role', 'in', ['team_leader', 'sales_director'])]</field>
+            <field name="context">{}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
