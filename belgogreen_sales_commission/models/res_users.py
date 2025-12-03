@@ -63,6 +63,19 @@ class ResUsers(models.Model):
         readonly=True
     )
 
+    team_commission_count = fields.Integer(
+        string='Team Commission Count',
+        compute='_compute_team_commission_stats',
+        help='Total commissions for all subordinates'
+    )
+
+    team_unpaid_total = fields.Monetary(
+        string='Team Unpaid Commissions',
+        compute='_compute_team_commission_stats',
+        currency_field='company_currency_id',
+        help='Total unpaid commissions for all subordinates'
+    )
+
     @api.depends('my_commission_ids', 'my_commission_ids.payment_status', 'my_commission_ids.commission_amount')
     def _compute_commission_stats(self):
         """Compute commission statistics for the user"""
@@ -86,4 +99,64 @@ class ResUsers(models.Model):
             'view_mode': 'list,form',
             'domain': [('user_id', '=', self.id)],
             'context': {'default_user_id': self.id}
+        }
+
+    def _get_all_subordinate_ids(self):
+        """
+        Get all subordinate user IDs recursively.
+
+        This method traverses the hierarchy tree downwards to find all users
+        who report to this user, directly or indirectly.
+
+        Returns:
+            list: List of user IDs for all subordinates
+        """
+        self.ensure_one()
+        subordinate_ids = []
+
+        # Get direct reports (team members)
+        direct_reports = self.team_member_ids
+
+        # Add direct reports to the list
+        subordinate_ids.extend(direct_reports.ids)
+
+        # Recursively get subordinates of direct reports
+        for member in direct_reports:
+            subordinate_ids.extend(member._get_all_subordinate_ids())
+
+        return subordinate_ids
+
+    def _compute_team_commission_stats(self):
+        """Compute commission statistics for all subordinates"""
+        for user in self:
+            subordinate_ids = user._get_all_subordinate_ids()
+
+            if not subordinate_ids:
+                user.team_commission_count = 0
+                user.team_unpaid_total = 0.0
+            else:
+                # Get all commissions for subordinates
+                team_commissions = self.env['sale.commission'].search([
+                    ('user_id', 'in', subordinate_ids)
+                ])
+
+                user.team_commission_count = len(team_commissions)
+                user.team_unpaid_total = sum(
+                    team_commissions.filtered(lambda c: c.payment_status == 'unpaid').mapped('commission_amount')
+                )
+
+    def action_view_team_commissions(self):
+        """Open commissions for all subordinates"""
+        self.ensure_one()
+        subordinate_ids = self._get_all_subordinate_ids()
+
+        return {
+            'name': _('Team Commissions'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.commission',
+            'view_mode': 'list,form',
+            'domain': [('user_id', 'in', subordinate_ids)],
+            'context': {
+                'search_default_group_by_user': 1,
+            }
         }
