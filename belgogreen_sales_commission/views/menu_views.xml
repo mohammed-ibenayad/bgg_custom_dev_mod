@@ -27,6 +27,12 @@
                   action="action_sale_commission_claim_my"
                   sequence="20"/>
 
+        <menuitem id="menu_team_commissions"
+                  name="Team Commissions"
+                  parent="menu_my_commission"
+                  action="action_sale_commission_team"
+                  sequence="30"/>
+
         <!-- Commission Management (for managers) -->
         <menuitem id="menu_commission_management"
                   name="Management"

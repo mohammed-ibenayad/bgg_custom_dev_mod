@@ -30,12 +30,14 @@
                             </field>
                         </group>
                         <group string="Commission Statistics">
-                            <group>
+                            <group string="My Commissions">
                                 <field name="commission_count"/>
                                 <field name="commission_unpaid_total"/>
-                            </group>
-                            <group>
                                 <field name="commission_paid_total"/>
+                            </group>
+                            <group string="Team Commissions" invisible="commission_role not in ['team_leader', 'sales_director']">
+                                <field name="team_commission_count"/>
+                                <field name="team_unpaid_total"/>
                             </group>
                         </group>
                         <div class="oe_button_box" name="button_box">
@@ -44,7 +46,14 @@
                                     class="oe_stat_button"
                                     icon="fa-money"
                                     invisible="commission_count == 0">
-                                <field name="commission_count" widget="statinfo" string="Commissions"/>
+                                <field name="commission_count" widget="statinfo" string="My Commissions"/>
+                            </button>
+                            <button name="action_view_team_commissions"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-users"
+                                    invisible="team_commission_count == 0">
+                                <field name="team_commission_count" widget="statinfo" string="Team Commissions"/>
                             </button>
                         </div>
                     </page>

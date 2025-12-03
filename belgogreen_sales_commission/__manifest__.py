@@ -15,6 +15,7 @@ This module provides a comprehensive hierarchical commission system that:
 * Provides dedicated views for salespeople to see their commissions (wallet)
 * Includes admin tools for managing and processing commission payments
 * Supports manual adjustments and flexible configuration
+* Hierarchical visibility: supervisors can view all subordinate commissions recursively
 
 Main Features:
 --------------
@@ -23,6 +24,8 @@ Main Features:
 * Commission claims and approval workflow
 * Payment tracking and history
 * Role-based commission percentages
+* Hierarchical commission visibility (supervisors see all sub-level commissions)
+* Team commission dashboard and statistics
 * Integration with Odoo's existing commission and sales modules
     """,
 
@@ -30,7 +33,7 @@ Main Features:
     'website': "https://www.belgogreen.com",
 
     'category': 'Sales/Sales',
-    'version': '18.0.1.2',
+    'version': '18.0.1.3',
     'license': 'LGPL-3',
 
     # Dependencies - require Odoo sale_commission module
