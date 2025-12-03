@@ -1090,3 +1090,598 @@ msgstr "Réclamation soumise"
 msgid "Your claim %s for %s commissions totaling %s has been submitted successfully."
 msgstr "Votre réclamation %s pour %s commissions d'un montant total de %s a été soumise avec succès."
 
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_form
+msgid "Additional notes..."
+msgstr "Notes supplémentaires..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_form
+msgid "Payment notes..."
+msgstr "Notes de paiement..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Reason for claim..."
+msgstr "Motif de la réclamation..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Internal notes..."
+msgstr "Notes internes..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Optional notes about this claim..."
+msgstr "Notes facultatives concernant cette réclamation..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_order_form_inherit_commission
+msgid "Generate Commissions"
+msgstr "Générer les commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_order_form_inherit_commission
+msgid "Generate commissions for this sale order if invoices are paid"
+msgstr "Générer les commissions pour cette commande de vente si les factures sont payées"
+
+#. module: belgogreen_sales_commission
+#: sql_constraint:hr.commission.role.config:0
+msgid "Only one percentage configuration per role per plan is allowed!"
+msgstr "Une seule configuration de pourcentage par rôle par plan est autorisée !"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__sale_commission_plan__type__hierarchical
+msgid "Hierarchical"
+msgstr "Hiérarchique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_plan__type
+msgid "Commission plan type:\n- Target: Based on sales targets with progressive rates\n- Achievement: Based on performance metrics\n- Hierarchical: Fixed percentages split across sales hierarchy (Salesperson/Team Leader/Director)"
+msgstr "Type de plan de commission :\n- Objectif : Basé sur des objectifs de vente avec des taux progressifs\n- Performance : Basé sur des indicateurs de performance\n- Hiérarchique : Pourcentages fixes répartis dans la hiérarchie des ventes (Commercial/Chef d'équipe/Directeur)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_plan__is_hierarchical
+msgid "Computed field: True if type is hierarchical"
+msgstr "Champ calculé : Vrai si le type est hiérarchique"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Hierarchical commissions are event-based (triggered by paid invoices), not period-based. The periodicity field is set to \"Month\" automatically but is not used for commission calculations. You can safely ignore the Periods tab."
+msgstr "Les commissions hiérarchiques sont basées sur des événements (déclenchées par des factures payées), et non sur des périodes. Le champ de périodicité est automatiquement défini sur \"Mois\" mais n'est pas utilisé pour les calculs de commission. Vous pouvez ignorer en toute sécurité l'onglet Périodes."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Typical setup:"
+msgstr "Configuration typique :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Salesperson: 3-5%"
+msgstr "Commercial : 3-5%"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Team Leader: 1-2%"
+msgstr "Chef d'équipe : 1-2%"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Sales Director: 0.5-1%"
+msgstr "Directeur commercial : 0,5-1%"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
+msgid "Enable this option to automatically calculate commissions for the entire sales hierarchy. When enabled, commissions will be distributed across Salesperson, Team Leader, and Sales Director based on the percentages defined in the \"Role Percentages\" tab."
+msgstr "Activez cette option pour calculer automatiquement les commissions pour toute la hiérarchie des ventes. Lorsqu'elle est activée, les commissions seront réparties entre le Commercial, le Chef d'équipe et le Directeur commercial en fonction des pourcentages définis dans l'onglet « Pourcentages par rôle »."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_all
+msgid "No commissions found"
+msgstr "Aucune commission trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_all
+msgid "Commissions are automatically created when invoices are paid."
+msgstr "Les commissions sont automatiquement créées lorsque les factures sont payées."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_user
+msgid "You don't have any commissions yet"
+msgstr "Vous n'avez pas encore de commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_user
+msgid "Your commissions will appear here once sales orders are invoiced and paid."
+msgstr "Vos commissions apparaîtront ici une fois que les commandes de vente seront facturées et payées."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_unpaid
+msgid "No unpaid commissions"
+msgstr "Aucune commission non payée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_claim
+msgid "No claims found"
+msgstr "Aucune réclamation trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_claim
+msgid "Users can claim their commissions for payment here."
+msgstr "Les utilisateurs peuvent réclamer leurs commissions pour paiement ici."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_claim_user
+msgid "You haven't submitted any claims yet"
+msgstr "Vous n'avez pas encore soumis de réclamation"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_claim_user
+msgid "You can claim your unpaid commissions for payment."
+msgstr "Vous pouvez réclamer vos commissions non payées pour paiement."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_payment
+msgid "Create a commission payment"
+msgstr "Créer un paiement de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_payment
+msgid "Group multiple commissions into a single payment batch for easier processing."
+msgstr "Regrouper plusieurs commissions dans un seul lot de paiement pour un traitement plus facile."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Create a commission role configuration"
+msgstr "Créer une configuration de rôle de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Define commission percentages for each role (Salesperson, Team Leader, Sales Director) within a commission plan."
+msgstr "Définir les pourcentages de commission pour chaque rôle (Commercial, Chef d'équipe, Directeur commercial) dans un plan de commission."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_plan
+msgid "Define commission plans with different calculation methods: Target: Based on sales targets with progressive rates, Achievement: Based on performance metrics, Hierarchical: Fixed percentages across sales hierarchy"
+msgstr "Définir des plans de commission avec différentes méthodes de calcul : Objectif : Basé sur des objectifs de vente avec des taux progressifs, Performance : Basé sur des indicateurs de performance, Hiérarchique : Pourcentages fixes dans la hiérarchie des ventes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_my_commission_section
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_plan__is_hierarchical
+msgid "Is Hierarchical"
+msgstr "Est hiérarchique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_all
+msgid "All Commissions"
+msgstr "Toutes les commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_user
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_unpaid
+msgid "Unpaid Commissions"
+msgstr "Commissions non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_claim
+msgid "Commission Claims"
+msgstr "Réclamations de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_claim_user
+msgid "My Claims"
+msgstr "Mes réclamations"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_payment
+msgid "Commission Payments"
+msgstr "Paiements de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Commission Role Configuration"
+msgstr "Configuration des rôles de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_tree
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_form
+msgid "Commission"
+msgstr "Commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_search
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_pivot
+msgid "Commissions Analysis"
+msgstr "Analyse des commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_graph
+msgid "Commissions Analysis"
+msgstr "Analyse des commissions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_claim_tree
+msgid "Commission Claims"
+msgstr "Réclamations de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Commission Claim"
+msgstr "Réclamation de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Commission Claims"
+msgstr "Réclamations de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_payment_tree
+msgid "Commission Payments"
+msgstr "Paiements de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_payment_form
+msgid "Commission Payment"
+msgstr "Paiement de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Commission Payments"
+msgstr "Paiements de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_plan_tree_hierarchical
+msgid "Commission Plans"
+msgstr "Plans de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Commission Plans"
+msgstr "Plans de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_hr_commission_role_config_tree
+msgid "Role Configurations"
+msgstr "Configurations des rôles"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Role Configuration"
+msgstr "Configuration des rôles"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.view,name:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Role Configuration"
+msgstr "Configuration des rôles"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Unpaid"
+msgstr "Non payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Claimed"
+msgstr "Réclamé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Processing"
+msgstr "En traitement"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Paid"
+msgstr "Payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Can Be Paid"
+msgstr "Peut être payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Salesperson"
+msgstr "Commercial"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Team Leader"
+msgstr "Chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Sales Director"
+msgstr "Directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Current Month"
+msgstr "Mois en cours"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Last Month"
+msgstr "Mois dernier"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Role"
+msgstr "Rôle"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Payment Status"
+msgstr "Statut de paiement"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Period"
+msgstr "Période"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Plan"
+msgstr "Plan"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_search
+msgid "Date"
+msgstr "Date"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "My Claims"
+msgstr "Mes réclamations"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Pending"
+msgstr "En attente"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Rejected"
+msgstr "Rejeté"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "State"
+msgstr "État"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Processed By"
+msgstr "Traité par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_search
+msgid "Claim Date"
+msgstr "Date de réclamation"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "My Payments"
+msgstr "Mes paiements"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Paid"
+msgstr "Payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "This Month"
+msgstr "Ce mois-ci"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Payment Method"
+msgstr "Mode de paiement"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "State"
+msgstr "État"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_search
+msgid "Payment Date"
+msgstr "Date de paiement"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Target Plans"
+msgstr "Plans d'objectifs"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Achievement Plans"
+msgstr "Plans de performance"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Hierarchical Plans"
+msgstr "Plans hiérarchiques"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Type"
+msgstr "Type"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "Periodicity"
+msgstr "Périodicité"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_search_inherit
+msgid "State"
+msgstr "État"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Active"
+msgstr "Actif"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Inactive"
+msgstr "Inactif"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Plan"
+msgstr "Plan"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_search
+msgid "Role"
+msgstr "Rôle"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Commission Role"
+msgstr "Rôle de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Hierarchy"
+msgstr "Hiérarchie"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Team Members"
+msgstr "Membres de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Commission Statistics"
+msgstr "Statistiques des commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_order_form_inherit_commission
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_order_form_inherit_commission
+msgid "Commission Information"
+msgstr "Informations sur la commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_account_move_form_inherit_commission
+msgid "Commissions"
+msgstr "Commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_claim_wizard_form
+msgid "Commissions"
+msgstr "Commissions"
+
