@@ -103,8 +103,6 @@
                     <field name="period"/>
                     <separator/>
                     <filter string="My Commissions" name="my_commissions" domain="[('user_id', '=', uid)]"/>
-                    <filter string="My Direct Team" name="my_direct_team" domain="[('user_id', 'in', user.team_member_ids.ids)]"/>
-                    <filter string="All My Team" name="my_all_team" domain="[('user_id', 'in', user._get_all_subordinate_ids())]"/>
                     <separator/>
                     <filter string="Unpaid" name="unpaid" domain="[('payment_status', '=', 'unpaid')]"/>
                     <filter string="Claimed" name="claimed" domain="[('payment_status', '=', 'claimed')]"/>
@@ -254,17 +252,20 @@
         </record>
 
         <!-- Team Commissions (Supervisor View) -->
+        <!-- Note: This action shows all commissions visible to the current user based on record rules.
+             The actual filtering happens automatically via the hierarchical record rules. -->
         <record id="action_sale_commission_team" model="ir.actions.act_window">
             <field name="name">Team Commissions</field>
             <field name="res_model">sale.commission</field>
             <field name="view_mode">list,form,kanban,pivot,graph</field>
-            <field name="context">{'search_default_my_all_team': 1, 'search_default_group_user': 1}</field>
+            <field name="context">{'search_default_group_user': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No team commissions found
                 </p>
                 <p>
                     Your team's commissions will appear here once sales orders are invoiced and paid.
+                    You will see commissions for all users in your hierarchy.
                 </p>
             </field>
         </record>
