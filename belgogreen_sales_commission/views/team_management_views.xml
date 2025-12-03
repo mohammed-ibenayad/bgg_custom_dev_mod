@@ -7,7 +7,7 @@
             <field name="name">team.hierarchy.tree</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <tree string="Team Hierarchy" decoration-info="commission_role == 'sales_director'"
+                <list string="Team Hierarchy" decoration-info="commission_role == 'sales_director'"
                       decoration-success="commission_role == 'team_leader'"
                       decoration-muted="not commission_role">
                     <field name="name"/>
@@ -18,7 +18,7 @@
                     <field name="active_commission_count"/>
                     <field name="commission_unpaid_total" sum="Total Unpaid"/>
                     <field name="team_unpaid_total" sum="Team Total Unpaid"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -110,7 +110,7 @@
         <record id="action_team_hierarchy" model="ir.actions.act_window">
             <field name="name">Team Hierarchy</field>
             <field name="res_model">res.users</field>
-            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_mode">list,kanban,form</field>
             <field name="domain">[('commission_role', '!=', False)]</field>
             <field name="context">{'search_default_group_director': 1}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
@@ -141,7 +141,7 @@
         <record id="action_team_management_dashboard" model="ir.actions.act_window">
             <field name="name">Team Management Dashboard</field>
             <field name="res_model">res.users</field>
-            <field name="view_mode">kanban,tree,graph,form</field>
+            <field name="view_mode">kanban,list,graph,form</field>
             <field name="domain">[('commission_role', '!=', False)]</field>
             <field name="context">{'search_default_has_subordinates': 1}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
