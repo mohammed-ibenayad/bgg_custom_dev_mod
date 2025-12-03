@@ -1685,3 +1685,333 @@ msgstr "Commissions"
 msgid "Commissions"
 msgstr "Commissions"
 
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__director_team_ids
+msgid "Director Team"
+msgstr "Équipe du directeur"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__director_team_ids
+msgid "Team leaders and salespeople reporting to this sales director"
+msgstr "Chefs d'équipe et commerciaux rattachés à ce directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_commission_count
+msgid "Team Commission Count"
+msgstr "Nombre de commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_commission_count
+msgid "Total commissions for all subordinates"
+msgstr "Total des commissions pour tous les subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__team_unpaid_total
+msgid "Team Unpaid Commissions"
+msgstr "Commissions d'équipe non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__team_unpaid_total
+msgid "Total unpaid commissions for all subordinates"
+msgstr "Total des commissions non payées pour tous les subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Team Members (Salespeople)"
+msgstr "Membres de l'équipe (Commerciaux)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Director Team (All Reports)"
+msgstr "Équipe du directeur (Tous les rapports)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "My Commissions"
+msgstr "Mes commissions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_commissions
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_sale_commission_team
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "No team commissions found"
+msgstr "Aucune commission d'équipe trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "Your team's commissions will appear here once sales orders are invoiced and paid."
+msgstr "Les commissions de votre équipe apparaîtront ici une fois que les commandes de vente seront facturées et payées."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_sale_commission_team
+msgid "You will see commissions for all users in your hierarchy."
+msgstr "Vous verrez les commissions de tous les utilisateurs de votre hiérarchie."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Team Commissions"
+msgstr "Commissions d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__active_commission_count
+msgid "Active Commissions"
+msgstr "Commissions actives"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__active_commission_count
+msgid "Number of unpaid or claimed commissions"
+msgstr "Nombre de commissions non payées ou réclamées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__has_subordinates
+msgid "Has Subordinates"
+msgstr "A des subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__has_subordinates
+msgid "True if user has team members reporting to them"
+msgstr "Vrai si l'utilisateur a des membres d'équipe qui lui rendent compte"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__subordinate_count
+msgid "Number of Subordinates"
+msgstr "Nombre de subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__subordinate_count
+msgid "Total number of subordinates (direct and indirect)"
+msgstr "Nombre total de subordonnés (directs et indirects)"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_res_users__hierarchy_warnings
+msgid "Hierarchy Warnings"
+msgstr "Avertissements hiérarchiques"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_res_users__hierarchy_warnings
+msgid "Warnings about hierarchy structure issues"
+msgstr "Avertissements concernant les problèmes de structure hiérarchique"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Salesperson has team members assigned"
+msgstr "Avertissement : Le commercial a des membres d'équipe assignés"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Salesperson should have a team leader"
+msgstr "Avertissement : Le commercial devrait avoir un chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Team leader shouldn't have a team leader assigned"
+msgstr "Avertissement : Le chef d'équipe ne devrait pas avoir de chef d'équipe assigné"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Team leader should have a sales director"
+msgstr "Avertissement : Le chef d'équipe devrait avoir un directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Team leader has director team members (should use team_member_ids)"
+msgstr "Avertissement : Le chef d'équipe a des membres d'équipe de directeur (devrait utiliser team_member_ids)"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Sales director shouldn't report to anyone"
+msgstr "Avertissement : Le directeur commercial ne devrait rendre compte à personne"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Warning: Sales director has team members (should use director_team_ids)"
+msgstr "Avertissement : Le directeur commercial a des membres d'équipe (devrait utiliser director_team_ids)"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• User has %s active commission(s) with role '%s'"
+msgstr "• L'utilisateur a %s commission(s) active(s) avec le rôle '%s'"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• Cannot change to Salesperson: User has %s subordinate(s) who would be orphaned"
+msgstr "• Impossible de changer en Commercial : L'utilisateur a %s subordonné(s) qui seraient orphelins"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• User manages %s subordinate(s) in the hierarchy"
+msgstr "• L'utilisateur gère %s subordonné(s) dans la hiérarchie"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• Cannot change to Salesperson: %s user(s) have this user as their team leader"
+msgstr "• Impossible de changer en Commercial : %s utilisateur(s) ont cet utilisateur comme chef d'équipe"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• Cannot change to Salesperson: %s user(s) have this user as their sales director"
+msgstr "• Impossible de changer en Commercial : %s utilisateur(s) ont cet utilisateur comme directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "• Cannot change to Team Leader: %s user(s) have this user as their sales director"
+msgstr "• Impossible de changer en Chef d'équipe : %s utilisateur(s) ont cet utilisateur comme directeur commercial"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Cannot change commission role from '%s' to '%s' for user %s:\n\n%s\n\nPlease reassign subordinates first."
+msgstr "Impossible de changer le rôle de commission de '%s' à '%s' pour l'utilisateur %s :\n\n%s\n\nVeuillez réaffecter les subordonnés d'abord."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Changing commission role from '%s' to '%s':\n\n%s\n\nPlease ensure commission plans are updated accordingly."
+msgstr "Changement du rôle de commission de '%s' à '%s' :\n\n%s\n\nVeuillez vous assurer que les plans de commission sont mis à jour en conséquence."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/res_users.py:0
+#, python-format
+msgid "Commission Role Changed"
+msgstr "Rôle de commission modifié"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_hierarchy
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_team_hierarchy
+msgid "Team Hierarchy"
+msgstr "Hiérarchie des équipes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_management_dashboard
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_team_management_dashboard
+msgid "Team Management"
+msgstr "Gestion des équipes"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
+msgid "No commission hierarchy defined yet"
+msgstr "Aucune hiérarchie de commission définie pour le moment"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
+msgid "Set up your sales team hierarchy by assigning commission roles to users."
+msgstr "Configurez la hiérarchie de votre équipe de vente en attribuant des rôles de commission aux utilisateurs."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_management_dashboard
+msgid "No teams found"
+msgstr "Aucune équipe trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_management_dashboard
+msgid "Teams will appear here once you assign Team Leaders and Sales Directors."
+msgstr "Les équipes apparaîtront ici une fois que vous aurez attribué des chefs d'équipe et des directeurs commerciaux."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Sales Directors"
+msgstr "Directeurs commerciaux"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Team Leaders"
+msgstr "Chefs d'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Salespeople"
+msgstr "Commerciaux"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Has Subordinates"
+msgstr "A des subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Has Active Commissions"
+msgstr "A des commissions actives"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Has Hierarchy Issues"
+msgstr "A des problèmes hiérarchiques"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Team Hierarchy"
+msgstr "Hiérarchie des équipes"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Total Unpaid"
+msgstr "Total non payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Team Total Unpaid"
+msgstr "Total équipe non payé"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Director:"
+msgstr "Directeur :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Team Leader:"
+msgstr "Chef d'équipe :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Subordinates:"
+msgstr "Subordonnés :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Active Commissions:"
+msgstr "Commissions actives :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Unpaid:"
+msgstr "Non payé :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Team Unpaid:"
+msgstr "Équipe non payée :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_management_graph
+msgid "Team Performance"
+msgstr "Performance de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_res_users_form_inherit
+msgid "⚠️ Hierarchy Issues:"
+msgstr "⚠️ Problèmes hiérarchiques :"
+

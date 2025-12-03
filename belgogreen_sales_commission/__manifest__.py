@@ -56,6 +56,7 @@ Main Features:
         'views/hr_commission_role_config_views.xml',
         'views/sale_commission_plan_views.xml',
         'views/res_users_views.xml',
+        'views/team_management_views.xml',
         'views/sale_order_views.xml',
         'views/sale_commission_payment_views.xml',  # Must load BEFORE sale_commission_views
         'views/sale_commission_claim_views.xml',
