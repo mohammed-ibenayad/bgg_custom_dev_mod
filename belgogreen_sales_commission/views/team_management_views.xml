@@ -12,9 +12,9 @@
                       decoration-muted="not commission_role">
                     <field name="name" string="Nom" width="150px"/>
                     <field name="commission_role" string="Rôle" width="120px"/>
-                    <field name="sales_director_id" string="Directeur" width="130px"/>
+                    <field name="sales_director_id" string="Directeur Com." width="130px"/>
                     <field name="team_leader_id" string="Chef d'équipe" width="130px"/>
-                    <field name="subordinate_count" string="N. subordonnés" width="100px"/>
+                    <field name="subordinate_count" string="Nb. subordonnés" width="100px"/>
                     <field name="active_commission_count" string="Com. actives" width="100px"/>
                     <field name="commission_unpaid_total" string="Non payé" sum="Total non payé" width="110px"/>
                     <field name="team_unpaid_total" string="Équipe non payée" sum="Total équipe" width="120px"/>

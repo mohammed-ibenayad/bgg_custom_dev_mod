@@ -10,23 +10,23 @@
             <field name="arch" type="xml">
                 <!-- Add commission fields in Preferences notebook -->
                 <xpath expr="//page[@name='preferences']" position="after">
-                    <page string="Commission Hierarchy" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
+                    <page string="Hiérarchie des commissions" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
                         <!-- Hidden fields for computation -->
                         <field name="has_subordinates" invisible="1"/>
 
                         <!-- Hierarchy Warnings Alert -->
                         <div class="alert alert-warning" role="alert" invisible="not hierarchy_warnings">
-                            <strong>⚠️ Hierarchy Issues:</strong>
+                            <strong>⚠️ Problèmes de hiérarchie :</strong>
                             <field name="hierarchy_warnings" nolabel="1" readonly="1"/>
                         </div>
 
                         <group>
-                            <group string="Commission Role">
+                            <group string="Rôle de commission">
                                 <field name="commission_role"/>
                                 <field name="active_commission_count" readonly="1"/>
                                 <field name="subordinate_count" readonly="1" invisible="subordinate_count == 0"/>
                             </group>
-                            <group string="Hierarchy">
+                            <group string="Hiérarchie">
                                 <field name="team_leader_id" invisible="commission_role == 'sales_director'"/>
                                 <field name="sales_director_id" invisible="commission_role == 'sales_director'"/>
                             </group>
@@ -49,8 +49,8 @@
                                 </list>
                             </field>
                         </group>
-                        <group string="Commission Statistics">
-                            <group string="My Commissions">
+                        <group string="Statistiques des commissions">
+                            <group string="Mes commissions">
                                 <field name="commission_count"/>
                                 <field name="commission_unpaid_total"/>
                                 <field name="commission_paid_total"/>
@@ -66,7 +66,7 @@
                                     class="oe_stat_button"
                                     icon="fa-money"
                                     invisible="commission_count == 0">
-                                <field name="commission_count" widget="statinfo" string="My Commissions"/>
+                                <field name="commission_count" widget="statinfo" string="Mes commissions"/>
                             </button>
                             <button name="action_view_team_commissions"
                                     type="object"

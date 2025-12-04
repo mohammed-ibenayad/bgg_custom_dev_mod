@@ -128,7 +128,7 @@ class ResUsers(models.Model):
         """Open the user's commissions"""
         self.ensure_one()
         return {
-            'name': _('My Commissions'),
+            'name': _('Mes commissions'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
             'view_mode': 'list,form',
@@ -197,7 +197,7 @@ class ResUsers(models.Model):
         subordinate_ids = self._get_all_subordinate_ids()
 
         return {
-            'name': _('Team Commissions'),
+            'name': _('Commissions de l\'équipe'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.commission',
             'view_mode': 'list,form',
@@ -233,23 +233,23 @@ class ResUsers(models.Model):
             # Check if role matches hierarchy position
             if user.commission_role == 'salesperson':
                 if user.team_member_ids or user.director_team_ids:
-                    warnings.append(_("Warning: Salesperson has team members assigned"))
+                    warnings.append(_("Attention : Un commercial a des membres d'équipe assignés"))
                 if not user.team_leader_id:
-                    warnings.append(_("Warning: Salesperson should have a team leader"))
+                    warnings.append(_("Attention : Un commercial doit avoir un chef d'équipe"))
 
             elif user.commission_role == 'team_leader':
                 if user.team_leader_id:
-                    warnings.append(_("Warning: Team leader shouldn't have a team leader assigned"))
+                    warnings.append(_("Attention : Un chef d'équipe ne doit pas avoir de chef d'équipe assigné"))
                 if not user.sales_director_id:
-                    warnings.append(_("Warning: Team leader should have a sales director"))
+                    warnings.append(_("Attention : Un chef d'équipe doit avoir un directeur commercial"))
                 if user.director_team_ids:
-                    warnings.append(_("Warning: Team leader has director team members (should use team_member_ids)"))
+                    warnings.append(_("Attention : Un chef d'équipe a des membres d'équipe de directeur (utiliser team_member_ids)"))
 
             elif user.commission_role == 'sales_director':
                 if user.team_leader_id or user.sales_director_id:
-                    warnings.append(_("Warning: Sales director shouldn't report to anyone"))
+                    warnings.append(_("Attention : Un directeur commercial ne doit rapporter à personne"))
                 if user.team_member_ids:
-                    warnings.append(_("Warning: Sales director has team members (should use director_team_ids)"))
+                    warnings.append(_("Attention : Un directeur commercial a des membres d'équipe (utiliser director_team_ids)"))
 
             user.hierarchy_warnings = '\n'.join(warnings) if warnings else ''
 
@@ -272,7 +272,7 @@ class ResUsers(models.Model):
                 # Check for active commissions
                 if user.active_commission_count > 0:
                     warnings.append(
-                        _("• User has %s active commission(s) with role '%s'") % (
+                        _("• L'utilisateur a %s commission(s) active(s) avec le rôle '%s'") % (
                             user.active_commission_count,
                             dict(user._fields['commission_role'].selection).get(old_role, old_role)
                         )
@@ -284,11 +284,11 @@ class ResUsers(models.Model):
                     if new_role == 'salesperson':
                         # Blocking: Can't change to salesperson if has subordinates
                         blocking_issues.append(
-                            _("• Cannot change to Salesperson: User has %s subordinate(s) who would be orphaned") % subordinate_count
+                            _("• Impossible de changer en Commercial : L'utilisateur a %s subordonné(s) qui seront orphelins") % subordinate_count
                         )
                     else:
                         warnings.append(
-                            _("• User manages %s subordinate(s) in the hierarchy") % subordinate_count
+                            _("• L'utilisateur gère %s subordonné(s) dans la hiérarchie") % subordinate_count
                         )
 
                 # Check for team members pointing to this user
@@ -297,14 +297,14 @@ class ResUsers(models.Model):
                     team_members = self.env['res.users'].search([('team_leader_id', '=', user.id)])
                     if team_members:
                         blocking_issues.append(
-                            _("• Cannot change to Salesperson: %s user(s) have this user as their team leader") % len(team_members)
+                            _("• Impossible de changer en Commercial : %s utilisateur(s) ont cet utilisateur comme chef d'équipe") % len(team_members)
                         )
 
                     # Check if anyone has this user as sales_director_id
                     director_members = self.env['res.users'].search([('sales_director_id', '=', user.id)])
                     if director_members:
                         blocking_issues.append(
-                            _("• Cannot change to Salesperson: %s user(s) have this user as their sales director") % len(director_members)
+                            _("• Impossible de changer en Commercial : %s utilisateur(s) ont cet utilisateur comme directeur commercial") % len(director_members)
                         )
 
                 elif new_role == 'team_leader':
@@ -312,13 +312,13 @@ class ResUsers(models.Model):
                     director_members = self.env['res.users'].search([('sales_director_id', '=', user.id)])
                     if director_members:
                         blocking_issues.append(
-                            _("• Cannot change to Team Leader: %s user(s) have this user as their sales director") % len(director_members)
+                            _("• Impossible de changer en Chef d'équipe : %s utilisateur(s) ont cet utilisateur comme directeur commercial") % len(director_members)
                         )
 
                 # If there are blocking issues, prevent the change
                 if blocking_issues:
                     raise UserError(
-                        _("Cannot change commission role from '%s' to '%s' for user %s:\n\n%s\n\nPlease reassign subordinates first.") % (
+                        _("Impossible de changer le rôle de commission de '%s' à '%s' pour l'utilisateur %s:\n\n%s\n\nVeuillez réassigner les subordonnés d'abord.") % (
                             dict(user._fields['commission_role'].selection).get(old_role, old_role),
                             dict(user._fields['commission_role'].selection).get(new_role, new_role),
                             user.name,
@@ -330,12 +330,12 @@ class ResUsers(models.Model):
                 if warnings:
                     # In Odoo, we can't show a confirmation dialog in write(),
                     # but we can log a warning message
-                    message = _("Changing commission role from '%s' to '%s':\n\n%s\n\nPlease ensure commission plans are updated accordingly.") % (
+                    message = _("Changement du rôle de commission de '%s' à '%s':\n\n%s\n\nVeuillez vous assurer que les plans de commission sont mis à jour en conséquence.") % (
                         dict(user._fields['commission_role'].selection).get(old_role, old_role),
                         dict(user._fields['commission_role'].selection).get(new_role, new_role),
                         '\n'.join(warnings)
                     )
                     # Post message to user's chatter
-                    user.message_post(body=message, subject=_("Commission Role Changed"))
+                    user.message_post(body=message, subject=_("Rôle de commission modifié"))
 
         return super(ResUsers, self).write(vals)
