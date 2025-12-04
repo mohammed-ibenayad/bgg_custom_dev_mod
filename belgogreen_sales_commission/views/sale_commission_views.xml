@@ -8,6 +8,7 @@
             <field name="model">sale.commission</field>
             <field name="arch" type="xml">
                 <list string="Commissions" decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'claimed'" decoration-muted="state == 'cancelled'">
+                    <field name="currency_id" column_invisible="1"/>
                     <field name="name" string="Référence" width="130px"/>
                     <field name="date" string="Date" width="90px"/>
                     <field name="user_id" string="Utilisateur" width="140px"/>
