@@ -10,14 +10,14 @@
                 <list string="Team Hierarchy" decoration-info="commission_role == 'sales_director'"
                       decoration-success="commission_role == 'team_leader'"
                       decoration-muted="not commission_role">
-                    <field name="name"/>
-                    <field name="commission_role"/>
-                    <field name="sales_director_id"/>
-                    <field name="team_leader_id"/>
-                    <field name="subordinate_count"/>
-                    <field name="active_commission_count"/>
-                    <field name="commission_unpaid_total" sum="Total Unpaid"/>
-                    <field name="team_unpaid_total" sum="Team Total Unpaid"/>
+                    <field name="name" string="Nom" width="150px"/>
+                    <field name="commission_role" string="Rôle" width="120px"/>
+                    <field name="sales_director_id" string="Directeur" width="130px"/>
+                    <field name="team_leader_id" string="Chef d'équipe" width="130px"/>
+                    <field name="subordinate_count" string="N. subordonnés" width="100px"/>
+                    <field name="active_commission_count" string="Com. actives" width="100px"/>
+                    <field name="commission_unpaid_total" string="Non payé" sum="Total non payé" width="110px"/>
+                    <field name="team_unpaid_total" string="Équipe non payée" sum="Total équipe" width="120px"/>
                 </list>
             </field>
         </record>
@@ -53,22 +53,22 @@
                                 </div>
                                 <div class="o_kanban_record_body">
                                     <div t-if="record.sales_director_id.value">
-                                        <strong>Director:</strong> <field name="sales_director_id"/>
+                                        <strong>Directeur :</strong> <field name="sales_director_id"/>
                                     </div>
                                     <div t-if="record.team_leader_id.value">
-                                        <strong>Team Leader:</strong> <field name="team_leader_id"/>
+                                        <strong>Chef d'équipe :</strong> <field name="team_leader_id"/>
                                     </div>
                                     <div t-if="record.subordinate_count.value > 0">
-                                        <strong>Subordinates:</strong> <field name="subordinate_count"/>
+                                        <strong>Subordonnés :</strong> <field name="subordinate_count"/>
                                     </div>
                                     <div>
-                                        <strong>Active Commissions:</strong> <field name="active_commission_count"/>
+                                        <strong>Com. actives :</strong> <field name="active_commission_count"/>
                                     </div>
                                     <div>
-                                        <strong>Unpaid:</strong> <field name="commission_unpaid_total"/>
+                                        <strong>Non payé :</strong> <field name="commission_unpaid_total"/>
                                     </div>
                                     <div t-if="record.team_unpaid_total.value > 0">
-                                        <strong>Team Unpaid:</strong> <field name="team_unpaid_total"/>
+                                        <strong>Équipe non payée :</strong> <field name="team_unpaid_total"/>
                                     </div>
                                 </div>
                             </div>
