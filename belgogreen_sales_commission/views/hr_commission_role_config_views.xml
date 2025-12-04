@@ -8,11 +8,11 @@
             <field name="model">hr.commission.role.config</field>
             <field name="arch" type="xml">
                 <list string="Role Configurations" editable="bottom">
-                    <field name="plan_id"/>
-                    <field name="role"/>
-                    <field name="default_percentage"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="active"/>
+                    <field name="plan_id" string="Plan" width="200px"/>
+                    <field name="role" string="Rôle" width="120px"/>
+                    <field name="default_percentage" string="%" width="80px"/>
+                    <field name="company_id" string="Société" groups="base.group_multi_company" width="150px"/>
+                    <field name="active" string="Actif" width="80px"/>
                 </list>
             </field>
         </record>
