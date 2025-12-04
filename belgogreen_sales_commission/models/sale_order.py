@@ -145,9 +145,9 @@ class SaleOrder(models.Model):
         # Build commission hierarchy
         users_to_commission = []
 
-        # 1. Salesperson
+        # 1. Salesperson (always gets salesperson commission when making a sale)
         if salesperson.commission_role:
-            users_to_commission.append((salesperson, salesperson.commission_role))
+            users_to_commission.append((salesperson, 'salesperson'))
 
         # 2. Team Leader
         if salesperson.team_leader_id:
