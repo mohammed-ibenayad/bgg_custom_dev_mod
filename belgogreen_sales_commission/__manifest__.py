@@ -33,7 +33,7 @@ Main Features:
     'website': "https://www.belgogreen.com",
 
     'category': 'Sales/Sales',
-    'version': '18.0.1.3',
+    'version': '18.0.1.4',
     'license': 'LGPL-3',
 
     # Dependencies - require Odoo sale_commission module
