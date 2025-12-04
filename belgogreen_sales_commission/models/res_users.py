@@ -147,28 +147,30 @@ class ResUsers(models.Model):
         For Sales Directors: Returns team leaders + their salespeople (via director_team_ids)
 
         Returns:
-            list: List of user IDs for all subordinates
+            list: List of unique user IDs for all active subordinates (no duplicates)
         """
         self.ensure_one()
-        subordinate_ids = []
+        subordinate_ids = set()  # Use set to avoid duplicates
 
         # Get direct reports via team_leader_id (for Team Leaders → Salespeople)
-        direct_reports = self.team_member_ids
+        # Filter only active users
+        direct_reports = self.team_member_ids.filtered(lambda u: u.active)
 
         # Get direct reports via sales_director_id (for Sales Directors → Team Leaders/Salespeople)
-        director_reports = self.director_team_ids
+        # Filter only active users
+        director_reports = self.director_team_ids.filtered(lambda u: u.active)
 
         # Combine both types of direct reports
         all_direct_reports = direct_reports | director_reports
 
-        # Add direct reports to the list
-        subordinate_ids.extend(all_direct_reports.ids)
+        # Add direct reports to the set
+        subordinate_ids.update(all_direct_reports.ids)
 
         # Recursively get subordinates of direct reports
         for member in all_direct_reports:
-            subordinate_ids.extend(member._get_all_subordinate_ids())
+            subordinate_ids.update(member._get_all_subordinate_ids())
 
-        return subordinate_ids
+        return list(subordinate_ids)  # Convert back to list for compatibility
 
     def _compute_team_commission_stats(self):
         """Compute commission statistics for all subordinates"""
