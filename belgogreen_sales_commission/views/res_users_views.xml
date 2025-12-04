@@ -16,7 +16,7 @@
 
                         <!-- Hierarchy Warnings Alert -->
                         <div class="alert alert-warning" role="alert" invisible="not hierarchy_warnings">
-                            <strong>⚠️ Hierarchy Issues:</strong>
+                            <strong>⚠️ Problèmes de hiérarchie :</strong>
                             <field name="hierarchy_warnings" nolabel="1" readonly="1"/>
                         </div>
 
