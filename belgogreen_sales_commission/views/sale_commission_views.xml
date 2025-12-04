@@ -40,16 +40,6 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                     </header>
                     <sheet>
-                        <div class="oe_button_box" name="button_box">
-                            <button name="%(action_sale_commission_payment)d"
-                                    type="action"
-                                    class="oe_stat_button"
-                                    icon="fa-money"
-                                    context="{'search_default_user_id': user_id}"
-                                    invisible="not payment_id">
-                                <field name="payment_status" widget="label"/>
-                            </button>
-                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -65,7 +55,7 @@
                             <group string="Calculation">
                                 <field name="plan_id" readonly="1"/>
                                 <field name="base_amount" readonly="1"/>
-                                <field name="percentage_override" groups="belgogreen_sales_commission.group_commission_manager"/>
+                                <field name="percentage_override" groups="belgogreen_sales_commission.group_commission_manager" readonly="payment_status in ['processing', 'paid']"/>
                                 <field name="commission_percentage" readonly="1"/>
                                 <field name="commission_amount" class="oe_subtotal_footer_separator" readonly="1"/>
                             </group>
