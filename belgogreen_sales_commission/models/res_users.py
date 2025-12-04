@@ -55,12 +55,14 @@ class ResUsers(models.Model):
     commission_unpaid_total = fields.Monetary(
         string='Unpaid Commissions',
         compute='_compute_commission_stats',
+        store=True,
         currency_field='company_currency_id'
     )
 
     commission_paid_total = fields.Monetary(
         string='Paid Commissions',
         compute='_compute_commission_stats',
+        store=True,
         currency_field='company_currency_id'
     )
 
