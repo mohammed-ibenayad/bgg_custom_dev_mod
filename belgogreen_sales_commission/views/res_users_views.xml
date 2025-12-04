@@ -34,18 +34,18 @@
                         <group string="Team Members (Salespeople)" invisible="commission_role != 'team_leader'">
                             <field name="team_member_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
-                                    <field name="name"/>
-                                    <field name="commission_role"/>
-                                    <field name="commission_unpaid_total"/>
+                                    <field name="name" string="Nom" width="180px"/>
+                                    <field name="commission_role" string="Rôle" width="120px"/>
+                                    <field name="commission_unpaid_total" string="Non payé" width="110px"/>
                                 </list>
                             </field>
                         </group>
                         <group string="Director Team (All Reports)" invisible="commission_role != 'sales_director'">
                             <field name="director_team_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
-                                    <field name="name"/>
-                                    <field name="commission_role"/>
-                                    <field name="commission_unpaid_total"/>
+                                    <field name="name" string="Nom" width="180px"/>
+                                    <field name="commission_role" string="Rôle" width="120px"/>
+                                    <field name="commission_unpaid_total" string="Non payé" width="110px"/>
                                 </list>
                             </field>
                         </group>
