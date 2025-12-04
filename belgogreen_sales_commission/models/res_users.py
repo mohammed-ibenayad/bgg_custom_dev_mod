@@ -49,7 +49,8 @@ class ResUsers(models.Model):
 
     commission_count = fields.Integer(
         string='Commission Count',
-        compute='_compute_commission_stats'
+        compute='_compute_commission_stats',
+        store=True
     )
 
     commission_unpaid_total = fields.Monetary(
