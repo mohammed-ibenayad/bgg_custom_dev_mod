@@ -79,15 +79,17 @@ class AccountMove(models.Model):
         # Create commission hierarchy
         users_to_commission = []
 
-        # 1. Salesperson
+        # 1. Salesperson (person who made the sale)
+        # Always use 'salesperson' role for commission percentage, regardless of their actual role
+        # (Team Leaders and Directors acting as salespeople should get salesperson commission %)
         if salesperson.commission_role:
-            users_to_commission.append((salesperson, salesperson.commission_role))
+            users_to_commission.append((salesperson, 'salesperson'))
 
-        # 2. Team Leader
+        # 2. Team Leader (if different from the salesperson)
         if salesperson.team_leader_id:
             users_to_commission.append((salesperson.team_leader_id, 'team_leader'))
 
-        # 3. Sales Director
+        # 3. Sales Director (if different from the salesperson)
         if salesperson.sales_director_id:
             users_to_commission.append((salesperson.sales_director_id, 'sales_director'))
         elif salesperson.team_leader_id and salesperson.team_leader_id.sales_director_id:
