@@ -69,8 +69,8 @@
                                         <field name="date" string="Date" width="90px"/>
                                         <field name="role" string="Rôle" width="110px"/>
                                         <field name="sale_order_id" string="Commande" width="120px"/>
-                                        <field name="base_amount" string="Base" width="100px"/>
-                                        <field name="commission_amount" string="Montant" sum="Total" width="110px"/>
+                                        <field name="base_amount" string="Base" sum="Total base" width="100px"/>
+                                        <field name="commission_amount" string="Montant" sum="Total commissions" width="110px"/>
                                         <field name="payment_status" string="Statut" width="90px"/>
                                     </list>
                                 </field>
