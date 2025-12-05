@@ -22,29 +22,19 @@
 
                         <group>
                             <group string="Rôle de commission">
-                                <field name="commission_role"/>
+                                <field name="commission_role_id"/>
                                 <field name="active_commission_count" readonly="1"/>
                                 <field name="subordinate_count" readonly="1" invisible="subordinate_count == 0"/>
                             </group>
                             <group string="Hiérarchie">
-                                <field name="team_leader_id" invisible="commission_role == 'sales_director'"/>
-                                <field name="sales_director_id" invisible="commission_role == 'sales_director'"/>
+                                <field name="commission_manager_id" invisible="not commission_role_id or (commission_role_id and not commission_role_id.requires_manager)"/>
                             </group>
                         </group>
-                        <group string="Team Members (Salespeople)" invisible="commission_role != 'team_leader'">
-                            <field name="team_member_ids" nolabel="1" options="{'no_create': True}">
+                        <group string="Direct Subordinates" invisible="not commission_role_id or (commission_role_id and not commission_role_id.can_manage_subordinates)">
+                            <field name="commission_subordinate_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
                                     <field name="name" string="Nom" width="180px"/>
-                                    <field name="commission_role" string="Rôle" width="120px"/>
-                                    <field name="commission_unpaid_total" string="Non payé" width="110px"/>
-                                </list>
-                            </field>
-                        </group>
-                        <group string="Director Team (All Reports)" invisible="commission_role != 'sales_director'">
-                            <field name="director_team_ids" nolabel="1" options="{'no_create': True}">
-                                <list>
-                                    <field name="name" string="Nom" width="180px"/>
-                                    <field name="commission_role" string="Rôle" width="120px"/>
+                                    <field name="commission_role_id" string="Rôle" width="120px"/>
                                     <field name="commission_unpaid_total" string="Non payé" width="110px"/>
                                 </list>
                             </field>
@@ -55,7 +45,7 @@
                                 <field name="commission_unpaid_total"/>
                                 <field name="commission_paid_total"/>
                             </group>
-                            <group string="Team Commissions" invisible="commission_role not in ['team_leader', 'sales_director']">
+                            <group string="Team Commissions" invisible="not commission_role_id or (commission_role_id and not commission_role_id.can_manage_subordinates)">
                                 <field name="team_commission_count"/>
                                 <field name="team_unpaid_total"/>
                             </group>

@@ -109,21 +109,25 @@
                           invisible="type != 'hierarchical'">
                         <field name="role_config_ids">
                             <list editable="bottom">
-                                <field name="role"/>
-                                <field name="default_percentage"/>
+                                <field name="role_id"/>
+                                <field name="direct_sale_percentage"/>
+                                <field name="override_percentage"/>
                                 <field name="active"/>
                             </list>
                         </field>
                         <group>
                             <div class="alert alert-info" role="alert">
-                                <strong>Note:</strong> Define the commission percentage for each role in the hierarchy.
-                                These percentages will be applied automatically when commissions are calculated.
-                                <br/><br/>
-                                <strong>Typical setup:</strong>
+                                <strong>Note:</strong> Define TWO commission percentages for each role:
                                 <ul>
-                                    <li>Salesperson: 3-5%</li>
-                                    <li>Team Leader: 1-2%</li>
-                                    <li>Sales Director: 0.5-1%</li>
+                                    <li><strong>Direct Sale %:</strong> When the user makes their own sale</li>
+                                    <li><strong>Override %:</strong> When the user receives commission on subordinate's sale</li>
+                                </ul>
+                                <br/>
+                                <strong>Example setup:</strong>
+                                <ul>
+                                    <li>Salesperson: Direct: 5%, Override: 0% (base role, no team)</li>
+                                    <li>Team Leader: Direct: 5%, Override: 2% (makes own sales + team override)</li>
+                                    <li>Sales Director: Direct: 5%, Override: 1% (makes own sales + all team override)</li>
                                 </ul>
                             </div>
                         </group>
