@@ -111,6 +111,29 @@ class ResUsers(models.Model):
         help='Warnings about hierarchy structure issues'
     )
 
+    has_hierarchy_anomaly = fields.Boolean(
+        string='Has Hierarchy Anomaly',
+        compute='_compute_hierarchy_anomalies',
+        store=True,
+        search='_search_has_hierarchy_anomaly',
+        help='True if user has hierarchical assignment issues that need review'
+    )
+
+    anomaly_type = fields.Selection([
+        ('salesperson_no_team_leader', 'Commercial sans chef d\'équipe'),
+        ('salesperson_bypass_team_leader', 'Commercial rattaché directement au directeur'),
+        ('team_leader_no_director', 'Chef d\'équipe sans directeur'),
+        ('director_has_manager', 'Directeur avec manager assigné'),
+        ('no_role_with_assignments', 'Pas de rôle avec assignations'),
+    ], string='Type d\'anomalie', compute='_compute_hierarchy_anomalies', store=True)
+
+    anomaly_description = fields.Text(
+        string='Description de l\'anomalie',
+        compute='_compute_hierarchy_anomalies',
+        store=True,
+        help='Description détaillée de l\'anomalie hiérarchique'
+    )
+
     @api.depends('my_commission_ids', 'my_commission_ids.payment_status', 'my_commission_ids.commission_amount')
     def _compute_commission_stats(self):
         """Compute commission statistics for the user"""
@@ -252,6 +275,127 @@ class ResUsers(models.Model):
                     warnings.append(_("Attention : Un directeur commercial a des membres d'équipe (utiliser director_team_ids)"))
 
             user.hierarchy_warnings = '\n'.join(warnings) if warnings else ''
+
+    @api.depends('commission_role', 'team_leader_id', 'sales_director_id')
+    def _compute_hierarchy_anomalies(self):
+        """Detect hierarchy anomalies that need business verification"""
+        for user in self:
+            anomaly = False
+            anomaly_type = False
+            description = ''
+
+            # Only check users with a commission role
+            if user.commission_role:
+                if user.commission_role == 'salesperson':
+                    # ANOMALY 1: Salesperson without team leader at all
+                    if not user.team_leader_id and not user.sales_director_id:
+                        anomaly = True
+                        anomaly_type = 'salesperson_no_team_leader'
+                        description = _("Ce commercial n'a ni chef d'équipe ni directeur commercial assigné. "
+                                      "Il doit être rattaché à la hiérarchie.")
+
+                    # ANOMALY 2: Salesperson reporting directly to director (bypassing team leader)
+                    elif not user.team_leader_id and user.sales_director_id:
+                        anomaly = True
+                        anomaly_type = 'salesperson_bypass_team_leader'
+                        description = _("Ce commercial est rattaché directement au directeur commercial '%s' "
+                                      "sans passer par un chef d'équipe. "
+                                      "Vérifiez si cela correspond à l'organisation souhaitée.") % user.sales_director_id.name
+
+                elif user.commission_role == 'team_leader':
+                    # ANOMALY 3: Team leader without sales director
+                    if not user.sales_director_id:
+                        anomaly = True
+                        anomaly_type = 'team_leader_no_director'
+                        description = _("Ce chef d'équipe n'a pas de directeur commercial assigné. "
+                                      "Il doit être rattaché à un directeur commercial.")
+
+                elif user.commission_role == 'sales_director':
+                    # ANOMALY 4: Sales director with manager assigned
+                    if user.team_leader_id or user.sales_director_id:
+                        anomaly = True
+                        anomaly_type = 'director_has_manager'
+                        managers = []
+                        if user.team_leader_id:
+                            managers.append(_("chef d'équipe: %s") % user.team_leader_id.name)
+                        if user.sales_director_id:
+                            managers.append(_("directeur commercial: %s") % user.sales_director_id.name)
+                        description = _("Ce directeur commercial a des managers assignés (%s). "
+                                      "Un directeur commercial ne doit rapporter à personne.") % ', '.join(managers)
+
+            # ANOMALY 5: User with hierarchy assignments but no role
+            elif not user.commission_role and (user.team_leader_id or user.sales_director_id):
+                anomaly = True
+                anomaly_type = 'no_role_with_assignments'
+                assignments = []
+                if user.team_leader_id:
+                    assignments.append(_("chef d'équipe: %s") % user.team_leader_id.name)
+                if user.sales_director_id:
+                    assignments.append(_("directeur commercial: %s") % user.sales_director_id.name)
+                description = _("Cet utilisateur a des assignations hiérarchiques (%s) "
+                              "mais n'a pas de rôle de commission défini.") % ', '.join(assignments)
+
+            user.has_hierarchy_anomaly = anomaly
+            user.anomaly_type = anomaly_type
+            user.anomaly_description = description
+
+    def _search_has_hierarchy_anomaly(self, operator, value):
+        """Search method for has_hierarchy_anomaly field"""
+        # Get all users and check for anomalies
+        if operator == '=' and value:
+            # Find users with anomalies
+            all_users = self.search([('commission_role', '!=', False)])
+            users_with_anomalies = []
+
+            for user in all_users:
+                if user.commission_role == 'salesperson':
+                    if not user.team_leader_id:
+                        users_with_anomalies.append(user.id)
+                elif user.commission_role == 'team_leader':
+                    if not user.sales_director_id:
+                        users_with_anomalies.append(user.id)
+                elif user.commission_role == 'sales_director':
+                    if user.team_leader_id or user.sales_director_id:
+                        users_with_anomalies.append(user.id)
+
+            # Also check users with assignments but no role
+            users_no_role = self.search([
+                ('commission_role', '=', False),
+                '|',
+                ('team_leader_id', '!=', False),
+                ('sales_director_id', '!=', False)
+            ])
+            users_with_anomalies.extend(users_no_role.ids)
+
+            return [('id', 'in', users_with_anomalies)]
+
+        elif operator == '=' and not value:
+            # Find users without anomalies
+            all_users = self.search([('commission_role', '!=', False)])
+            users_with_anomalies = []
+
+            for user in all_users:
+                if user.commission_role == 'salesperson':
+                    if not user.team_leader_id:
+                        users_with_anomalies.append(user.id)
+                elif user.commission_role == 'team_leader':
+                    if not user.sales_director_id:
+                        users_with_anomalies.append(user.id)
+                elif user.commission_role == 'sales_director':
+                    if user.team_leader_id or user.sales_director_id:
+                        users_with_anomalies.append(user.id)
+
+            users_no_role = self.search([
+                ('commission_role', '=', False),
+                '|',
+                ('team_leader_id', '!=', False),
+                ('sales_director_id', '!=', False)
+            ])
+            users_with_anomalies.extend(users_no_role.ids)
+
+            return [('id', 'not in', users_with_anomalies)]
+
+        return []
 
     def write(self, vals):
         """Override write to validate role changes"""

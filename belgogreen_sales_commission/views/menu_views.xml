@@ -95,5 +95,11 @@
                   action="action_team_management_dashboard"
                   sequence="40"/>
 
+        <menuitem id="menu_hierarchy_anomalies"
+                  name="Hierarchy Anomalies"
+                  parent="menu_commission_configuration"
+                  action="belgogreen_sales_commission.action_hierarchy_anomalies"
+                  sequence="50"/>
+
     </data>
 </odoo>
