@@ -7,9 +7,10 @@
             <field name="name">team.hierarchy.tree</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <list string="Team Hierarchy" decoration-info="commission_role == 'sales_director'"
+                <list string="Structure des équipes" decoration-info="commission_role == 'sales_director'"
                       decoration-success="commission_role == 'team_leader'"
-                      decoration-muted="not commission_role">
+                      decoration-muted="not commission_role"
+                      create="false">
                     <field name="name" string="Nom" width="150px"/>
                     <field name="commission_role" string="Rôle" width="120px"/>
                     <field name="sales_director_id" string="Directeur Com." width="130px"/>
@@ -83,7 +84,7 @@
             <field name="name">team.hierarchy.search</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <search string="Team Hierarchy">
+                <search string="Structure des équipes">
                     <field name="name"/>
                     <field name="commission_role"/>
                     <field name="sales_director_id"/>
@@ -110,18 +111,18 @@
 
         <!-- Team Hierarchy Action -->
         <record id="action_team_hierarchy" model="ir.actions.act_window">
-            <field name="name">Team Hierarchy</field>
+            <field name="name">Structure des équipes</field>
             <field name="res_model">res.users</field>
             <field name="view_mode">list,kanban,form</field>
             <field name="domain">[('commission_role', '!=', False)]</field>
-            <field name="context">{'search_default_group_director': 1}</field>
+            <field name="context">{'search_default_group_director': 1, 'create': False}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    No commission hierarchy defined yet
+                    Aucune hiérarchie de commission définie
                 </p>
                 <p>
-                    Set up your sales team hierarchy by assigning commission roles to users.
+                    Configurez la hiérarchie de votre équipe commerciale en assignant des rôles de commission aux utilisateurs.
                 </p>
             </field>
         </record>
@@ -140,11 +141,11 @@
 
         <!-- Team Management Dashboard Action -->
         <record id="action_team_management_dashboard" model="ir.actions.act_window">
-            <field name="name">Team Management Dashboard</field>
+            <field name="name">Gestion des managers</field>
             <field name="res_model">res.users</field>
             <field name="view_mode">kanban,list,graph,form</field>
             <field name="domain">[('commission_role', 'in', ['team_leader', 'sales_director'])]</field>
-            <field name="context">{}</field>
+            <field name="context">{'create': False}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_team_hierarchy_kanban')}),
@@ -152,10 +153,10 @@
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('view_team_management_graph')})]"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    No teams found
+                    Aucune équipe trouvée
                 </p>
                 <p>
-                    Teams will appear here once you assign Team Leaders and Sales Directors.
+                    Les équipes apparaîtront ici une fois que vous aurez assigné des chefs d'équipe et des directeurs commerciaux.
                 </p>
             </field>
         </record>
@@ -165,11 +166,12 @@
             <field name="name">hierarchy.anomalies.tree</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <list string="Hierarchy Anomalies"
+                <list string="Anomalies Hiérarchiques"
                       decoration-warning="anomaly_type == 'salesperson_bypass_team_leader'"
                       decoration-danger="anomaly_type in ['salesperson_no_team_leader', 'team_leader_no_director', 'director_has_manager']"
                       decoration-muted="anomaly_type == 'no_role_with_assignments'"
-                      create="false">
+                      create="false"
+                      edit="false">
                     <field name="name" string="Nom"/>
                     <field name="commission_role" string="Rôle"/>
                     <field name="anomaly_type" string="Type d'anomalie"/>
@@ -186,7 +188,7 @@
             <field name="name">hierarchy.anomalies.search</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <search string="Hierarchy Anomalies">
+                <search string="Anomalies Hiérarchiques">
                     <field name="name"/>
                     <field name="commission_role"/>
                     <field name="anomaly_type"/>
@@ -216,7 +218,7 @@
             <field name="res_model">res.users</field>
             <field name="view_mode">list,form</field>
             <field name="domain">[('has_hierarchy_anomaly', '=', True)]</field>
-            <field name="context">{'search_default_group_anomaly_type': 1}</field>
+            <field name="context">{'search_default_group_anomaly_type': 1, 'create': False, 'edit': False}</field>
             <field name="search_view_id" ref="view_hierarchy_anomalies_search"/>
             <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'list', 'view_id': ref('view_hierarchy_anomalies_tree')})]"/>
