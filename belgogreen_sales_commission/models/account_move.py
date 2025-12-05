@@ -49,16 +49,53 @@ class AccountMove(models.Model):
         for sale_order in sale_orders:
             self._create_commission_for_sale(sale_order)
 
+    def _get_commission_hierarchy(self, base_user):
+        """
+        Traverse hierarchy upwards from base user to collect all managers who should receive commission.
+
+        Supports unlimited hierarchy levels by following commission_manager_id chain.
+        Includes cycle detection to prevent infinite loops.
+
+        Args:
+            base_user: res.users record (typically the salesperson who made the sale)
+
+        Returns:
+            list of tuples: [(user, role, commission_type), ...] ordered from bottom to top of hierarchy
+        """
+        hierarchy = []
+        current_user = base_user
+        seen_ids = set()  # Cycle detection
+
+        while current_user and current_user.id not in seen_ids:
+            # Only include users with a commission role
+            if current_user.commission_role_id:
+                # Determine commission type
+                is_direct_sale = (current_user.id == base_user.id)  # First person in chain = made the sale
+                commission_type = 'direct' if is_direct_sale else 'override'
+
+                hierarchy.append((current_user, current_user.commission_role_id, commission_type))
+                seen_ids.add(current_user.id)
+
+            # Move up to manager
+            current_user = current_user.commission_manager_id
+
+            # Safety check: prevent infinite loops
+            if len(seen_ids) > 20:
+                break
+
+        return hierarchy
+
     def _create_commission_for_sale(self, sale_order):
-        """Create commissions for a specific sale order"""
+        """
+        Create commissions for a specific sale order.
+        Now supports dynamic N-level hierarchies with dual percentage (direct vs override).
+        """
         # Get the salesperson
         salesperson = sale_order.user_id
         if not salesperson:
             return
 
         # Find applicable commission plan
-        # For now, we'll use the first active hierarchical plan
-        # In production, this should be more sophisticated (e.g., based on product, team, etc.)
         commission_plan = self.env['sale.commission.plan'].search([
             ('is_hierarchical', '=', True),
             ('state', '=', 'approved'),
@@ -73,36 +110,21 @@ class AccountMove(models.Model):
             return
 
         # Calculate base amount for commissions
-        # This could be total, margin, etc. - for now using invoice total
         base_amount = self.amount_total
 
-        # Create commission hierarchy
-        users_to_commission = []
+        # Build commission hierarchy dynamically - SUPPORTS ANY NUMBER OF LEVELS
+        users_to_commission = self._get_commission_hierarchy(salesperson)
 
-        # 1. Salesperson (person who made the sale)
-        # Always use 'salesperson' role for commission percentage, regardless of their actual role
-        # (Team Leaders and Directors acting as salespeople should get salesperson commission %)
-        if salesperson.commission_role:
-            users_to_commission.append((salesperson, 'salesperson'))
-
-        # 2. Team Leader (if different from the salesperson)
-        if salesperson.team_leader_id:
-            users_to_commission.append((salesperson.team_leader_id, 'team_leader'))
-
-        # 3. Sales Director (if different from the salesperson)
-        if salesperson.sales_director_id:
-            users_to_commission.append((salesperson.sales_director_id, 'sales_director'))
-        elif salesperson.team_leader_id and salesperson.team_leader_id.sales_director_id:
-            users_to_commission.append((salesperson.team_leader_id.sales_director_id, 'sales_director'))
+        if not users_to_commission:
+            return
 
         # Calculate period (YYYY-MM format)
         period = self.invoice_date.strftime('%Y-%m') if self.invoice_date else fields.Date.today().strftime('%Y-%m')
 
         # Create commission records for each user in the hierarchy
-        for user, role in users_to_commission:
+        for user, role, commission_type in users_to_commission:
             # Check if user is in the plan's allowed users list
             if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
-                # User not in plan's user list, skip
                 continue
 
             # Check if commission already exists for this specific user
@@ -110,26 +132,28 @@ class AccountMove(models.Model):
                 ('invoice_id', '=', self.id),
                 ('sale_order_id', '=', sale_order.id),
                 ('user_id', '=', user.id),
-                ('role', '=', role)
+                ('role_id', '=', role.id),
+                ('commission_type', '=', commission_type)
             ], limit=1)
 
             if existing_commission:
-                # Commission already exists for this user, skip
                 continue
 
             # Check if there's a role configuration
             role_config = self.env['hr.commission.role.config'].search([
                 ('plan_id', '=', commission_plan.id),
-                ('role', '=', role)
+                ('role_id', '=', role.id),
+                ('active', '=', True)
             ], limit=1)
 
             if not role_config:
                 continue
 
-            # Create commission record
+            # Create commission record with role_id and commission_type
             self.env['sale.commission'].create({
                 'user_id': user.id,
-                'role': role,
+                'role_id': role.id,
+                'commission_type': commission_type,  # NEW: direct or override
                 'sale_order_id': sale_order.id,
                 'invoice_id': self.id,
                 'plan_id': commission_plan.id,
