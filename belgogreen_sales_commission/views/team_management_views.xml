@@ -93,6 +93,12 @@
                     <filter string="Team Leaders" name="team_leaders" domain="[('commission_role', '=', 'team_leader')]"/>
                     <filter string="Salespeople" name="salespeople" domain="[('commission_role', '=', 'salesperson')]"/>
                     <separator/>
+                    <filter string="Hide 'Aucun' (No Assignment)" name="hide_none"
+                            domain="[('sales_director_id', '!=', False), ('team_leader_id', '!=', False)]"
+                            help="Hide users without hierarchical assignments (removes 'Aucun' groups)"/>
+                    <filter string="With Sales Director Only" name="has_director" domain="[('sales_director_id', '!=', False)]"/>
+                    <filter string="With Team Leader Only" name="has_team_leader" domain="[('team_leader_id', '!=', False)]"/>
+                    <separator/>
                     <group expand="0" string="Group By">
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role'}"/>
                         <filter string="Sales Director" name="group_director" context="{'group_by': 'sales_director_id'}"/>
@@ -150,6 +156,84 @@
                 </p>
                 <p>
                     Teams will appear here once you assign Team Leaders and Sales Directors.
+                </p>
+            </field>
+        </record>
+
+        <!-- Hierarchy Anomalies List View -->
+        <record id="view_hierarchy_anomalies_tree" model="ir.ui.view">
+            <field name="name">hierarchy.anomalies.tree</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <list string="Hierarchy Anomalies"
+                      decoration-warning="anomaly_type == 'salesperson_bypass_team_leader'"
+                      decoration-danger="anomaly_type in ['salesperson_no_team_leader', 'team_leader_no_director', 'director_has_manager']"
+                      decoration-muted="anomaly_type == 'no_role_with_assignments'"
+                      create="false">
+                    <field name="name" string="Nom"/>
+                    <field name="commission_role" string="Rôle"/>
+                    <field name="anomaly_type" string="Type d'anomalie"/>
+                    <field name="anomaly_description" string="Description" widget="text"/>
+                    <field name="team_leader_id" string="Chef d'équipe"/>
+                    <field name="sales_director_id" string="Directeur Com."/>
+                    <field name="subordinate_count" string="Subordonnés"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Hierarchy Anomalies Search View -->
+        <record id="view_hierarchy_anomalies_search" model="ir.ui.view">
+            <field name="name">hierarchy.anomalies.search</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <search string="Hierarchy Anomalies">
+                    <field name="name"/>
+                    <field name="commission_role"/>
+                    <field name="anomaly_type"/>
+                    <separator/>
+                    <filter string="Commercial sans chef d'équipe" name="salesperson_no_team_leader"
+                            domain="[('anomaly_type', '=', 'salesperson_no_team_leader')]"/>
+                    <filter string="Commercial rattaché directement au directeur" name="salesperson_bypass_team_leader"
+                            domain="[('anomaly_type', '=', 'salesperson_bypass_team_leader')]"/>
+                    <filter string="Chef d'équipe sans directeur" name="team_leader_no_director"
+                            domain="[('anomaly_type', '=', 'team_leader_no_director')]"/>
+                    <filter string="Directeur avec manager assigné" name="director_has_manager"
+                            domain="[('anomaly_type', '=', 'director_has_manager')]"/>
+                    <filter string="Pas de rôle avec assignations" name="no_role_with_assignments"
+                            domain="[('anomaly_type', '=', 'no_role_with_assignments')]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Type d'anomalie" name="group_anomaly_type" context="{'group_by': 'anomaly_type'}"/>
+                        <filter string="Rôle de commission" name="group_role" context="{'group_by': 'commission_role'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Hierarchy Anomalies Action -->
+        <record id="action_hierarchy_anomalies" model="ir.actions.act_window">
+            <field name="name">Anomalies Hiérarchiques</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('has_hierarchy_anomaly', '=', True)]</field>
+            <field name="context">{'search_default_group_anomaly_type': 1}</field>
+            <field name="search_view_id" ref="view_hierarchy_anomalies_search"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('view_hierarchy_anomalies_tree')})]"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aucune anomalie hiérarchique détectée
+                </p>
+                <p>
+                    Les utilisateurs avec des problèmes d'assignation hiérarchique apparaîtront ici.
+                </p>
+                <p>
+                    <strong>Types d'anomalies détectées:</strong><br/>
+                    • Commercial sans chef d'équipe<br/>
+                    • Commercial rattaché directement au directeur (sans chef d'équipe intermédiaire)<br/>
+                    • Chef d'équipe sans directeur commercial<br/>
+                    • Directeur commercial avec manager assigné<br/>
+                    • Utilisateur sans rôle mais avec assignations hiérarchiques
                 </p>
             </field>
         </record>
