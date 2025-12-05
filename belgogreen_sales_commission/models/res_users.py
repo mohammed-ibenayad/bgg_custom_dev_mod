@@ -114,6 +114,7 @@ class ResUsers(models.Model):
     has_hierarchy_anomaly = fields.Boolean(
         string='Has Hierarchy Anomaly',
         compute='_compute_hierarchy_anomalies',
+        store=True,
         search='_search_has_hierarchy_anomaly',
         help='True if user has hierarchical assignment issues that need review'
     )
