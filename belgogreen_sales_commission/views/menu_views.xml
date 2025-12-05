@@ -96,7 +96,7 @@
                   sequence="40"/>
 
         <menuitem id="menu_hierarchy_anomalies"
-                  name="Hierarchy Anomalies"
+                  name="Anomalies Hiérarchiques"
                   parent="menu_commission_configuration"
                   action="belgogreen_sales_commission.action_hierarchy_anomalies"
                   sequence="50"/>

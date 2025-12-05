@@ -93,11 +93,11 @@
                     <filter string="Team Leaders" name="team_leaders" domain="[('commission_role', '=', 'team_leader')]"/>
                     <filter string="Salespeople" name="salespeople" domain="[('commission_role', '=', 'salesperson')]"/>
                     <separator/>
-                    <filter string="Hide 'Aucun' (No Assignment)" name="hide_none"
+                    <filter string="Masquer 'Aucun' (Sans assignation)" name="hide_none"
                             domain="[('sales_director_id', '!=', False), ('team_leader_id', '!=', False)]"
-                            help="Hide users without hierarchical assignments (removes 'Aucun' groups)"/>
-                    <filter string="With Sales Director Only" name="has_director" domain="[('sales_director_id', '!=', False)]"/>
-                    <filter string="With Team Leader Only" name="has_team_leader" domain="[('team_leader_id', '!=', False)]"/>
+                            help="Masquer les utilisateurs sans assignations hiérarchiques (supprime les groupes 'Aucun')"/>
+                    <filter string="Avec directeur commercial uniquement" name="has_director" domain="[('sales_director_id', '!=', False)]"/>
+                    <filter string="Avec chef d'équipe uniquement" name="has_team_leader" domain="[('team_leader_id', '!=', False)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role'}"/>
