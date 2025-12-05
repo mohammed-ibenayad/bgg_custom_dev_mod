@@ -1,23 +1,32 @@
 # Dynamic Roles Implementation Analysis
-## Belgogreen Sales Commission Module
+## Belgogreen Sales Commission Module - Development Environment
 
 **Date:** December 5, 2025
+**Environment:** Development (No Production Data)
 **Objective:** Convert hardcoded 3-tier role system to dynamic, manager-configurable roles
 
 ---
 
 ## Executive Summary
 
-The current system uses **3 hardcoded roles** (Salesperson, Team Leader, Sales Director) defined as Selection fields across multiple models. Converting to dynamic roles requires:
+Since we're in **development mode with no production data**, we can implement a clean, optimal solution without migration concerns. The current system uses **3 hardcoded roles** defined as Selection fields. We'll convert this to a fully dynamic system where sales managers can create and configure unlimited roles.
 
-- Creating a new `sale.commission.role` master model
-- Replacing all Selection fields with Many2one references
-- Updating hierarchy logic to support N-level hierarchies
-- Modifying commission calculation to work with dynamic roles
-- Extensive data migration for existing records
+### What We'll Do:
+- ✅ Create new `sale.commission.role` master model
+- ✅ Replace all Selection fields with Many2one references
+- ✅ Replace dual hierarchy fields (`team_leader_id`, `sales_director_id`) with single generic `commission_manager_id`
+- ✅ Update hierarchy logic to support N-level hierarchies
+- ✅ Modify commission calculation to work dynamically
+- ✅ Update all views and UI components
 
-**Estimated Complexity:** HIGH
-**Risk Level:** MEDIUM-HIGH (affects core commission calculation logic)
+### Key Benefits:
+- **No data migration** - Clean slate implementation
+- **No backward compatibility** - Optimal design choices
+- **Lower risk** - No production data to corrupt
+- **Faster delivery** - Skip all migration complexity
+
+**Estimated Effort:** 15-20 developer days (3-4 weeks)
+**Risk Level:** LOW-MEDIUM (thorough testing still required for commission logic)
 
 ---
 
@@ -42,772 +51,1125 @@ HARDCODED_ROLES = [
 ]
 ```
 
-### 1.3 Hierarchy Management
+### 1.3 Current Hierarchy Implementation
 
-**Current Implementation:**
-- Fixed 3-level hierarchy enforced in code
-- Specific fields for each level:
-  - `team_leader_id` → Points to users with role='team_leader'
-  - `sales_director_id` → Points to users with role='sales_director'
-- Domains hardcoded: `domain=[('commission_role', '=', 'team_leader')]`
+**Problems with Current Design:**
+```python
+# res_users.py - Hardcoded hierarchy fields
+team_leader_id = fields.Many2one('res.users', domain=[('commission_role', '=', 'team_leader')])
+sales_director_id = fields.Many2one('res.users', domain=[('commission_role', '=', 'sales_director')])
+```
 
-**Commission Flow:**
-```
-Sale Order (Salesperson)
-    ↓
-Commission #1: Salesperson (role='salesperson')
-Commission #2: Team Leader (team_leader_id, role='team_leader')
-Commission #3: Sales Director (sales_director_id, role='sales_director')
-```
+**Issues:**
+- 🔴 Limited to exactly 3 levels - cannot add 4th tier
+- 🔴 Hardcoded field names require code changes for new roles
+- 🔴 Commission calculation has hardcoded hierarchy traversal
+- 🔴 Anomaly detection checks for specific role names
+- 🔴 UI shows separate fields for each level
 
 ---
 
-## 2. Required Changes for Dynamic Roles
+## 2. Proposed Dynamic Solution
 
 ### 2.1 New Master Data Model
 
-**Create: `sale.commission.role`**
+**Create: `models/sale_commission_role.py`**
 
 ```python
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
+
 class SaleCommissionRole(models.Model):
     _name = 'sale.commission.role'
     _description = 'Commission Role'
     _order = 'sequence, name'
 
-    name = fields.Char(string='Role Name', required=True, translate=True)
-    code = fields.Char(string='Code', required=True, help='Unique identifier (e.g., SP, TL, SD)')
-    sequence = fields.Integer(string='Hierarchy Level', default=10,
-                              help='Lower numbers = bottom of hierarchy')
-    description = fields.Text(string='Description', translate=True)
-    active = fields.Boolean(default=True)
-    company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
-    color = fields.Integer(string='Color', help='Color for kanban view')
+    name = fields.Char(
+        string='Role Name',
+        required=True,
+        translate=True,
+        help='Name of the commission role (e.g., Salesperson, Team Leader)'
+    )
+
+    code = fields.Char(
+        string='Code',
+        required=True,
+        help='Unique identifier for technical use (e.g., SP, TL, SD)'
+    )
+
+    sequence = fields.Integer(
+        string='Hierarchy Level',
+        default=10,
+        required=True,
+        help='Defines position in hierarchy. Lower = bottom, Higher = top (e.g., 10=Salesperson, 20=Team Leader, 30=Director)'
+    )
+
+    description = fields.Text(
+        string='Description',
+        translate=True
+    )
+
+    active = fields.Boolean(
+        string='Active',
+        default=True
+    )
+
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company
+    )
+
+    color = fields.Integer(
+        string='Color',
+        help='Color for UI display (kanban, etc.)'
+    )
 
     # Hierarchy configuration
-    allow_subordinates = fields.Boolean(string='Can Have Subordinates', default=True)
-    requires_manager = fields.Boolean(string='Requires Manager', default=True)
-    is_top_level = fields.Boolean(string='Is Top Level', default=False,
-                                   help='Top-level roles do not need a manager')
+    is_base_role = fields.Boolean(
+        string='Is Base Role',
+        default=False,
+        help='Base roles are at the bottom of hierarchy (e.g., Salesperson). They create commissions from sales.'
+    )
+
+    requires_manager = fields.Boolean(
+        string='Requires Manager',
+        default=True,
+        help='If True, users with this role must have a manager assigned'
+    )
+
+    can_manage_subordinates = fields.Boolean(
+        string='Can Manage Subordinates',
+        default=True,
+        help='If True, users with this role can have team members reporting to them'
+    )
+
+    # Statistics
+    user_count = fields.Integer(
+        string='Active Users',
+        compute='_compute_user_count'
+    )
+
+    commission_count = fields.Integer(
+        string='Commissions',
+        compute='_compute_commission_count'
+    )
 
     _sql_constraints = [
-        ('code_unique', 'unique(code, company_id)', 'Role code must be unique per company!'),
-        ('name_unique', 'unique(name, company_id)', 'Role name must be unique per company!')
+        ('code_company_unique',
+         'unique(code, company_id)',
+         'Role code must be unique per company!'),
+        ('name_company_unique',
+         'unique(name, company_id)',
+         'Role name must be unique per company!')
     ]
+
+    @api.depends('user_count')
+    def _compute_user_count(self):
+        """Count active users with this role"""
+        for role in self:
+            role.user_count = self.env['res.users'].search_count([
+                ('commission_role_id', '=', role.id),
+                ('active', '=', True)
+            ])
+
+    @api.depends('commission_count')
+    def _compute_commission_count(self):
+        """Count commissions with this role"""
+        for role in self:
+            role.commission_count = self.env['sale.commission'].search_count([
+                ('role_id', '=', role.id)
+            ])
+
+    @api.constrains('sequence')
+    def _check_sequence(self):
+        """Ensure sequence is positive"""
+        for role in self:
+            if role.sequence < 0:
+                raise ValidationError(_('Hierarchy level must be a positive number'))
+
+    def unlink(self):
+        """Prevent deletion of roles with active users or commissions"""
+        for role in self:
+            if role.user_count > 0:
+                raise ValidationError(
+                    _('Cannot delete role "%s" because %d user(s) are assigned to it. '
+                      'Please reassign users first.') % (role.name, role.user_count)
+                )
+            if role.commission_count > 0:
+                raise ValidationError(
+                    _('Cannot delete role "%s" because %d commission(s) exist with it. '
+                      'You can deactivate the role instead.') % (role.name, role.commission_count)
+                )
+        return super().unlink()
+
+    def action_view_users(self):
+        """View users with this role"""
+        self.ensure_one()
+        return {
+            'name': _('Users - %s') % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.users',
+            'view_mode': 'tree,form',
+            'domain': [('commission_role_id', '=', self.id)],
+            'context': {'default_commission_role_id': self.id}
+        }
+
+    def action_view_commissions(self):
+        """View commissions with this role"""
+        self.ensure_one()
+        return {
+            'name': _('Commissions - %s') % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.commission',
+            'view_mode': 'tree,form',
+            'domain': [('role_id', '=', self.id)],
+            'context': {'default_role_id': self.id}
+        }
 ```
 
 ### 2.2 Model Field Changes
 
-#### A. `res.users` (res_users.py)
+#### A. `res_users.py` - User Model
 
-**Current:**
+**REMOVE:**
 ```python
-commission_role = fields.Selection([...], ...)
-team_leader_id = fields.Many2one('res.users', domain=[('commission_role', '=', 'team_leader')])
-sales_director_id = fields.Many2one('res.users', domain=[('commission_role', '=', 'sales_director')])
+commission_role = fields.Selection([...])      # DELETE
+team_leader_id = fields.Many2one(...)          # DELETE
+sales_director_id = fields.Many2one(...)       # DELETE
+team_member_ids = fields.One2many(...)         # DELETE
+director_team_ids = fields.One2many(...)       # DELETE
 ```
 
-**Proposed:**
+**ADD:**
 ```python
-# Replace Selection with Many2one
+# Replace Selection with Many2one to dynamic role
 commission_role_id = fields.Many2one(
     'sale.commission.role',
     string='Commission Role',
-    domain="[('company_id', '=', company_id)]"
+    domain="[('company_id', '=', company_id), ('active', '=', True)]",
+    help='The role of this user in the commission hierarchy'
 )
 
-# Replace hardcoded hierarchy with generic manager field
+# Replace dual hierarchy fields with single generic manager field
 commission_manager_id = fields.Many2one(
     'res.users',
     string='Commission Manager',
-    domain="[('commission_role_id', '!=', False), ('id', '!=', id)]",
+    domain="[('commission_role_id', '!=', False), ('id', '!=', id), ('company_id', '=', company_id)]",
     help='Direct manager in the commission hierarchy'
 )
 
-# Add computed/related fields for backward compatibility
+# Reverse relation for subordinates
 commission_subordinate_ids = fields.One2many(
     'res.users',
     'commission_manager_id',
-    string='Direct Subordinates'
+    string='Direct Subordinates',
+    help='Users who report directly to this user in commission hierarchy'
 )
 ```
 
-**Impact:**
-- 🔴 **BREAKING**: Removes `team_leader_id` and `sales_director_id`
-- 🔴 Existing views showing these fields will break
-- 🔴 Requires data migration
+#### B. `hr_commission_role_config.py` - Role Configuration
 
-#### B. `hr.commission.role.config` (hr_commission_role_config.py)
-
-**Current:**
+**CHANGE:**
 ```python
+# OLD
 role = fields.Selection([...], required=True)
-```
 
-**Proposed:**
-```python
+# NEW
 role_id = fields.Many2one(
     'sale.commission.role',
     string='Role',
     required=True,
-    domain="[('company_id', '=', company_id)]"
+    domain="[('company_id', '=', company_id)]",
+    help='The role this percentage applies to'
 )
 
 _sql_constraints = [
-    ('unique_plan_role', 'unique(plan_id, role_id)',
+    ('unique_plan_role',
+     'unique(plan_id, role_id)',  # Changed from role to role_id
      'Only one percentage per role per plan!')
 ]
 ```
 
-**Impact:**
-- 🔴 **BREAKING**: Changes SQL constraint
-- 🟡 Requires data migration
-- ✅ More flexible for new roles
-
-#### C. `sale.commission` (sale_commission.py)
-
-**Current:**
+**UPDATE display_name:**
 ```python
-role = fields.Selection([...], required=True, tracking=True)
+def _compute_display_name(self):
+    for record in self:
+        record.display_name = _('%(plan)s - %(role)s (%(percentage)s%%)') % {
+            'plan': record.plan_id.name,
+            'role': record.role_id.name,  # Changed from dict lookup
+            'percentage': record.default_percentage
+        }
 ```
 
-**Proposed:**
+#### C. `sale_commission.py` - Commission Records
+
+**CHANGE:**
 ```python
+# OLD
+role = fields.Selection([...], required=True, tracking=True)
+
+# NEW
 role_id = fields.Many2one(
     'sale.commission.role',
     string='Role',
     required=True,
-    tracking=True
+    tracking=True,
+    help='The role of the user receiving this commission'
 )
 ```
 
-**Impact:**
-- 🟡 Historical commission records need migration
-- 🟡 Reports filtering by role need update
-- ✅ Supports any future roles automatically
+**UPDATE percentage computation:**
+```python
+@api.depends('percentage_override', 'plan_id', 'role_id')  # Changed from 'role'
+def _compute_commission_percentage(self):
+    for commission in self:
+        if commission.percentage_override:
+            commission.commission_percentage = commission.percentage_override
+        else:
+            config = self.env['hr.commission.role.config'].search([
+                ('plan_id', '=', commission.plan_id.id),
+                ('role_id', '=', commission.role_id.id)  # Changed from 'role'
+            ], limit=1)
+            commission.commission_percentage = config.default_percentage if config else 0.0
+```
 
 ---
 
-## 3. Commission Calculation Logic Changes
+## 3. Commission Calculation Logic - Dynamic Hierarchy
 
-### 3.1 Current Hierarchical Commission Creation
+### 3.1 NEW Hierarchy Traversal Method
 
-**File:** `sale_order.py:145-161`
-
-**Current Logic:**
-```python
-# Hardcoded 3-tier hierarchy traversal
-users_to_commission = []
-
-# 1. Salesperson
-if salesperson.commission_role:
-    users_to_commission.append((salesperson, 'salesperson'))
-
-# 2. Team Leader (hardcoded field)
-if salesperson.team_leader_id:
-    users_to_commission.append((salesperson.team_leader_id, 'team_leader'))
-
-# 3. Sales Director (hardcoded field)
-if salesperson.sales_director_id:
-    users_to_commission.append((salesperson.sales_director_id, 'sales_director'))
-elif salesperson.team_leader_id and salesperson.team_leader_id.sales_director_id:
-    users_to_commission.append((salesperson.team_leader_id.sales_director_id, 'sales_director'))
-```
-
-### 3.2 Proposed Dynamic Logic
+**Add to `sale_order.py`:**
 
 ```python
-def _get_commission_hierarchy(self, salesperson):
+def _get_commission_hierarchy(self, base_user):
     """
-    Traverse hierarchy upwards to collect all managers who should receive commission
-    Returns: [(user, role_id), ...]
-    """
-    users_to_commission = []
-    current_user = salesperson
-    processed_ids = set()  # Prevent infinite loops
+    Traverse hierarchy upwards from base user to collect all managers who should receive commission.
 
-    while current_user and current_user.id not in processed_ids:
+    Supports unlimited hierarchy levels by following commission_manager_id chain.
+    Includes cycle detection to prevent infinite loops.
+
+    Args:
+        base_user: res.users record (typically the salesperson)
+
+    Returns:
+        list of tuples: [(user, role), ...] ordered from bottom to top of hierarchy
+    """
+    hierarchy = []
+    current_user = base_user
+    seen_ids = set()  # Cycle detection
+
+    while current_user and current_user.id not in seen_ids:
+        # Only include users with a commission role
         if current_user.commission_role_id:
-            users_to_commission.append((current_user, current_user.commission_role_id))
-            processed_ids.add(current_user.id)
+            hierarchy.append((current_user, current_user.commission_role_id))
+            seen_ids.add(current_user.id)
 
-        # Move up the hierarchy
+        # Move up to manager
         current_user = current_user.commission_manager_id
 
-    return users_to_commission
+        # Safety check: prevent infinite loops
+        if len(seen_ids) > 20:
+            _logger.warning("Hierarchy depth exceeds 20 levels for user %s. Possible circular reference.", base_user.name)
+            break
 
-# Usage in _create_commissions_for_invoice
-users_to_commission = self._get_commission_hierarchy(salesperson)
-
-for user, role_id in users_to_commission:
-    # Create commission with role_id instead of role
-    self.env['sale.commission'].create({
-        'user_id': user.id,
-        'role_id': role_id.id,  # Changed from 'role': role
-        # ... rest of fields
-    })
+    return hierarchy
 ```
 
-**Benefits:**
-- ✅ Supports N-level hierarchies automatically
-- ✅ No code changes needed when adding new roles
-- ✅ Cycle detection built-in
-- ⚠️ Requires thorough testing for edge cases
+### 3.2 UPDATE Commission Creation
+
+**Replace in `sale_order.py:135-161`:**
+
+```python
+def _create_commissions_for_invoice(self, invoice, commission_plan):
+    """
+    Create commission records for a specific invoice.
+    Now supports dynamic N-level hierarchies.
+    """
+    self.ensure_one()
+
+    salesperson = self.user_id
+    base_amount = invoice.amount_total
+
+    # Build commission hierarchy dynamically
+    users_to_commission = self._get_commission_hierarchy(salesperson)
+
+    if not users_to_commission:
+        _logger.info("No commission hierarchy found for user %s", salesperson.name)
+        return 0
+
+    # Calculate period
+    period = invoice.invoice_date.strftime('%Y-%m') if invoice.invoice_date else fields.Date.today().strftime('%Y-%m')
+
+    # Create commission records
+    commissions_created = 0
+    for user, role in users_to_commission:
+        # Check if user is in plan's allowed users list
+        if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
+            _logger.info("Skipping %s (%s) - not in plan's user list", user.name, role.name)
+            continue
+
+        # Check if commission already exists
+        existing = self.env['sale.commission'].search([
+            ('invoice_id', '=', invoice.id),
+            ('sale_order_id', '=', self.id),
+            ('user_id', '=', user.id),
+            ('role_id', '=', role.id)
+        ], limit=1)
+
+        if existing:
+            _logger.info("Commission already exists for %s (%s) on order %s", user.name, role.name, self.name)
+            continue
+
+        # Get role configuration
+        role_config = self.env['hr.commission.role.config'].search([
+            ('plan_id', '=', commission_plan.id),
+            ('role_id', '=', role.id),
+            ('active', '=', True)
+        ], limit=1)
+
+        if not role_config:
+            _logger.warning("No active role config found for %s in plan %s", role.name, commission_plan.name)
+            continue
+
+        # Create commission record
+        try:
+            self.env['sale.commission'].create({
+                'user_id': user.id,
+                'role_id': role.id,
+                'sale_order_id': self.id,
+                'invoice_id': invoice.id,
+                'plan_id': commission_plan.id,
+                'date': invoice.invoice_date or fields.Date.today(),
+                'period': period,
+                'base_amount': base_amount,
+                'payment_status': 'unpaid',
+                'state': 'confirmed',
+                'company_id': self.company_id.id,
+                'currency_id': self.currency_id.id,
+            })
+            commissions_created += 1
+            _logger.info("Created commission for %s (%s) - Order: %s, Invoice: %s",
+                        user.name, role.name, self.name, invoice.name)
+        except Exception as e:
+            _logger.error("Error creating commission for %s: %s", user.name, str(e))
+
+    return commissions_created
+```
 
 ---
 
-## 4. Anomaly Detection Changes
+## 4. Anomaly Detection - Dynamic Version
 
-### 4.1 Current Anomaly Types
+### 4.1 REPLACE Anomaly Detection Logic
 
-**File:** `res_users.py:122-128`
-
-```python
-anomaly_type = fields.Selection([
-    ('salesperson_no_team_leader', ...),      # Hardcoded role check
-    ('salesperson_bypass_team_leader', ...),  # Hardcoded role check
-    ('team_leader_no_director', ...),         # Hardcoded role check
-    ('director_has_manager', ...),            # Hardcoded role check
-    ('no_role_with_assignments', ...),
-])
-```
-
-### 4.2 Proposed Generic Anomaly Detection
+**In `res_users.py`, replace lines 122-340:**
 
 ```python
+# New generic anomaly types
 anomaly_type = fields.Selection([
     ('missing_manager', 'Missing Required Manager'),
-    ('has_manager_top_level', 'Top-level role should not have manager'),
-    ('no_role_with_manager', 'No role assigned but has manager'),
+    ('top_role_has_manager', 'Top-level role should not have manager'),
+    ('no_role_with_manager', 'Manager assigned without commission role'),
+    ('manager_lower_level', 'Manager has lower hierarchy level than subordinate'),
     ('circular_hierarchy', 'Circular reference in hierarchy'),
-], ...)
+], string='Anomaly Type', compute='_compute_hierarchy_anomalies', store=True)
 
-@api.depends('commission_role_id', 'commission_manager_id')
+@api.depends('commission_role_id', 'commission_manager_id',
+             'commission_manager_id.commission_role_id')
 def _compute_hierarchy_anomalies(self):
+    """Detect hierarchy anomalies using dynamic role configuration"""
     for user in self:
         anomaly = False
         anomaly_type = False
         description = ''
 
         if user.commission_role_id:
-            # Check if role requires manager but user has none
-            if user.commission_role_id.requires_manager and not user.commission_manager_id:
+            role = user.commission_role_id
+
+            # ANOMALY 1: Role requires manager but none assigned
+            if role.requires_manager and not user.commission_manager_id:
                 anomaly = True
                 anomaly_type = 'missing_manager'
-                description = _("User with role '%s' requires a manager but none is assigned") % user.commission_role_id.name
+                description = _("User with role '%s' requires a manager but none is assigned. "
+                              "Please assign a manager in the commission hierarchy.") % role.name
 
-            # Check if top-level role has a manager assigned
-            if user.commission_role_id.is_top_level and user.commission_manager_id:
+            # ANOMALY 2: Role shouldn't have manager (is_base_role=False, requires_manager=False)
+            elif not role.requires_manager and user.commission_manager_id:
                 anomaly = True
-                anomaly_type = 'has_manager_top_level'
-                description = _("User with top-level role '%s' should not have a manager") % user.commission_role_id.name
+                anomaly_type = 'top_role_has_manager'
+                description = _("User with role '%s' is a top-level role and should not have a manager. "
+                              "Current manager: %s") % (role.name, user.commission_manager_id.name)
 
-        # Check for role assignment without manager field
+            # ANOMALY 3: Manager has lower hierarchy level (sequence) than subordinate
+            elif user.commission_manager_id and user.commission_manager_id.commission_role_id:
+                manager_level = user.commission_manager_id.commission_role_id.sequence
+                user_level = role.sequence
+
+                if manager_level <= user_level:
+                    anomaly = True
+                    anomaly_type = 'manager_lower_level'
+                    description = _("Hierarchy issue: Manager '%s' (level %d - %s) has same or lower hierarchy level "
+                                  "than subordinate '%s' (level %d - %s). Manager should have higher level.") % (
+                                      user.commission_manager_id.name, manager_level,
+                                      user.commission_manager_id.commission_role_id.name,
+                                      user.name, user_level, role.name
+                                  )
+
+        # ANOMALY 4: Manager assigned but no role
         elif not user.commission_role_id and user.commission_manager_id:
             anomaly = True
             anomaly_type = 'no_role_with_manager'
-            description = _("User has manager assigned but no commission role defined")
+            description = _("User has manager '%s' assigned but no commission role defined. "
+                          "Please assign a commission role first.") % user.commission_manager_id.name
+
+        # ANOMALY 5: Detect circular hierarchy
+        if user.commission_manager_id and not anomaly:
+            if user._has_circular_hierarchy():
+                anomaly = True
+                anomaly_type = 'circular_hierarchy'
+                description = _("Circular reference detected in commission hierarchy. "
+                              "User is in their own management chain.")
 
         user.has_hierarchy_anomaly = anomaly
         user.anomaly_type = anomaly_type
         user.anomaly_description = description
+
+def _has_circular_hierarchy(self):
+    """Check if user's hierarchy contains a circular reference"""
+    self.ensure_one()
+    visited = set()
+    current = self
+
+    while current.commission_manager_id:
+        if current.id in visited:
+            return True  # Circular reference found
+        visited.add(current.id)
+        current = current.commission_manager_id
+
+        if len(visited) > 50:  # Safety limit
+            return True
+
+    return False
 ```
 
-**Benefits:**
-- ✅ Generic rules work for any role configuration
-- ✅ Role-specific rules defined in role master data
-- ⚠️ May need custom validation rules for specific business needs
+### 4.2 UPDATE Search Method
+
+```python
+def _search_has_hierarchy_anomaly(self, operator, value):
+    """Search method for has_hierarchy_anomaly field"""
+    # Trigger recomputation for all users with roles
+    users = self.search([
+        '|',
+        ('commission_role_id', '!=', False),
+        ('commission_manager_id', '!=', False)
+    ])
+
+    # Get users with anomalies after computation
+    if operator == '=' and value:
+        return [('id', 'in', users.filtered('has_hierarchy_anomaly').ids)]
+    elif operator == '=' and not value:
+        return [('id', 'in', users.filtered(lambda u: not u.has_hierarchy_anomaly).ids)]
+
+    return []
+```
 
 ---
 
-## 5. View and UI Changes
+## 5. View Updates
 
-### 5.1 Forms Requiring Updates
+### 5.1 User Form View
 
-| View File | Elements to Change | Complexity |
-|-----------|-------------------|------------|
-| `res_users_views.xml` | commission_role field → commission_role_id | LOW |
-| `res_users_views.xml` | team_leader_id, sales_director_id → commission_manager_id | MEDIUM |
-| `sale_commission_plan_views.xml` | Role percentages tab tree view | LOW |
-| `sale_commission_views.xml` | Role filters and grouping | LOW |
-| `team_management_views.xml` | Hierarchy views (kanban/tree) | HIGH |
-| `team_management_views.xml` | Role-specific filters | MEDIUM |
+**File: `views/res_users_views.xml`**
 
-### 5.2 Critical View Changes
+**REPLACE hierarchy section:**
 
-#### A. User Form - Commission Hierarchy Tab
-
-**Current:** Shows separate fields for team_leader_id and sales_director_id
-
-**Proposed:**
 ```xml
-<group name="hierarchy" string="Commission Hierarchy">
+<group name="commission_hierarchy" string="Commission Hierarchy">
     <field name="commission_role_id"
-           options="{'no_create': True}"/>
+           options="{'no_create': True, 'no_open': True}"/>
+
     <field name="commission_manager_id"
-           domain="[('commission_role_id.sequence', '>', commission_role_id.sequence), ('id', '!=', id)]"
-           context="{'show_commission_role': True}"/>
-    <field name="commission_subordinate_ids" widget="many2many_tags" readonly="1"/>
+           domain="[('commission_role_id.sequence', '>', commission_role_id.sequence),
+                    ('id', '!=', id),
+                    ('company_id', '=', company_id)]"
+           options="{'no_create': True}"
+           context="{'show_commission_role': True}"
+           attrs="{'invisible': [('commission_role_id', '=', False)]}"/>
+
+    <field name="commission_subordinate_ids"
+           widget="many2many_tags"
+           readonly="1"
+           attrs="{'invisible': [('commission_subordinate_ids', '=', [])]}"/>
+
+    <!-- Anomaly warnings -->
+    <field name="has_hierarchy_anomaly" invisible="1"/>
+    <field name="anomaly_type" invisible="1"/>
+    <div class="alert alert-warning" role="alert"
+         attrs="{'invisible': [('has_hierarchy_anomaly', '=', False)]}">
+        <field name="anomaly_description" readonly="1" nolabel="1"/>
+    </div>
 </group>
 ```
 
-#### B. Team Management Views
+### 5.2 Team Management Views
 
-**Current:** Separate tree views for each role level
+**File: `views/team_management_views.xml`**
 
-**Proposed:** Unified tree view with dynamic grouping by role
+**UPDATE tree view for dynamic roles:**
 
 ```xml
-<tree string="Team Hierarchy"
-      decoration-info="commission_role_id.sequence == 1"
-      decoration-warning="commission_role_id.sequence == 2"
-      decoration-success="commission_role_id.sequence == 3">
+<tree string="Commission Hierarchy"
+      decoration-muted="not active"
+      decoration-danger="has_hierarchy_anomaly">
     <field name="name"/>
     <field name="commission_role_id"/>
     <field name="commission_manager_id"/>
-    <field name="subordinate_count"/>
+    <field name="subordinate_count" string="Subordinates"/>
+    <field name="commission_count" string="Commissions"/>
+    <field name="commission_unpaid_total" string="Unpaid" widget="monetary"/>
+    <field name="has_hierarchy_anomaly" invisible="1"/>
+    <field name="active" invisible="1"/>
 </tree>
 ```
 
-### 5.3 New Configuration Menu
+**ADD dynamic filters:**
 
-Add menu item for Sales Managers to manage roles:
+```xml
+<search>
+    <field name="name"/>
+    <field name="commission_role_id"/>
+    <field name="commission_manager_id"/>
 
+    <filter name="has_anomaly"
+            string="With Anomalies"
+            domain="[('has_hierarchy_anomaly', '=', True)]"/>
+
+    <filter name="has_subordinates"
+            string="Managers"
+            domain="[('has_subordinates', '=', True)]"/>
+
+    <group expand="0" string="Group By">
+        <filter name="group_by_role"
+                string="Role"
+                context="{'group_by': 'commission_role_id'}"/>
+        <filter name="group_by_manager"
+                string="Manager"
+                context="{'group_by': 'commission_manager_id'}"/>
+    </group>
+</search>
 ```
-Configuration > Commission Roles
+
+### 5.3 Commission Plan - Role Percentages
+
+**File: `views/sale_commission_plan_views.xml`**
+
+**UPDATE role configuration tree:**
+
+```xml
+<tree string="Role Percentages" editable="bottom">
+    <field name="role_id"
+           domain="[('company_id', '=', parent.company_id)]"
+           options="{'no_create': True}"/>
+    <field name="default_percentage" widget="percentage"/>
+    <field name="active"/>
+</tree>
 ```
 
-Form view for `sale.commission.role`:
-- Name, Code, Sequence
-- Hierarchy settings (allow_subordinates, requires_manager, is_top_level)
-- Active users count with this role
-- Active commissions count with this role
+### 5.4 Commission Filters
+
+**File: `views/sale_commission_views.xml`**
+
+**UPDATE search view:**
+
+```xml
+<search>
+    <field name="name"/>
+    <field name="user_id"/>
+    <field name="role_id"/>
+    <field name="plan_id"/>
+
+    <filter name="unpaid"
+            string="Unpaid"
+            domain="[('payment_status', '=', 'unpaid')]"/>
+
+    <group expand="0" string="Group By">
+        <filter name="group_by_role"
+                string="Role"
+                context="{'group_by': 'role_id'}"/>
+        <filter name="group_by_user"
+                string="User"
+                context="{'group_by': 'user_id'}"/>
+        <filter name="group_by_period"
+                string="Period"
+                context="{'group_by': 'period'}"/>
+    </group>
+</search>
+```
 
 ---
 
-## 6. Impact Assessment
+## 6. New Configuration Interface
 
-### 6.1 Database Schema Changes
+### 6.1 Role Management Views
 
-| Model | Field Changes | Type | Risk |
-|-------|--------------|------|------|
-| `res.users` | Add `commission_role_id` M2o | New field | LOW |
-| `res.users` | Add `commission_manager_id` M2o | New field | LOW |
-| `res.users` | Remove `commission_role` Selection | Breaking | HIGH |
-| `res.users` | Remove `team_leader_id` M2o | Breaking | HIGH |
-| `res.users` | Remove `sales_director_id` M2o | Breaking | HIGH |
-| `sale.commission` | Add `role_id` M2o | New field | LOW |
-| `sale.commission` | Remove `role` Selection | Breaking | HIGH |
-| `hr.commission.role.config` | Add `role_id` M2o | New field | LOW |
-| `hr.commission.role.config` | Remove `role` Selection | Breaking | MEDIUM |
+**Create: `views/sale_commission_role_views.xml`**
 
-### 6.2 Data Migration Requirements
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_sale_commission_role_form" model="ir.ui.view">
+        <field name="name">sale.commission.role.form</field>
+        <field name="model">sale.commission.role</field>
+        <field name="arch" type="xml">
+            <form string="Commission Role">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_users"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="user_count" widget="statinfo" string="Users"/>
+                        </button>
+                        <button name="action_view_commissions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-money">
+                            <field name="commission_count" widget="statinfo" string="Commissions"/>
+                        </button>
+                    </div>
 
-#### Phase 1: Create Role Master Data
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"
+                                   help="Lower numbers = bottom of hierarchy (e.g., 10=Salesperson, 20=Team Leader, 30=Director)"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="is_base_role"
+                                   help="Check if this is the base role that creates commissions from sales"/>
+                            <field name="requires_manager"
+                                   help="Users with this role must have a manager assigned"/>
+                            <field name="can_manage_subordinates"
+                                   help="Users with this role can have team members"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="description" placeholder="Describe this role's responsibilities..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_sale_commission_role_tree" model="ir.ui.view">
+        <field name="name">sale.commission.role.tree</field>
+        <field name="model">sale.commission.role</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Roles"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="sequence" invisible="1"/>
+                <field name="is_base_role"/>
+                <field name="requires_manager"/>
+                <field name="can_manage_subordinates"/>
+                <field name="user_count"/>
+                <field name="commission_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_sale_commission_role" model="ir.actions.act_window">
+        <field name="name">Commission Roles</field>
+        <field name="res_model">sale.commission.role</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first commission role!
+            </p>
+            <p>
+                Define roles in your sales commission hierarchy (e.g., Salesperson, Team Leader, Sales Director).
+                Set the hierarchy level (sequence) to determine who reports to whom.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_sale_commission_role"
+              name="Commission Roles"
+              parent="sale.sale_menu_root"
+              action="action_sale_commission_role"
+              sequence="90"
+              groups="belgogreen_sales_commission.group_commission_manager"/>
+</odoo>
+```
+
+### 6.2 Security Rules
+
+**Update: `security/ir.model.access.csv`**
+
+Add these lines:
+```csv
+access_sale_commission_role_user,sale.commission.role.user,model_sale_commission_role,group_commission_user,1,0,0,0
+access_sale_commission_role_manager,sale.commission.role.manager,model_sale_commission_role,group_commission_manager,1,1,1,1
+```
+
+---
+
+## 7. Data Setup
+
+### 7.1 Default Roles
+
+**Create: `data/sale_commission_role_data.xml`**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Base Salesperson Role -->
+        <record id="role_salesperson" model="sale.commission.role">
+            <field name="name">Salesperson</field>
+            <field name="code">SP</field>
+            <field name="sequence">10</field>
+            <field name="is_base_role">True</field>
+            <field name="requires_manager">True</field>
+            <field name="can_manage_subordinates">False</field>
+            <field name="description">Front-line sales representatives who close deals and generate commissions</field>
+            <field name="color">1</field>
+        </record>
+
+        <!-- Team Leader Role -->
+        <record id="role_team_leader" model="sale.commission.role">
+            <field name="name">Team Leader</field>
+            <field name="code">TL</field>
+            <field name="sequence">20</field>
+            <field name="is_base_role">False</field>
+            <field name="requires_manager">True</field>
+            <field name="can_manage_subordinates">True</field>
+            <field name="description">Manages a team of salespeople and receives commissions on team sales</field>
+            <field name="color">3</field>
+        </record>
+
+        <!-- Sales Director Role -->
+        <record id="role_sales_director" model="sale.commission.role">
+            <field name="name">Sales Director</field>
+            <field name="code">SD</field>
+            <field name="sequence">30</field>
+            <field name="is_base_role">False</field>
+            <field name="requires_manager">False</field>
+            <field name="can_manage_subordinates">True</field>
+            <field name="description">Top-level sales management overseeing multiple teams</field>
+            <field name="color">2</field>
+        </record>
+    </data>
+</odoo>
+```
+
+---
+
+## 8. Implementation Checklist
+
+### Phase 1: Foundation (Days 1-3)
+- [ ] Create `sale_commission_role.py` model
+- [ ] Create role views XML
+- [ ] Add security rules
+- [ ] Create default role data
+- [ ] Update `__manifest__.py` with new files
+- [ ] Test role creation/management
+
+### Phase 2: Model Updates (Days 4-7)
+- [ ] Update `res_users.py`:
+  - [ ] Replace `commission_role` Selection with `commission_role_id` M2o
+  - [ ] Replace `team_leader_id`/`sales_director_id` with `commission_manager_id`
+  - [ ] Update `commission_subordinate_ids`
+  - [ ] Remove old One2many fields (`team_member_ids`, `director_team_ids`)
+- [ ] Update `sale_commission.py`:
+  - [ ] Replace `role` Selection with `role_id` M2o
+  - [ ] Update `_compute_commission_percentage` method
+- [ ] Update `hr_commission_role_config.py`:
+  - [ ] Replace `role` Selection with `role_id` M2o
+  - [ ] Update SQL constraint
+  - [ ] Update `_compute_display_name` method
+
+### Phase 3: Logic Updates (Days 8-12)
+- [ ] Update `sale_order.py`:
+  - [ ] Add `_get_commission_hierarchy()` method
+  - [ ] Replace hardcoded hierarchy in `_create_commissions_for_invoice()`
+  - [ ] Update logging to use `role.name` instead of hardcoded values
+- [ ] Update `account_move.py`:
+  - [ ] Apply same hierarchy changes as sale_order.py
+- [ ] Update `res_users.py` anomaly detection:
+  - [ ] Replace hardcoded anomaly types
+  - [ ] Implement `_compute_hierarchy_anomalies()` with dynamic logic
+  - [ ] Add `_has_circular_hierarchy()` method
+  - [ ] Update `_search_has_hierarchy_anomaly()`
+- [ ] Update role validation in `write()` method
+
+### Phase 4: View Updates (Days 13-15)
+- [ ] Update `res_users_views.xml`:
+  - [ ] Replace role/hierarchy fields in form view
+  - [ ] Update filters to use `commission_role_id`
+- [ ] Update `team_management_views.xml`:
+  - [ ] Update tree/kanban views for dynamic roles
+  - [ ] Update filters and grouping
+- [ ] Update `sale_commission_plan_views.xml`:
+  - [ ] Update role percentages tab tree view
+- [ ] Update `sale_commission_views.xml`:
+  - [ ] Update filters to use `role_id`
+  - [ ] Update group_by contexts
+
+### Phase 5: Testing (Days 16-18)
+- [ ] Create test data:
+  - [ ] 3+ roles with different hierarchy levels
+  - [ ] Users assigned to each role
+  - [ ] Commission plans with role percentages
+- [ ] Test scenarios:
+  - [ ] 2-level hierarchy (Salesperson → Team Leader)
+  - [ ] 3-level hierarchy (SP → TL → Director)
+  - [ ] 4-level hierarchy (add Regional Manager)
+  - [ ] Orphaned user (no manager)
+  - [ ] Circular hierarchy detection
+  - [ ] Manager with lower sequence than subordinate
+- [ ] Test commission generation:
+  - [ ] Verify all hierarchy levels get commissions
+  - [ ] Verify percentages calculated correctly
+  - [ ] Verify no duplicate commissions
+- [ ] Test anomaly detection:
+  - [ ] Missing manager
+  - [ ] Top role with manager
+  - [ ] Hierarchy level violations
+
+### Phase 6: Documentation (Days 19-20)
+- [ ] User guide for creating roles
+- [ ] User guide for assigning hierarchy
+- [ ] Admin guide for commission plan setup
+- [ ] Developer notes for future customization
+
+---
+
+## 9. Testing Scenarios
+
+### 9.1 Role Management Tests
+
 ```python
-def migrate_create_roles(cr):
-    """Create default roles matching old selection values"""
-    roles = [
-        ('salesperson', 'Salesperson', 10, False),      # sequence=10, not top level
-        ('team_leader', 'Team Leader', 20, False),      # sequence=20, not top level
-        ('sales_director', 'Sales Director', 30, True), # sequence=30, IS top level
-    ]
+# Test 1: Create new role
+role = env['sale.commission.role'].create({
+    'name': 'Regional Manager',
+    'code': 'RM',
+    'sequence': 25,  # Between TL (20) and SD (30)
+    'requires_manager': True,
+    'can_manage_subordinates': True
+})
 
-    for code, name, sequence, is_top_level in roles:
-        cr.execute("""
-            INSERT INTO sale_commission_role (code, name, sequence, is_top_level,
-                                               allow_subordinates, requires_manager,
-                                               active, create_date, write_date)
-            VALUES (%s, %s, %s, %s, TRUE, %s, TRUE, NOW(), NOW())
-        """, (code, name, sequence, is_top_level, not is_top_level))
+# Test 2: Delete role with users (should fail)
+try:
+    role.unlink()  # Should raise ValidationError if users assigned
+except ValidationError:
+    pass  # Expected
+
+# Test 3: Deactivate role
+role.active = False  # Should work
 ```
 
-#### Phase 2: Migrate User Roles
+### 9.2 Hierarchy Tests
+
 ```python
-def migrate_user_roles(cr):
-    """Migrate res.users commission_role Selection to commission_role_id M2o"""
+# Test 1: 4-level hierarchy
+salesperson = env['res.users'].create({
+    'name': 'John Doe',
+    'login': 'john@test.com',
+    'commission_role_id': role_salesperson.id,
+    'commission_manager_id': team_leader.id
+})
 
-    # Map old selection values to new role IDs
-    cr.execute("""
-        UPDATE res_users u
-        SET commission_role_id = r.id
-        FROM sale_commission_role r
-        WHERE u.commission_role = r.code
-          AND u.commission_role IS NOT NULL
-    """)
+team_leader = env['res.users'].create({
+    'name': 'Jane Manager',
+    'login': 'jane@test.com',
+    'commission_role_id': role_team_leader.id,
+    'commission_manager_id': regional_manager.id
+})
+
+regional_manager = env['res.users'].create({
+    'name': 'Bob Regional',
+    'login': 'bob@test.com',
+    'commission_role_id': role_regional_manager.id,
+    'commission_manager_id': director.id
+})
+
+director = env['res.users'].create({
+    'name': 'Alice Director',
+    'login': 'alice@test.com',
+    'commission_role_id': role_director.id,
+    'commission_manager_id': False  # Top level
+})
+
+# Test 2: Verify hierarchy traversal
+hierarchy = sale_order._get_commission_hierarchy(salesperson)
+assert len(hierarchy) == 4
+assert hierarchy[0][0] == salesperson
+assert hierarchy[1][0] == team_leader
+assert hierarchy[2][0] == regional_manager
+assert hierarchy[3][0] == director
 ```
 
-#### Phase 3: Migrate User Hierarchy
+### 9.3 Commission Calculation Tests
+
 ```python
-def migrate_user_hierarchy(cr):
-    """Convert team_leader_id/sales_director_id to commission_manager_id"""
+# Test 1: Commission generation for 4-level hierarchy
+sale_order = env['sale.order'].create({...})
+sale_order.action_confirm()
+invoice = sale_order._create_invoices()
+invoice.action_post()
+# Mark as paid...
 
-    # For salespeople: manager = team_leader_id (if exists) else sales_director_id
-    cr.execute("""
-        UPDATE res_users
-        SET commission_manager_id = COALESCE(team_leader_id, sales_director_id)
-        WHERE commission_role = 'salesperson'
-    """)
+commissions = env['sale.commission'].search([('sale_order_id', '=', sale_order.id)])
+assert len(commissions) == 4  # One for each level
 
-    # For team leaders: manager = sales_director_id
-    cr.execute("""
-        UPDATE res_users
-        SET commission_manager_id = sales_director_id
-        WHERE commission_role = 'team_leader'
-          AND sales_director_id IS NOT NULL
-    """)
-
-    # Sales directors have no manager (top level)
+# Test 2: Verify percentages
+for comm in commissions:
+    config = env['hr.commission.role.config'].search([
+        ('plan_id', '=', comm.plan_id.id),
+        ('role_id', '=', comm.role_id.id)
+    ])
+    assert comm.commission_percentage == config.default_percentage
 ```
 
-#### Phase 4: Migrate Commission Records
+### 9.4 Anomaly Detection Tests
+
 ```python
-def migrate_commission_roles(cr):
-    """Migrate sale.commission role Selection to role_id M2o"""
-    cr.execute("""
-        UPDATE sale_commission c
-        SET role_id = r.id
-        FROM sale_commission_role r
-        WHERE c.role = r.code
-    """)
+# Test 1: Missing manager
+user = env['res.users'].create({
+    'name': 'Test User',
+    'commission_role_id': role_salesperson.id,  # Requires manager
+    'commission_manager_id': False  # But none assigned
+})
+assert user.has_hierarchy_anomaly == True
+assert user.anomaly_type == 'missing_manager'
+
+# Test 2: Top role with manager
+director = env['res.users'].create({
+    'name': 'Test Director',
+    'commission_role_id': role_director.id,  # Doesn't require manager
+    'commission_manager_id': some_user.id  # But has one
+})
+assert director.has_hierarchy_anomaly == True
+assert director.anomaly_type == 'top_role_has_manager'
+
+# Test 3: Manager lower level than subordinate
+subordinate = env['res.users'].create({
+    'name': 'Subordinate',
+    'commission_role_id': role_director.id,  # sequence=30
+    'commission_manager_id': salesperson.id  # sequence=10 (lower!)
+})
+assert subordinate.has_hierarchy_anomaly == True
+assert subordinate.anomaly_type == 'manager_lower_level'
 ```
 
-#### Phase 5: Migrate Role Configurations
-```python
-def migrate_role_configs(cr):
-    """Migrate hr.commission.role.config"""
-    cr.execute("""
-        UPDATE hr_commission_role_config c
-        SET role_id = r.id
-        FROM sale_commission_role r
-        WHERE c.role = r.code
-    """)
-```
+---
 
-### 6.3 Affected Business Logic
+## 10. Risk Assessment (Development Environment)
 
-| Component | Location | Change Required | Complexity |
-|-----------|----------|----------------|------------|
-| Commission calculation | `sale_order.py:145-161` | Rewrite hierarchy traversal | HIGH |
-| Commission calculation | `account_move.py:85-96` | Rewrite hierarchy traversal | HIGH |
-| Anomaly detection | `res_users.py:279-340` | Rewrite all checks | HIGH |
-| Role validation | `res_users.py:400-485` | Adapt to dynamic roles | MEDIUM |
-| Subordinate retrieval | `res_users.py:162-196` | Simplify with generic field | MEDIUM |
-| Hierarchy warnings | `res_users.py:250-277` | Rewrite all checks | MEDIUM |
-| Record rules | `commission_security.xml` | Should work as-is | LOW |
+### 10.1 Risks & Mitigation
+
+| Risk | Severity | Mitigation |
+|------|----------|------------|
+| Commission calculation bugs | MEDIUM | Comprehensive testing with multiple scenarios |
+| Circular hierarchy not detected | LOW | Built-in cycle detection in traversal |
+| Performance issues with deep hierarchies | LOW | Depth limit (20 levels) and cycle detection |
+| Missing role configurations | LOW | Validation on commission plan approval |
+| UI confusion for users | LOW | Clear help text and tooltips |
+
+### 10.2 What We Don't Need to Worry About
+
+Since we're in development:
+- ✅ No production data migration
+- ✅ No backward compatibility required
+- ✅ Can modify database schema freely
+- ✅ Can change field names/types
+- ✅ Can delete old fields immediately
+- ✅ No user training until deployment
 
 ---
 
-## 7. Potential Blockers
+## 11. Files to Modify
 
-### 7.1 Technical Blockers
+### New Files
+- `models/sale_commission_role.py` (new model)
+- `views/sale_commission_role_views.xml` (new views)
+- `data/sale_commission_role_data.xml` (default roles)
 
-#### 🔴 **CRITICAL: Data Migration Complexity**
-
-**Issue:** Complex hierarchy mapping with edge cases
-- What if salesperson has both team_leader_id AND sales_director_id? (bypass scenario)
-- How to handle orphaned records?
-- What if multiple people have conflicting hierarchy assignments?
-
-**Solution:**
-- Run pre-migration audit to identify all edge cases
-- Create migration log table to track decisions
-- Provide manual resolution UI for conflicts
-
-#### 🔴 **CRITICAL: Commission Calculation Changes**
-
-**Issue:** Core algorithm rewrite affects money calculations
-- Any bugs could result in incorrect commission payments
-- Need extensive testing with real data
-
-**Solution:**
-- Run parallel calculations (old vs new) for validation period
-- Create comprehensive test cases covering all scenarios
-- QA sign-off required before production
-
-#### 🟡 **MEDIUM: View/Report Updates**
-
-**Issue:** Many views filter/group by hardcoded role values
-- Existing reports may break
-- Custom filters in saved searches become invalid
-
-**Solution:**
-- Audit all XML views and update domains
-- Provide migration script for user-saved filters
-- Update documentation for report changes
-
-#### 🟡 **MEDIUM: Backward Compatibility**
-
-**Issue:** External integrations or customizations may reference old fields
-- API calls using `commission_role` field
-- Custom modules depending on `team_leader_id`/`sales_director_id`
-
-**Solution:**
-- Provide computed fields for backward compatibility
-- Add deprecation warnings
-- Document migration guide for customizations
-
-### 7.2 Business Blockers
-
-#### 🟡 **MEDIUM: Manager Training**
-
-**Issue:** Sales managers need to understand new role management system
-- How to create new roles
-- How to set role hierarchy levels (sequence)
-- Understanding role configuration options
-
-**Solution:**
-- Create user documentation with screenshots
-- Provide training sessions
-- Set up example role configurations
-
-#### 🟡 **MEDIUM: Role Design Decisions**
-
-**Issue:** Need to define business rules for dynamic roles
-- Can roles be deleted if commissions exist?
-- Can role sequence be changed after commissions are generated?
-- What happens to existing commissions if role is deactivated?
-
-**Solution:**
-- Define clear business rules document
-- Implement validation constraints in code
-- Add warning messages for dangerous operations
-
-#### 🟢 **LOW: Performance Impact**
-
-**Issue:** Dynamic hierarchy traversal may be slower than hardcoded logic
-
-**Solution:**
-- Add indexes on new M2o fields
-- Consider caching hierarchy paths
-- Performance testing before go-live
+### Modified Files
+- `models/res_users.py` - Replace role fields, update hierarchy logic
+- `models/sale_commission.py` - Replace role field
+- `models/hr_commission_role_config.py` - Replace role field
+- `models/sale_order.py` - Update commission creation
+- `models/account_move.py` - Update commission creation
+- `views/res_users_views.xml` - Update form/tree views
+- `views/team_management_views.xml` - Update hierarchy views
+- `views/sale_commission_plan_views.xml` - Update role config
+- `views/sale_commission_views.xml` - Update filters
+- `security/ir.model.access.csv` - Add role model access
+- `__manifest__.py` - Add new files
 
 ---
 
-## 8. Recommended Implementation Plan
+## 12. Estimated Timeline
 
-### Phase 1: Foundation (Week 1-2)
-- [ ] Create `sale.commission.role` model
-- [ ] Add views and security rules for role management
-- [ ] Create default roles (Salesperson, Team Leader, Sales Director)
-- [ ] Add new fields to models (keep old fields for compatibility)
+| Phase | Duration | Details |
+|-------|----------|---------|
+| **Phase 1: Foundation** | 3 days | Create role model, views, security |
+| **Phase 2: Model Updates** | 4 days | Update all models to use dynamic roles |
+| **Phase 3: Logic Updates** | 5 days | Rewrite hierarchy traversal and anomaly detection |
+| **Phase 4: View Updates** | 3 days | Update all XML views |
+| **Phase 5: Testing** | 3 days | Create test data, run scenarios |
+| **Phase 6: Documentation** | 2 days | User guides, developer notes |
+| **Total** | **20 days** | ~4 weeks with 1 developer |
 
-### Phase 2: Logic Adaptation (Week 3-4)
-- [ ] Rewrite `_get_commission_hierarchy()` method
-- [ ] Update commission calculation logic to use new fields
-- [ ] Adapt anomaly detection to use role configuration
-- [ ] Update validation logic
-
-### Phase 3: UI Updates (Week 5)
-- [ ] Update all XML views to show new fields
-- [ ] Create role configuration menu for managers
-- [ ] Update team management views
-- [ ] Update filters and search views
-
-### Phase 4: Testing & Migration (Week 6-7)
-- [ ] Create comprehensive test dataset
-- [ ] Write and test migration scripts
-- [ ] Run parallel calculation validation
-- [ ] QA testing of all scenarios
-- [ ] User acceptance testing
-
-### Phase 5: Deployment (Week 8)
-- [ ] Backup production database
-- [ ] Run migration scripts
-- [ ] Verify data integrity
-- [ ] Remove deprecated fields after grace period
-- [ ] Monitor for issues
+**Note:** This is a clean implementation timeline with no migration overhead.
 
 ---
 
-## 9. Alternative Approaches
+## 13. Next Steps
 
-### Option A: Hybrid Approach (Recommended)
-**Keep hardcoded roles but make them configurable**
+### Immediate Actions
 
-- Keep 3-tier structure as default
-- Allow managers to configure role names and percentages
-- Maintain hardcoded fields but make labels dynamic
-- Add ability to "activate" 4th or 5th tier if needed
+1. **Review & Approve Approach**
+   - Confirm dynamic role model structure
+   - Confirm single `commission_manager_id` field approach
+   - Confirm anomaly detection logic
 
-**Pros:**
-- ✅ Less risky - minimal code changes
-- ✅ Faster implementation
-- ✅ No complex data migration
-- ✅ Existing logic mostly preserved
+2. **Start Implementation**
+   - Create `sale_commission_role.py` model
+   - Add views and security
+   - Load default role data
+   - Test role management UI
 
-**Cons:**
-- ⚠️ Still limited to predefined number of levels
-- ⚠️ Not truly "dynamic"
+3. **Iterative Development**
+   - Complete one model at a time
+   - Test after each change
+   - Commit frequently
 
-### Option B: Full Dynamic System (High Effort)
-**Complete rewrite as described in this document**
-
-**Pros:**
-- ✅ Unlimited flexibility
-- ✅ No code changes needed for new roles
-- ✅ Future-proof solution
-
-**Cons:**
-- ❌ High implementation cost
-- ❌ High risk of bugs
-- ❌ Complex migration
-
-### Option C: Phased Hybrid Approach (Balanced)
-**Start with Option A, migrate to Option B over time**
-
-1. Phase 1: Make current 3 roles configurable (names, percentages)
-2. Phase 2: Add optional 4th "Regional Manager" role
-3. Phase 3: Generalize to fully dynamic system
-
-**Pros:**
-- ✅ Delivers value quickly
-- ✅ Lower risk per phase
-- ✅ Can pause if issues arise
-
-**Cons:**
-- ⚠️ Requires two migration efforts
-- ⚠️ Longer total timeline
-
----
-
-## 10. Recommendations
-
-### Recommended Approach: **Option C - Phased Hybrid**
-
-**Rationale:**
-1. **Quick wins:** Sales managers can customize role names/labels immediately
-2. **Lower risk:** Smaller changes per phase = easier testing
-3. **Flexible:** Can stop at any phase if business needs are met
-4. **Proven pattern:** Incremental refactoring reduces big-bang risk
-
-### Immediate Next Steps
-
-1. **Week 1: Requirements Gathering**
-   - Interview sales managers about desired roles
-   - Document current hierarchy anomalies
-   - Identify must-have vs nice-to-have features
-
-2. **Week 2: Technical Design**
-   - Detail Phase 1 implementation (configurable 3-tier)
-   - Create database migration plan
-   - Set up test environment with production data copy
-
-3. **Week 3-4: Phase 1 Implementation**
-   - Create basic role master model
-   - Add configuration UI
-   - Keep all existing fields/logic intact
-
-4. **Week 5: Testing & Validation**
-   - User acceptance testing
-   - Performance testing
-   - Edge case validation
-
-5. **Week 6: Phase 1 Deployment**
-   - Deploy to production
-   - Monitor for issues
-   - Gather feedback
-
-6. **Decide on Phase 2/3 based on feedback**
-
----
-
-## 11. Risk Mitigation Strategies
-
-### Data Integrity
-- ✅ Run migration in transaction with rollback capability
-- ✅ Create backup before migration
-- ✅ Validate data after each migration step
-- ✅ Keep old fields for 1-2 months as backup
-
-### Commission Accuracy
-- ✅ Run parallel calculations for 1 month (old + new logic)
-- ✅ Alert if discrepancies found
-- ✅ Manual review of first month's commissions
-- ✅ Easy rollback procedure documented
-
-### User Adoption
-- ✅ Training materials and videos
-- ✅ In-app help text and tooltips
-- ✅ Gradual rollout (pilot team first)
-- ✅ Dedicated support during transition
-
----
-
-## 12. Success Metrics
-
-### Technical Metrics
-- Zero data loss during migration
-- < 5% performance degradation in commission calculation
-- Zero critical bugs in first month
-- All automated tests passing
-
-### Business Metrics
-- Sales managers can create new role within 5 minutes
-- 100% of existing commissions migrated correctly
-- No incorrect commission payments
-- Positive feedback from pilot users
-
----
-
-## Appendices
-
-### Appendix A: Files Requiring Changes
-
-**High Priority (Core Logic):**
-- `models/res_users.py` (486 lines) - Major refactoring
-- `models/sale_order.py` (286 lines) - Commission creation logic
-- `models/account_move.py` - Commission creation logic
-- `models/sale_commission.py` (253 lines) - Role field changes
-- `models/hr_commission_role_config.py` (70 lines) - Role field changes
-
-**Medium Priority (Views):**
-- `views/res_users_views.xml` - Form updates
-- `views/team_management_views.xml` - Hierarchy views
-- `views/sale_commission_plan_views.xml` - Role config tab
-- `views/sale_commission_views.xml` - Filters
-
-**Low Priority (Supporting):**
-- `security/commission_security.xml` - May need review
-- `data/cron_data.xml` - Should work as-is
-- Various wizard/report files - Minor updates
-
-### Appendix B: Test Scenarios Required
-
-1. **Single-level commission** (just salesperson)
-2. **Two-level commission** (salesperson + manager)
-3. **Three-level commission** (full hierarchy)
-4. **Four-level commission** (with new role)
-5. **Orphaned salesperson** (no manager)
-6. **Role change mid-period**
-7. **Manager change mid-period**
-8. **Circular hierarchy** (should be prevented)
-9. **Duplicate role assignment** (should be prevented)
-10. **Commission recalculation** after role changes
-
-### Appendix C: Estimated Effort
-
-| Phase | Tasks | Effort (Days) | Resources |
-|-------|-------|---------------|-----------|
-| Analysis | Requirements, Design | 5 | 1 Dev + 1 BA |
-| Development | Coding, Unit Tests | 20 | 2 Devs |
-| Testing | QA, UAT | 10 | 1 QA + Users |
-| Migration | Scripts, Validation | 5 | 1 Dev |
-| Deployment | Deploy, Monitor | 3 | 1 Dev + 1 Ops |
-| **Total** | | **43 days** | |
-
-**Note:** This is for Option C Phase 1 only. Full implementation would be 2-3x this estimate.
-
----
-
-## Conclusion
-
-Converting to dynamic roles is **technically feasible** but requires **significant effort** and carries **moderate risk**. The **phased hybrid approach (Option C)** provides the best balance of value delivery, risk management, and flexibility.
-
-**Key Success Factors:**
-1. ✅ Comprehensive testing with production-like data
-2. ✅ Parallel validation of old vs new calculations
-3. ✅ Clear rollback procedure
-4. ✅ User training and documentation
-5. ✅ Gradual rollout with monitoring
-
-**Recommendation:** Proceed with **Phase 1 (Configurable 3-tier)** to deliver immediate value while minimizing risk. Evaluate need for full dynamic system after Phase 1 feedback.
+Would you like me to:
+1. **Start implementing** the role model and views?
+2. **Create a detailed migration script** for updating the models?
+3. **Write test cases** for the new hierarchy logic?
+4. **Something else**?
