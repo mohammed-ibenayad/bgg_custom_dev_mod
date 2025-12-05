@@ -9,10 +9,12 @@
             <field name="arch" type="xml">
                 <list string="Role Configurations" editable="bottom">
                     <field name="plan_id" string="Plan" width="200px"/>
-                    <field name="role" string="Rôle" width="120px"/>
-                    <field name="default_percentage" string="%" width="80px"/>
-                    <field name="company_id" string="Société" groups="base.group_multi_company" width="150px"/>
-                    <field name="active" string="Actif" width="80px"/>
+                    <field name="role_id" string="Role" width="150px"
+                           options="{'no_create': True}"/>
+                    <field name="direct_sale_percentage" string="Direct Sale %" width="100px"/>
+                    <field name="override_percentage" string="Override %" width="100px"/>
+                    <field name="company_id" string="Company" groups="base.group_multi_company" width="150px"/>
+                    <field name="active" string="Active" width="80px" widget="boolean_toggle"/>
                 </list>
             </field>
         </record>
@@ -27,13 +29,30 @@
                         <group>
                             <group>
                                 <field name="plan_id"/>
-                                <field name="role"/>
+                                <field name="role_id" options="{'no_create': True}"/>
                             </group>
                             <group>
-                                <field name="default_percentage"/>
+                                <field name="direct_sale_percentage"
+                                       help="Percentage when this role makes their own sale"/>
+                                <field name="override_percentage"
+                                       help="Percentage when this role gets commission on subordinate's sale"/>
                                 <field name="active"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
+                        </group>
+
+                        <group string="Explanation">
+                            <div class="alert alert-info" role="alert">
+                                <strong>Direct Sale %:</strong> Applied when a user with this role makes their own sale.
+                                <br/>
+                                <strong>Override %:</strong> Applied when a user receives commission on a subordinate's sale.
+                                <br/><br/>
+                                <strong>Example:</strong> If Team Leader has Direct=5% and Override=2%:
+                                <ul>
+                                    <li>Team Leader makes $1000 sale → Gets $50 (5%)</li>
+                                    <li>Salesperson makes $1000 sale → Team Leader gets $20 (2%)</li>
+                                </ul>
+                            </div>
                         </group>
                     </sheet>
                 </form>
@@ -47,12 +66,12 @@
             <field name="arch" type="xml">
                 <search string="Role Configuration">
                     <field name="plan_id"/>
-                    <field name="role"/>
+                    <field name="role_id"/>
                     <filter string="Active" name="active" domain="[('active', '=', True)]"/>
                     <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
                     <group expand="0" string="Group By">
                         <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
-                        <filter string="Role" name="group_role" context="{'group_by': 'role'}"/>
+                        <filter string="Role" name="group_role" context="{'group_by': 'role_id'}"/>
                     </group>
                 </search>
             </field>
@@ -69,7 +88,12 @@
                     Create a commission role configuration
                 </p>
                 <p>
-                    Define commission percentages for each role (Salesperson, Team Leader, Sales Director) within a commission plan.
+                    Define commission percentages for each role within a commission plan.
+                    Each role has two percentages:
+                    <ul>
+                        <li><strong>Direct Sale %</strong>: When the user makes their own sale</li>
+                        <li><strong>Override %</strong>: When they receive commission on subordinate's sale</li>
+                    </ul>
                 </p>
             </field>
         </record>

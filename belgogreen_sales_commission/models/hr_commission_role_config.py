@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class HrCommissionRoleConfig(models.Model):
     _name = 'hr.commission.role.config'
     _description = 'Commission Configuration by Role'
-    _order = 'plan_id, role'
+    _order = 'plan_id, role_id'
 
     plan_id = fields.Many2one(
         'sale.commission.plan',
@@ -17,17 +17,30 @@ class HrCommissionRoleConfig(models.Model):
         help='The commission plan this configuration applies to'
     )
 
-    role = fields.Selection([
-        ('salesperson', 'Salesperson'),
-        ('team_leader', 'Team Leader'),
-        ('sales_director', 'Sales Director')
-    ], string='Role', required=True, help='The role this percentage applies to')
+    role_id = fields.Many2one(
+        'sale.commission.role',
+        string='Role',
+        required=True,
+        domain="[('company_id', '=', company_id)]",
+        help='The role this percentage applies to'
+    )
 
-    default_percentage = fields.Float(
-        string='Default Percentage',
+    # DUAL PERCENTAGE APPROACH
+    # This solves the problem: "What % when Team Leader makes their OWN sale vs manages a sale?"
+    direct_sale_percentage = fields.Float(
+        string='Direct Sale %',
         required=True,
         digits=(5, 2),
-        help='Default commission percentage for this role (e.g., 5.00 for 5%)'
+        default=0.0,
+        help='Commission percentage when user with this role makes their own sale (e.g., Team Leader selling directly = 5%)'
+    )
+
+    override_percentage = fields.Float(
+        string='Override %',
+        required=True,
+        digits=(5, 2),
+        default=0.0,
+        help='Commission percentage when user receives commission on subordinate\'s sale (e.g., Team Leader getting commission on salesperson\'s sale = 2%)'
     )
 
     company_id = fields.Many2one(
@@ -45,25 +58,29 @@ class HrCommissionRoleConfig(models.Model):
 
     _sql_constraints = [
         ('unique_plan_role',
-         'unique(plan_id, role)',
+         'unique(plan_id, role_id)',
          'Only one percentage configuration per role per plan is allowed!')
     ]
 
-    @api.constrains('default_percentage')
-    def _check_percentage(self):
-        """Validate that percentage is between 0 and 100"""
+    @api.constrains('direct_sale_percentage', 'override_percentage')
+    def _check_percentages(self):
+        """Validate that percentages are between 0 and 100"""
         for record in self:
-            if record.default_percentage < 0 or record.default_percentage > 100:
+            if record.direct_sale_percentage < 0 or record.direct_sale_percentage > 100:
                 raise ValidationError(
-                    _('Commission percentage must be between 0 and 100. Got: %s') % record.default_percentage
+                    _('Direct sale percentage must be between 0 and 100. Got: %s') % record.direct_sale_percentage
+                )
+            if record.override_percentage < 0 or record.override_percentage > 100:
+                raise ValidationError(
+                    _('Override percentage must be between 0 and 100. Got: %s') % record.override_percentage
                 )
 
     def _compute_display_name(self):
         """Custom display name for Odoo 18"""
         for record in self:
-            role_label = dict(record._fields['role'].selection).get(record.role, record.role)
-            record.display_name = _('%(plan)s - %(role)s (%(percentage)s%%)') % {
+            record.display_name = _('%(plan)s - %(role)s (Direct: %(direct)s%% / Override: %(override)s%%)') % {
                 'plan': record.plan_id.name,
-                'role': role_label,
-                'percentage': record.default_percentage
+                'role': record.role_id.name,
+                'direct': record.direct_sale_percentage,
+                'override': record.override_percentage
             }
