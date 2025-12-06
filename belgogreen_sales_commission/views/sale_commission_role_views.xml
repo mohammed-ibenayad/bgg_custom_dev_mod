@@ -105,12 +105,12 @@
                             <div class="o_kanban_record_bottom">
                                 <div class="oe_kanban_bottom_left">
                                     <span class="badge badge-pill">
-                                        <i class="fa fa-users"/> <field name="user_count"/> users
+                                        <i class="fa fa-users" title="Users"/> <field name="user_count"/> users
                                     </span>
                                 </div>
                                 <div class="oe_kanban_bottom_right">
                                     <span class="badge badge-pill badge-success">
-                                        <i class="fa fa-money"/> <field name="commission_count"/>
+                                        <i class="fa fa-money" title="Commissions"/> <field name="commission_count"/>
                                     </span>
                                 </div>
                             </div>
