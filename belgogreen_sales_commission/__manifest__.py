@@ -54,6 +54,7 @@ Main Features:
         'data/sale_commission_role_data.xml',
         'data/cron_data.xml',
         'wizard/commission_claim_wizard_views.xml',
+        'views/menu_views.xml',  # Load menu structure first
         'views/sale_commission_role_views.xml',
         'views/hr_commission_role_config_views.xml',
         'views/sale_commission_plan_views.xml',
@@ -64,7 +65,6 @@ Main Features:
         'views/sale_commission_claim_views.xml',
         'views/sale_commission_views.xml',
         'views/account_move_views.xml',
-        'views/menu_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
