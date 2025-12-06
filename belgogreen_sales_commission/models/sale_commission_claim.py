@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class SaleCommissionClaim(models.Model):
@@ -94,6 +95,92 @@ class SaleCommissionClaim(models.Model):
         compute='_compute_commission_count'
     )
 
+    # Deduction fields
+    mandatory_deduction_ids = fields.Many2many(
+        'commission.deduction',
+        'claim_mandatory_deduction_rel',
+        'claim_id', 'deduction_id',
+        string='Mandatory Deductions',
+        compute='_compute_deductions',
+        store=True,
+        help="Auto-applied mandatory deductions"
+    )
+
+    optional_deduction_ids = fields.Many2many(
+        'commission.deduction',
+        'claim_optional_deduction_rel',
+        'claim_id', 'deduction_id',
+        string='Optional Deductions',
+        help="User-selected optional deductions"
+    )
+
+    all_deduction_ids = fields.Many2many(
+        'commission.deduction',
+        'claim_all_deduction_rel',
+        'claim_id', 'deduction_id',
+        string='All Deductions',
+        compute='_compute_totals',
+        help="All deductions (mandatory + optional)"
+    )
+
+    total_mandatory_deductions = fields.Monetary(
+        string='Mandatory Deductions',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id'
+    )
+
+    total_optional_deductions = fields.Monetary(
+        string='Optional Deductions',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id'
+    )
+
+    total_deductions = fields.Monetary(
+        string='Total Deductions',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id'
+    )
+
+    net_amount = fields.Monetary(
+        string='Net Amount',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+        help='Amount after all deductions'
+    )
+
+    # Purchase Order fields
+    purchase_order_id = fields.Many2one(
+        'purchase.order',
+        string='Purchase Order',
+        readonly=True,
+        copy=False,
+        help='Purchase order generated from this claim'
+    )
+
+    purchase_order_state = fields.Selection(
+        related='purchase_order_id.state',
+        string='PO Status',
+        store=True
+    )
+
+    # Enhanced state to track PO confirmation
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('po_sent', 'PO Sent to Employee'),
+        ('po_confirmed', 'Employee Confirmed'),
+        ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled')
+    ], string='State', default='draft', required=True, tracking=True,
+       help='Draft: Being prepared | Pending: Awaiting manager | Approved: Manager approved | '
+            'PO Sent: Waiting employee confirmation | PO Confirmed: Ready for payment | '
+            'Rejected: Denied | Cancelled: Cancelled')
+
     @api.model_create_multi
     def create(self, vals_list):
         """Generate sequence and notify admins"""
@@ -118,17 +205,118 @@ class SaleCommissionClaim(models.Model):
         for claim in self:
             claim.commission_count = len(claim.commission_ids)
 
-    def action_approve(self):
-        """Approve the claim"""
+    @api.depends('user_id', 'state')
+    def _compute_deductions(self):
+        """Auto-load mandatory deductions for the user"""
         for claim in self:
-            claim.write({
-                'state': 'approved',
-                'processed_by': self.env.user.id,
-                'processed_date': fields.Datetime.now()
-            })
-            claim.commission_ids.write({'payment_status': 'processing'})
-            # Send notification to claimant
-            claim._notify_claimant('approved')
+            if claim.user_id and claim.state in ['draft', 'pending']:
+                # Load pending mandatory deductions
+                mandatory = self.env['commission.deduction'].search([
+                    ('user_id', '=', claim.user_id.id),
+                    ('deduction_category', '=', 'mandatory'),
+                    ('state', '=', 'pending'),
+                    ('company_id', '=', claim.company_id.id)
+                ])
+                claim.mandatory_deduction_ids = mandatory
+            else:
+                claim.mandatory_deduction_ids = False
+
+    @api.depends('commission_ids', 'commission_ids.commission_amount',
+                 'mandatory_deduction_ids', 'mandatory_deduction_ids.amount',
+                 'optional_deduction_ids', 'optional_deduction_ids.amount')
+    def _compute_totals(self):
+        """Compute all totals including deductions"""
+        for claim in self:
+            # Gross commission amount
+            claim.total_amount = sum(claim.commission_ids.mapped('commission_amount'))
+
+            # Mandatory deductions
+            claim.total_mandatory_deductions = sum(claim.mandatory_deduction_ids.mapped('amount'))
+
+            # Optional deductions
+            claim.total_optional_deductions = sum(claim.optional_deduction_ids.mapped('amount'))
+
+            # Total deductions
+            claim.total_deductions = claim.total_mandatory_deductions + claim.total_optional_deductions
+
+            # All deductions combined
+            claim.all_deduction_ids = claim.mandatory_deduction_ids | claim.optional_deduction_ids
+
+            # Net amount
+            claim.net_amount = claim.total_amount - claim.total_deductions
+
+    @api.constrains('net_amount', 'state')
+    def _check_net_amount_positive(self):
+        """Ensure net amount is positive when submitting"""
+        for claim in self:
+            if claim.state == 'pending' and claim.net_amount < 0:
+                raise ValidationError(
+                    _("Cannot submit claim with negative net amount.\n\n"
+                      "Gross commissions: %(gross)s\n"
+                      "Mandatory deductions: -%(mandatory)s\n"
+                      "Optional deductions: -%(optional)s\n"
+                      "────────────────────────────\n"
+                      "Net amount: %(net)s\n\n"
+                      "Please contact your manager to resolve deduction issues.") % {
+                        'gross': claim.total_amount,
+                        'mandatory': claim.total_mandatory_deductions,
+                        'optional': claim.total_optional_deductions,
+                        'net': claim.net_amount
+                    }
+                )
+
+    def action_submit(self):
+        """Submit claim for approval"""
+        self.ensure_one()
+        if not self.commission_ids:
+            raise UserError(_('Please select at least one commission to claim.'))
+        if self.net_amount <= 0:
+            raise UserError(_('Net claim amount must be positive.'))
+
+        self.write({'state': 'pending'})
+        self._notify_admins()
+        return True
+
+    def action_approve(self):
+        """Approve claim and create draft PO"""
+        self.ensure_one()
+
+        # Ensure user is set up as vendor
+        vendor = self._ensure_user_as_vendor()
+
+        # Create draft Purchase Order
+        po = self._create_purchase_order(vendor)
+
+        # Update claim state
+        self.write({
+            'state': 'approved',
+            'processed_by': self.env.user.id,
+            'processed_date': fields.Datetime.now(),
+            'purchase_order_id': po.id
+        })
+
+        # Mark deductions as applied
+        self.all_deduction_ids.write({
+            'state': 'applied',
+            'claim_id': self.id,
+            'purchase_order_id': po.id
+        })
+
+        # Notify claimant
+        self._notify_claimant('approved')
+
+        # Open PO for manager to review/edit
+        return {
+            'name': _('Review Purchase Order'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'res_id': po.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_commission_claim_id': self.id,
+            }
+        }
 
     def action_reject(self):
         """Reject the claim"""
@@ -191,3 +379,102 @@ class SaleCommissionClaim(models.Model):
             'domain': [('id', 'in', self.commission_ids.ids)],
             'context': {'default_user_id': self.user_id.id}
         }
+
+    def action_view_purchase_order(self):
+        """View related purchase order"""
+        self.ensure_one()
+        if not self.purchase_order_id:
+            raise UserError(_('No purchase order has been created yet.'))
+
+        return {
+            'name': _('Purchase Order'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'res_id': self.purchase_order_id.id,
+            'view_mode': 'form',
+            'target': 'current'
+        }
+
+    def _ensure_user_as_vendor(self):
+        """Ensure user has a vendor/partner record"""
+        self.ensure_one()
+
+        partner = self.user_id.partner_id
+        if not partner:
+            raise UserError(_('User %s does not have a linked partner record.') % self.user_id.name)
+
+        # Ensure partner is set as supplier
+        if not partner.supplier_rank:
+            partner.write({'supplier_rank': 1})
+
+        return partner
+
+    def _create_purchase_order(self, vendor):
+        """Create draft purchase order for commission payment"""
+        self.ensure_one()
+
+        # Get commission service product
+        product = self.env.ref('belgogreen_sales_commission.product_commission_service', raise_if_not_found=False)
+        if not product:
+            raise UserError(_(
+                'Commission service product not found. '
+                'Please contact your administrator to configure the commission service product.'
+            ))
+
+        # Create PO
+        po_vals = {
+            'partner_id': vendor.id,
+            'origin': self.name,
+            'commission_claim_id': self.id,
+            'state': 'draft',
+            'company_id': self.company_id.id,
+            'currency_id': self.currency_id.id,
+            'notes': self._generate_po_notes(),
+        }
+
+        po = self.env['purchase.order'].create(po_vals)
+
+        # Create PO line with gross amount (manager will add deduction lines)
+        self.env['purchase.order.line'].create({
+            'order_id': po.id,
+            'product_id': product.id,
+            'name': _('Commission Payment - %s') % self.name,
+            'product_qty': 1,
+            'price_unit': self.total_amount,  # Gross amount
+            'date_planned': fields.Date.today(),
+        })
+
+        return po
+
+    def _generate_po_notes(self):
+        """Generate notes for PO with deduction breakdown"""
+        self.ensure_one()
+
+        notes = _('Commission Payment Details\n')
+        notes += _('═' * 50) + '\n\n'
+        notes += _('Claim Reference: %s\n') % self.name
+        notes += _('Claimant: %s\n') % self.user_id.name
+        notes += _('Number of Commissions: %s\n\n') % self.commission_count
+
+        notes += _('Financial Breakdown:\n')
+        notes += _('─' * 50) + '\n'
+        notes += _('Gross Commissions: %s %s\n') % (self.total_amount, self.currency_id.symbol)
+
+        if self.all_deduction_ids:
+            notes += _('\nDeductions:\n')
+            for deduction in self.all_deduction_ids:
+                notes += _('  • %s: -%s %s\n') % (
+                    deduction.deduction_type.replace('_', ' ').title(),
+                    deduction.amount,
+                    self.currency_id.symbol
+                )
+            notes += _('─' * 50) + '\n'
+            notes += _('Total Deductions: -%s %s\n') % (self.total_deductions, self.currency_id.symbol)
+
+        notes += _('═' * 50) + '\n'
+        notes += _('NET AMOUNT: %s %s\n') % (self.net_amount, self.currency_id.symbol)
+
+        if self.notes:
+            notes += _('\nClaimant Notes:\n%s\n') % self.notes
+
+        return notes
