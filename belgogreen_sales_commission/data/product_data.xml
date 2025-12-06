@@ -11,7 +11,6 @@
             <field name="standard_price">0.0</field>
             <field name="purchase_ok" eval="True"/>
             <field name="sale_ok" eval="False"/>
-            <field name="detailed_type">service</field>
             <field name="description">
 Service product used for commission payment purchase orders.
 This product represents commission payments to salespeople.
