@@ -64,7 +64,8 @@
                                         <field name="currency_id" column_invisible="1"/>
                                         <field name="name" string="Référence" width="130px"/>
                                         <field name="date" string="Date" width="90px"/>
-                                        <field name="role" string="Rôle" width="110px"/>
+                                        <field name="role_id" string="Rôle" width="110px"/>
+                                        <field name="commission_type" string="Type" width="80px"/>
                                         <field name="sale_order_id" string="Commande" width="120px"/>
                                         <field name="base_amount" string="Base" sum="Total base" width="100px"/>
                                         <field name="commission_amount" string="Montant" sum="Total commissions" width="110px"/>

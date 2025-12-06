@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_commission_role_user,sale.commission.role.user,model_sale_commission_role,group_commission_user,1,0,0,0
+access_sale_commission_role_manager,sale.commission.role.manager,model_sale_commission_role,group_commission_manager,1,1,1,1
 access_sale_commission_user,sale.commission.user,model_sale_commission,group_commission_user,1,1,0,0
 access_sale_commission_manager,sale.commission.manager,model_sale_commission,group_commission_manager,1,1,1,1
 access_sale_commission_payment_user,sale.commission.payment.user,model_sale_commission_payment,group_commission_user,1,0,0,0

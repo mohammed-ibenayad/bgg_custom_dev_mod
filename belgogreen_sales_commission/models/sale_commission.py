@@ -27,12 +27,19 @@ class SaleCommission(models.Model):
         help='The user receiving this commission'
     )
 
-    role = fields.Selection([
-        ('salesperson', 'Salesperson'),
-        ('team_leader', 'Team Leader'),
-        ('sales_director', 'Sales Director')
-    ], string='Role', required=True, tracking=True,
-       help='The role of the user in this commission')
+    role_id = fields.Many2one(
+        'sale.commission.role',
+        string='Role',
+        required=True,
+        tracking=True,
+        help='The role of the user in this commission'
+    )
+
+    commission_type = fields.Selection([
+        ('direct', 'Direct Sale'),
+        ('override', 'Override Commission')
+    ], string='Commission Type', required=True, default='direct', tracking=True,
+       help='Direct = user made the sale, Override = commission on subordinate\'s sale')
 
     # Related Sale and Invoice
     sale_order_id = fields.Many2one(
@@ -164,19 +171,32 @@ class SaleCommission(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('sale.commission') or _('New')
         return super(SaleCommission, self).create(vals_list)
 
-    @api.depends('percentage_override', 'plan_id', 'role')
+    @api.depends('percentage_override', 'plan_id', 'role_id', 'commission_type')
     def _compute_commission_percentage(self):
-        """Compute the effective commission percentage"""
+        """
+        Compute the effective commission percentage based on:
+        - Manual override (if set)
+        - Commission type (direct vs override)
+        - Role configuration
+        """
         for commission in self:
             if commission.percentage_override:
                 commission.commission_percentage = commission.percentage_override
             else:
-                # Get default percentage from role configuration
+                # Get role configuration for this plan and role
                 config = self.env['hr.commission.role.config'].search([
                     ('plan_id', '=', commission.plan_id.id),
-                    ('role', '=', commission.role)
+                    ('role_id', '=', commission.role_id.id)
                 ], limit=1)
-                commission.commission_percentage = config.default_percentage if config else 0.0
+
+                if config:
+                    # Use appropriate percentage based on commission type
+                    if commission.commission_type == 'direct':
+                        commission.commission_percentage = config.direct_sale_percentage
+                    else:  # override
+                        commission.commission_percentage = config.override_percentage
+                else:
+                    commission.commission_percentage = 0.0
 
     @api.depends('base_amount', 'commission_percentage')
     def _compute_commission_amount(self):

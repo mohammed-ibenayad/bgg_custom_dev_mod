@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import models
+from . import sale_commission_role
 from . import hr_commission_role_config
 from . import sale_commission_plan
 from . import res_users

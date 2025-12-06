@@ -85,7 +85,7 @@ class SaleOrder(models.Model):
             return result
 
         # Check if salesperson has commission role
-        if not self.user_id.commission_role:
+        if not self.user_id.commission_role_id:
             result['message'] = _("Salesperson %s has no commission role set") % self.user_id.name
             return result
 
@@ -132,9 +132,48 @@ class SaleOrder(models.Model):
 
         return result
 
+    def _get_commission_hierarchy(self, base_user):
+        """
+        Traverse hierarchy upwards from base user to collect all managers who should receive commission.
+
+        Supports unlimited hierarchy levels by following commission_manager_id chain.
+        Includes cycle detection to prevent infinite loops.
+
+        Args:
+            base_user: res.users record (typically the salesperson who made the sale)
+
+        Returns:
+            list of tuples: [(user, role, commission_type), ...] ordered from bottom to top of hierarchy
+        """
+        hierarchy = []
+        current_user = base_user
+        seen_ids = set()  # Cycle detection
+
+        while current_user and current_user.id not in seen_ids:
+            # Only include users with a commission role
+            if current_user.commission_role_id:
+                # Determine commission type
+                is_direct_sale = (current_user.id == base_user.id)  # First person in chain = made the sale
+                commission_type = 'direct' if is_direct_sale else 'override'
+
+                hierarchy.append((current_user, current_user.commission_role_id, commission_type))
+                seen_ids.add(current_user.id)
+
+            # Move up to manager
+            current_user = current_user.commission_manager_id
+
+            # Safety check: prevent infinite loops
+            if len(seen_ids) > 20:
+                _logger.warning("Hierarchy depth exceeds 20 levels for user %s. Possible circular reference.", base_user.name)
+                break
+
+        return hierarchy
+
     def _create_commissions_for_invoice(self, invoice, commission_plan):
         """
-        Create commission records for a specific invoice
+        Create commission records for a specific invoice.
+        Now supports dynamic N-level hierarchies with dual percentage (direct vs override).
+
         Returns: number of commissions created
         """
         self.ensure_one()
@@ -142,33 +181,22 @@ class SaleOrder(models.Model):
         salesperson = self.user_id
         base_amount = invoice.amount_total
 
-        # Build commission hierarchy
-        users_to_commission = []
+        # Build commission hierarchy dynamically - SUPPORTS ANY NUMBER OF LEVELS
+        users_to_commission = self._get_commission_hierarchy(salesperson)
 
-        # 1. Salesperson (always gets salesperson commission when making a sale)
-        if salesperson.commission_role:
-            users_to_commission.append((salesperson, 'salesperson'))
-
-        # 2. Team Leader
-        if salesperson.team_leader_id:
-            users_to_commission.append((salesperson.team_leader_id, 'team_leader'))
-
-        # 3. Sales Director
-        if salesperson.sales_director_id:
-            users_to_commission.append((salesperson.sales_director_id, 'sales_director'))
-        elif salesperson.team_leader_id and salesperson.team_leader_id.sales_director_id:
-            users_to_commission.append((salesperson.team_leader_id.sales_director_id, 'sales_director'))
+        if not users_to_commission:
+            _logger.info("No commission hierarchy found for user %s", salesperson.name)
+            return 0
 
         # Calculate period (YYYY-MM format)
         period = invoice.invoice_date.strftime('%Y-%m') if invoice.invoice_date else fields.Date.today().strftime('%Y-%m')
 
         # Create commission records
         commissions_created = 0
-        for user, role in users_to_commission:
+        for user, role, commission_type in users_to_commission:
             # Check if user is in the plan's allowed users list
             if commission_plan.user_ids and user.id not in commission_plan.user_ids.mapped('user_id').ids:
-                # User not in plan's user list, skip
-                _logger.info(_("Skipping %s (%s) - not in plan's user list") % (user.name, role))
+                _logger.info("Skipping %s (%s) - not in plan's user list", user.name, role.name)
                 continue
 
             # Check if commission already exists for this specific user
@@ -176,29 +204,32 @@ class SaleOrder(models.Model):
                 ('invoice_id', '=', invoice.id),
                 ('sale_order_id', '=', self.id),
                 ('user_id', '=', user.id),
-                ('role', '=', role)
+                ('role_id', '=', role.id),
+                ('commission_type', '=', commission_type)
             ], limit=1)
 
             if existing_commission:
-                _logger.info(_("Commission already exists for %s (%s) on order %s") % (user.name, role, self.name))
+                _logger.info("Commission already exists for %s (%s, %s) on order %s",
+                           user.name, role.name, commission_type, self.name)
                 continue
 
             # Get role configuration
             role_config = self.env['hr.commission.role.config'].search([
                 ('plan_id', '=', commission_plan.id),
-                ('role', '=', role),
+                ('role_id', '=', role.id),
                 ('active', '=', True)
             ], limit=1)
 
             if not role_config:
-                _logger.warning(_("No active role config found for %s in plan %s") % (role, commission_plan.name))
+                _logger.warning("No active role config found for %s in plan %s", role.name, commission_plan.name)
                 continue
 
-            # Create commission record
+            # Create commission record with role_id and commission_type
             try:
                 self.env['sale.commission'].create({
                     'user_id': user.id,
-                    'role': role,
+                    'role_id': role.id,
+                    'commission_type': commission_type,  # NEW: direct or override
                     'sale_order_id': self.id,
                     'invoice_id': invoice.id,
                     'plan_id': commission_plan.id,
@@ -211,9 +242,10 @@ class SaleOrder(models.Model):
                     'currency_id': self.currency_id.id,
                 })
                 commissions_created += 1
-                _logger.info(_("Created commission for %s (%s) - Order: %s, Invoice: %s") % (user.name, role, self.name, invoice.name))
+                _logger.info("Created commission for %s (%s, %s) - Order: %s, Invoice: %s",
+                           user.name, role.name, commission_type, self.name, invoice.name)
             except Exception as e:
-                _logger.error(_("Error creating commission for %s: %s") % (user.name, str(e)))
+                _logger.error("Error creating commission for %s: %s", user.name, str(e))
 
         return commissions_created
 
