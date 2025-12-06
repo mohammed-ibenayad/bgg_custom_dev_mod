@@ -15,6 +15,14 @@ class ResUsers(models.Model):
         help='The role of this user in the commission hierarchy'
     )
 
+    commission_role_sequence = fields.Integer(
+        string='Role Level',
+        related='commission_role_id.sequence',
+        store=True,
+        readonly=True,
+        help='Hierarchy level from role (lower number = lower in hierarchy)'
+    )
+
     # UNIFIED HIERARCHY FIELD (replaces team_leader_id and sales_director_id)
     commission_manager_id = fields.Many2one(
         'res.users',

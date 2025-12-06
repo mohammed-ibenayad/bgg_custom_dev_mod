@@ -84,7 +84,7 @@
                     <filter string="With Manager" name="has_manager" domain="[('commission_manager_id', '!=', False)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
-                        <filter string="Role Level" name="group_role_level" context="{'group_by': 'commission_role_id.sequence'}"/>
+                        <filter string="Role Level" name="group_role_level" context="{'group_by': 'commission_role_sequence'}"/>
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role_id'}"/>
                         <filter string="Manager" name="group_manager" context="{'group_by': 'commission_manager_id'}"/>
                     </group>
