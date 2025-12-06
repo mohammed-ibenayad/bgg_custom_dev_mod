@@ -33,13 +33,14 @@ Main Features:
     'website': "https://www.belgogreen.com",
 
     'category': 'Sales/Sales',
-    'version': '18.0.1.8',
+    'version': '18.0.2.0',
     'license': 'LGPL-3',
 
     # Dependencies - require Odoo sale_commission module
     'depends': [
         'base',
         'sale_management',
+        'purchase',
         'account',
         'hr',
         'mail',
@@ -51,6 +52,7 @@ Main Features:
         'security/commission_security.xml',
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
+        'data/product_data.xml',
         'data/sale_commission_role_data.xml',
         'data/cron_data.xml',
         'wizard/commission_claim_wizard_views.xml',
@@ -59,6 +61,7 @@ Main Features:
         'views/sale_commission_plan_views.xml',
         'views/res_users_views.xml',
         'views/team_management_views.xml',
+        'views/commission_deduction_views.xml',
         'views/sale_order_views.xml',
         'views/sale_commission_payment_views.xml',  # Must load BEFORE sale_commission_views
         'views/sale_commission_claim_views.xml',
