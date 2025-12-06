@@ -28,7 +28,7 @@
                     <header>
                         <button name="action_submit" string="Submit Claim" type="object" class="oe_highlight"
                                 invisible="state != 'draft'"/>
-                        <button name="action_approve" string="Approve & Create PO" type="object" class="oe_highlight"
+                        <button name="action_approve" string="Approve &amp; Create PO" type="object" class="oe_highlight"
                                 invisible="state != 'pending'"
                                 groups="belgogreen_sales_commission.group_commission_manager"/>
                         <button name="action_view_purchase_order" string="View Purchase Order" type="object"
