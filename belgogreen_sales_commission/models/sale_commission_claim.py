@@ -120,18 +120,19 @@ class SaleCommissionClaim(models.Model):
         'claim_id', 'deduction_id',
         string='All Deductions',
         compute='_compute_totals',
+        store=True,
         help="All deductions (mandatory + optional)"
     )
 
     total_mandatory_deductions = fields.Monetary(
-        string='Mandatory Deductions',
+        string='Total Mandatory Deductions',
         compute='_compute_totals',
         store=True,
         currency_field='currency_id'
     )
 
     total_optional_deductions = fields.Monetary(
-        string='Optional Deductions',
+        string='Total Optional Deductions',
         compute='_compute_totals',
         store=True,
         currency_field='currency_id'
