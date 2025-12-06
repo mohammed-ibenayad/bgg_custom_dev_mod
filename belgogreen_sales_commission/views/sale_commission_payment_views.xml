@@ -60,7 +60,10 @@
                         <notebook>
                             <page string="Commissions" name="commissions">
                                 <field name="commission_ids" readonly="state != 'draft'" context="{'default_user_id': user_id}">
-                                    <list decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'claimed'">
+                                    <list decoration-success="payment_status == 'paid'"
+                                          decoration-warning="payment_status == 'claimed'"
+                                          create="false"
+                                          delete="1">
                                         <field name="currency_id" column_invisible="1"/>
                                         <field name="name" string="Reference" width="130px"/>
                                         <field name="date" string="Date" width="90px"/>

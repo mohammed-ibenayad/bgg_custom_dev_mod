@@ -64,7 +64,9 @@
                         <notebook>
                             <page string="Commissions" name="commissions">
                                 <field name="commission_ids" readonly="state != 'pending'">
-                                    <list decoration-success="payment_status == 'paid'">
+                                    <list decoration-success="payment_status == 'paid'"
+                                          create="false"
+                                          delete="1">
                                         <field name="name" string="Reference" width="130px"/>
                                         <field name="date" string="Date" width="90px"/>
                                         <field name="role_id" string="Role" width="110px"/>
