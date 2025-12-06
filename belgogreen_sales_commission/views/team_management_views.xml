@@ -82,7 +82,6 @@
                     <separator/>
                     <filter string="With Commission Role" name="has_role" domain="[('commission_role_id', '!=', False)]"/>
                     <filter string="With Manager" name="has_manager" domain="[('commission_manager_id', '!=', False)]"/>
-                    <filter string="Has Subordinates" name="has_subordinates" domain="[('subordinate_count', '>', 0)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role_id'}"/>
