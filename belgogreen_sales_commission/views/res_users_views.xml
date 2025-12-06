@@ -10,37 +10,37 @@
             <field name="arch" type="xml">
                 <!-- Add commission fields in Preferences notebook -->
                 <xpath expr="//page[@name='preferences']" position="after">
-                    <page string="Hiérarchie des commissions" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
+                    <page string="Commission Hierarchy" name="commission_hierarchy" groups="belgogreen_sales_commission.group_commission_manager">
                         <!-- Hidden fields for computation -->
                         <field name="has_subordinates" invisible="1"/>
 
                         <!-- Hierarchy Warnings Alert -->
                         <div class="alert alert-warning" role="alert" invisible="not hierarchy_warnings">
-                            <strong>⚠️ Problèmes de hiérarchie :</strong>
+                            <strong>⚠️ Hierarchy Issues:</strong>
                             <field name="hierarchy_warnings" nolabel="1" readonly="1"/>
                         </div>
 
                         <group>
-                            <group string="Rôle de commission">
+                            <group string="Commission Role">
                                 <field name="commission_role_id"/>
                                 <field name="active_commission_count" readonly="1"/>
                                 <field name="subordinate_count" readonly="1" invisible="subordinate_count == 0"/>
                             </group>
-                            <group string="Hiérarchie">
+                            <group string="Hierarchy">
                                 <field name="commission_manager_id" invisible="not commission_role_id or (commission_role_id and not commission_role_id.requires_manager)"/>
                             </group>
                         </group>
                         <group string="Direct Subordinates" invisible="not commission_role_id or (commission_role_id and not commission_role_id.can_manage_subordinates)">
                             <field name="commission_subordinate_ids" nolabel="1" options="{'no_create': True}">
                                 <list>
-                                    <field name="name" string="Nom" width="180px"/>
-                                    <field name="commission_role_id" string="Rôle" width="120px"/>
-                                    <field name="commission_unpaid_total" string="Non payé" width="110px"/>
+                                    <field name="name" string="Name" width="180px"/>
+                                    <field name="commission_role_id" string="Role" width="120px"/>
+                                    <field name="commission_unpaid_total" string="Unpaid" width="110px"/>
                                 </list>
                             </field>
                         </group>
-                        <group string="Statistiques des commissions">
-                            <group string="Mes commissions">
+                        <group string="Commission Statistics">
+                            <group string="My Commissions">
                                 <field name="commission_count"/>
                                 <field name="commission_unpaid_total"/>
                                 <field name="commission_paid_total"/>
@@ -56,7 +56,7 @@
                                     class="oe_stat_button"
                                     icon="fa-money"
                                     invisible="commission_count == 0">
-                                <field name="commission_count" widget="statinfo" string="Mes commissions"/>
+                                <field name="commission_count" widget="statinfo" string="My Commissions"/>
                             </button>
                             <button name="action_view_team_commissions"
                                     type="object"

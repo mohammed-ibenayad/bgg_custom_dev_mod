@@ -64,7 +64,7 @@ Main Features:
         'views/sale_commission_claim_views.xml',
         'views/sale_commission_views.xml',
         'views/account_move_views.xml',
-        'views/menu_views.xml',
+        'views/menu_views.xml',  # Load menu structure LAST - after all actions are defined
     ],
     # only loaded in demonstration mode
     'demo': [
