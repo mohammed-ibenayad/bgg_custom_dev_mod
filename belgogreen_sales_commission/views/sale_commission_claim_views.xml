@@ -7,14 +7,14 @@
             <field name="name">sale.commission.claim.tree</field>
             <field name="model">sale.commission.claim</field>
             <field name="arch" type="xml">
-                <list string="Réclamations de commissions" decoration-success="state == 'approved'" decoration-warning="state == 'pending'" decoration-danger="state == 'rejected'">
-                    <field name="name" string="Référence" width="130px"/>
-                    <field name="user_id" string="Utilisateur" width="150px"/>
+                <list string="Commission Claims" decoration-success="state == 'approved'" decoration-warning="state == 'pending'" decoration-danger="state == 'rejected'">
+                    <field name="name" string="Reference" width="130px"/>
+                    <field name="user_id" string="User" width="150px"/>
                     <field name="claim_date" string="Date" width="100px"/>
-                    <field name="commission_count" string="Nb. com." width="80px"/>
-                    <field name="total_amount" string="Montant" sum="Total" width="110px"/>
-                    <field name="state" string="État" width="90px"/>
-                    <field name="processed_by" string="Traité par" width="130px"/>
+                    <field name="commission_count" string="# Comm." width="80px"/>
+                    <field name="total_amount" string="Amount" sum="Total" width="110px"/>
+                    <field name="state" string="State" width="90px"/>
+                    <field name="processed_by" string="Processed By" width="130px"/>
                 </list>
             </field>
         </record>
@@ -65,14 +65,14 @@
                             <page string="Commissions" name="commissions">
                                 <field name="commission_ids" readonly="state != 'pending'">
                                     <list decoration-success="payment_status == 'paid'">
-                                        <field name="name" string="Référence" width="130px"/>
+                                        <field name="name" string="Reference" width="130px"/>
                                         <field name="date" string="Date" width="90px"/>
-                                        <field name="role_id" string="Rôle" width="110px"/>
+                                        <field name="role_id" string="Role" width="110px"/>
                                         <field name="commission_type" string="Type" width="80px"/>
-                                        <field name="sale_order_id" string="Commande" width="120px"/>
+                                        <field name="sale_order_id" string="Order" width="120px"/>
                                         <field name="base_amount" string="Base" sum="Total base" width="100px"/>
-                                        <field name="commission_amount" string="Montant" sum="Total commissions" width="110px"/>
-                                        <field name="payment_status" string="Statut" width="90px"/>
+                                        <field name="commission_amount" string="Amount" sum="Total commissions" width="110px"/>
+                                        <field name="payment_status" string="Status" width="90px"/>
                                     </list>
                                 </field>
                             </page>

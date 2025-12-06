@@ -171,11 +171,4 @@
         </field>
     </record>
 
-    <!-- Menu -->
-    <menuitem id="menu_sale_commission_role"
-              name="Commission Roles"
-              parent="menu_commission_configuration"
-              action="action_sale_commission_role"
-              sequence="15"
-              groups="belgogreen_sales_commission.group_commission_manager"/>
 </odoo>

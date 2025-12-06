@@ -83,26 +83,33 @@
                   action="action_hr_commission_role_config"
                   sequence="20"/>
 
+        <menuitem id="menu_sale_commission_role"
+                  name="Commission Roles"
+                  parent="menu_commission_configuration"
+                  action="action_sale_commission_role"
+                  sequence="15"
+                  groups="belgogreen_sales_commission.group_commission_manager"/>
+
         <!-- Hierarchy Management Submenu -->
         <menuitem id="menu_hierarchy_management"
-                  name="Hiérarchie"
+                  name="Hierarchy"
                   parent="menu_commission_configuration"
                   sequence="30"/>
 
         <menuitem id="menu_team_hierarchy"
-                  name="Structure des équipes"
+                  name="Team Structure"
                   parent="menu_hierarchy_management"
                   action="action_team_hierarchy"
                   sequence="10"/>
 
         <menuitem id="menu_team_management_dashboard"
-                  name="Gestion des managers"
+                  name="Manager Management"
                   parent="menu_hierarchy_management"
                   action="action_team_management_dashboard"
                   sequence="20"/>
 
         <menuitem id="menu_hierarchy_anomalies"
-                  name="Anomalies Hiérarchiques"
+                  name="Hierarchy Anomalies"
                   parent="menu_hierarchy_management"
                   action="belgogreen_sales_commission.action_hierarchy_anomalies"
                   sequence="30"/>

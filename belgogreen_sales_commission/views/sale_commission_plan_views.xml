@@ -144,20 +144,20 @@
             <field name="priority">20</field>
             <field name="arch" type="xml">
                 <list string="Commission Plans">
-                    <field name="name" string="Nom" width="200px"/>
+                    <field name="name" string="Name" width="200px"/>
                     <field name="type" string="Type"
                            widget="badge"
                            decoration-info="type == 'target'"
                            decoration-success="type == 'achievement'"
                            decoration-warning="type == 'hierarchical'"
                            optional="show" width="120px"/>
-                    <field name="periodicity" string="Période"
+                    <field name="periodicity" string="Period"
                            optional="show" width="100px"/>
-                    <field name="state" string="État"
+                    <field name="state" string="State"
                            widget="badge"
                            decoration-success="state == 'approved'"
                            decoration-info="state == 'draft'" width="100px"/>
-                    <field name="company_id" string="Société" groups="base.group_multi_company" optional="hide" width="150px"/>
+                    <field name="company_id" string="Company" groups="base.group_multi_company" optional="hide" width="150px"/>
                 </list>
             </field>
         </record>
