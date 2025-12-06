@@ -7,7 +7,13 @@
             <field name="name">sale.commission.tree</field>
             <field name="model">sale.commission</field>
             <field name="arch" type="xml">
-                <list string="Commissions" decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'claimed'" decoration-muted="state == 'cancelled'">
+                <list string="Commissions"
+                      decoration-success="payment_status == 'paid'"
+                      decoration-warning="payment_status == 'claimed'"
+                      decoration-muted="state == 'cancelled'"
+                      create="false"
+                      edit="false"
+                      delete="false">
                     <field name="currency_id" column_invisible="1"/>
                     <field name="name" string="Reference" width="130px"/>
                     <field name="date" string="Date" width="90px"/>
@@ -160,7 +166,7 @@
             <field name="name">sale.commission.kanban</field>
             <field name="model">sale.commission</field>
             <field name="arch" type="xml">
-                <kanban class="o_kanban_mobile">
+                <kanban class="o_kanban_mobile" create="false">
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="role_id"/>
