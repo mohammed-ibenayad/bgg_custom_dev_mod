@@ -84,6 +84,7 @@
                     <filter string="With Manager" name="has_manager" domain="[('commission_manager_id', '!=', False)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
+                        <filter string="Role Level" name="group_role_level" context="{'group_by': 'commission_role_id.sequence'}"/>
                         <filter string="Commission Role" name="group_role" context="{'group_by': 'commission_role_id'}"/>
                         <filter string="Manager" name="group_manager" context="{'group_by': 'commission_manager_id'}"/>
                     </group>
@@ -97,7 +98,7 @@
             <field name="res_model">res.users</field>
             <field name="view_mode">list,kanban,form</field>
             <field name="domain">[('commission_role_id', '!=', False)]</field>
-            <field name="context">{'search_default_group_manager': 1, 'create': False}</field>
+            <field name="context">{'search_default_group_role_level': 1, 'create': False}</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
