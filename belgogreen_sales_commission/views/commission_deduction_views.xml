@@ -171,13 +171,5 @@
             <field name="context">{'search_default_group_user': 1}</field>
         </record>
 
-        <!-- Menu Items -->
-        <menuitem id="menu_commission_deductions"
-                  name="Deductions"
-                  parent="belgogreen_sales_commission.menu_commission_configuration"
-                  action="action_commission_deduction"
-                  sequence="25"
-                  groups="belgogreen_sales_commission.group_commission_manager"/>
-
     </data>
 </odoo>
