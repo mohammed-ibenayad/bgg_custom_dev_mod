@@ -90,6 +90,13 @@
                   sequence="15"
                   groups="belgogreen_sales_commission.group_commission_manager"/>
 
+        <menuitem id="menu_commission_deductions"
+                  name="Deductions"
+                  parent="menu_commission_configuration"
+                  action="action_commission_deduction"
+                  sequence="25"
+                  groups="belgogreen_sales_commission.group_commission_manager"/>
+
         <!-- Hierarchy Management Submenu -->
         <menuitem id="menu_hierarchy_management"
                   name="Hierarchy"

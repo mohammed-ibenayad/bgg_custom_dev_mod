@@ -26,14 +26,19 @@
             <field name="arch" type="xml">
                 <form string="Commission Claim">
                     <header>
-                        <button name="action_approve" string="Approve" type="object" class="oe_highlight"
+                        <button name="action_submit" string="Submit Claim" type="object" class="oe_highlight"
+                                invisible="state != 'draft'"/>
+                        <button name="action_approve" string="Approve &amp; Create PO" type="object" class="oe_highlight"
                                 invisible="state != 'pending'"
                                 groups="belgogreen_sales_commission.group_commission_manager"/>
+                        <button name="action_view_purchase_order" string="View Purchase Order" type="object"
+                                invisible="not purchase_order_id"
+                                class="btn-primary"/>
                         <button name="action_reject" string="Reject" type="object"
                                 invisible="state != 'pending'"
                                 groups="belgogreen_sales_commission.group_commission_manager"
                                 confirm="Are you sure you want to reject this claim?"/>
-                        <field name="state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved,po_sent,po_confirmed"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -44,21 +49,41 @@
                                 <field name="commission_count" widget="statinfo" string="Commissions"/>
                             </button>
                         </div>
+
+                        <!-- PO Status Alert -->
+                        <div class="alert alert-info" role="alert" invisible="not purchase_order_id">
+                            <strong>📄 Purchase Order:</strong> <field name="purchase_order_id" readonly="1"/>
+                            <span> - Status: <field name="purchase_order_state" readonly="1"/></span>
+                        </div>
+
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
+
                         <group>
                             <group string="Claim Information">
                                 <field name="user_id" readonly="1"/>
                                 <field name="claim_date" readonly="1"/>
-                                <field name="total_amount" class="oe_subtotal_footer_separator"/>
+                                <field name="currency_id" invisible="1"/>
                             </group>
                             <group string="Processing">
                                 <field name="processed_by" readonly="1"/>
                                 <field name="processed_date" readonly="1"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+
+                        <!-- Financial Summary -->
+                        <group string="Financial Summary">
+                            <group>
+                                <field name="total_amount" readonly="1" class="oe_subtotal_footer_separator"/>
+                                <field name="total_deductions" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="net_amount" readonly="1" class="oe_subtotal_footer_separator"
+                                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                         </group>
                         <notebook>
@@ -78,14 +103,55 @@
                                     </list>
                                 </field>
                             </page>
+                            <page string="Deductions" name="deductions">
+                                <group>
+                                    <group string="Mandatory Deductions" col="1">
+                                        <field name="mandatory_deduction_ids" nolabel="1" readonly="1">
+                                            <list create="false" delete="false" edit="false"
+                                                  decoration-danger="deduction_category == 'mandatory'">
+                                                <field name="name" string="Reference" width="120px"/>
+                                                <field name="deduction_type" string="Type" width="140px"/>
+                                                <field name="amount" string="Amount" sum="Total Mandatory" width="100px"/>
+                                                <field name="description" string="Description"/>
+                                                <field name="deduction_category" column_invisible="1"/>
+                                            </list>
+                                        </field>
+                                        <field name="total_mandatory_deductions" readonly="1" class="oe_subtotal_footer_separator"/>
+                                    </group>
+                                    <group string="Optional Deductions" col="1">
+                                        <field name="optional_deduction_ids" nolabel="1"
+                                               readonly="state != 'draft'"
+                                               domain="[('user_id', '=', user_id), ('deduction_category', '=', 'optional'), ('state', '=', 'pending')]">
+                                            <list create="false" delete="true"
+                                                  decoration-info="deduction_category == 'optional'">
+                                                <field name="name" string="Reference" width="120px"/>
+                                                <field name="deduction_type" string="Type" width="140px"/>
+                                                <field name="amount" string="Amount" sum="Total Optional" width="100px"/>
+                                                <field name="description" string="Description"/>
+                                                <field name="deduction_category" column_invisible="1"/>
+                                            </list>
+                                        </field>
+                                        <field name="total_optional_deductions" readonly="1" class="oe_subtotal_footer_separator"/>
+                                    </group>
+                                </group>
+                                <div class="alert alert-warning" role="alert" invisible="not mandatory_deduction_ids">
+                                    <strong>ℹ️ Note:</strong> Mandatory deductions are automatically applied and cannot be removed.
+                                    You can select additional optional deductions above.
+                                </div>
+                            </page>
                             <page string="Claimant Notes" name="notes">
-                                <field name="notes" placeholder="Reason for claim..." readonly="state != 'pending'"/>
+                                <field name="notes" placeholder="Reason for claim..." readonly="state not in ['draft', 'pending']"/>
                             </page>
                             <page string="Admin Notes" name="admin_notes" groups="belgogreen_sales_commission.group_commission_manager">
                                 <field name="admin_notes" placeholder="Internal notes..."/>
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>
