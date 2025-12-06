@@ -411,7 +411,7 @@ class SaleCommissionClaim(models.Model):
         return partner
 
     def _create_purchase_order(self, vendor):
-        """Create draft purchase order for commission payment"""
+        """Create draft purchase order for commission payment with deduction lines"""
         self.ensure_one()
 
         # Get commission service product
@@ -435,7 +435,7 @@ class SaleCommissionClaim(models.Model):
 
         po = self.env['purchase.order'].create(po_vals)
 
-        # Create PO line with gross amount (manager will add deduction lines)
+        # Create main PO line with gross commission amount
         self.env['purchase.order.line'].create({
             'order_id': po.id,
             'product_id': product.id,
@@ -444,6 +444,22 @@ class SaleCommissionClaim(models.Model):
             'price_unit': self.total_amount,  # Gross amount
             'date_planned': fields.Date.today(),
         })
+
+        # Create negative PO lines for each deduction
+        for deduction in self.all_deduction_ids:
+            # Get human-readable deduction type name
+            deduction_type_name = dict(deduction._fields['deduction_type'].selection).get(
+                deduction.deduction_type,
+                deduction.deduction_type
+            )
+            self.env['purchase.order.line'].create({
+                'order_id': po.id,
+                'product_id': product.id,
+                'name': _('Deduction: %s - %s') % (deduction_type_name, deduction.name),
+                'product_qty': 1,
+                'price_unit': -deduction.amount,  # Negative amount
+                'date_planned': fields.Date.today(),
+            })
 
         return po
 
