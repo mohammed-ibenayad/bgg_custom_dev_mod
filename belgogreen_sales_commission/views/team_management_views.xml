@@ -153,40 +153,6 @@
             </field>
         </record>
 
-        <!-- Team Management Dashboard View (Graph) -->
-        <record id="view_team_management_graph" model="ir.ui.view">
-            <field name="name">team.management.graph</field>
-            <field name="model">res.users</field>
-            <field name="arch" type="xml">
-                <graph string="Team Performance" type="bar">
-                    <field name="commission_role_id" type="row"/>
-                    <field name="commission_unpaid_total" type="measure"/>
-                </graph>
-            </field>
-        </record>
-
-        <!-- Team Management Dashboard Action -->
-        <record id="action_team_management_dashboard" model="ir.actions.act_window">
-            <field name="name">Manager Management</field>
-            <field name="res_model">res.users</field>
-            <field name="view_mode">kanban,list,graph,form</field>
-            <field name="domain">[('commission_role_id.can_manage_subordinates', '=', True)]</field>
-            <field name="context">{'create': False}</field>
-            <field name="search_view_id" ref="view_team_hierarchy_search"/>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_team_hierarchy_kanban')}),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('view_team_hierarchy_tree')}),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('view_team_management_graph')})]"/>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No teams found
-                </p>
-                <p>
-                    Teams will appear here once you assign management roles with subordinates.
-                </p>
-            </field>
-        </record>
-
         <!-- Hierarchy Anomalies List View -->
         <record id="view_hierarchy_anomalies_tree" model="ir.ui.view">
             <field name="name">hierarchy.anomalies.tree</field>
