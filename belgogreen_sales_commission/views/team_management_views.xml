@@ -7,7 +7,7 @@
             <field name="name">team.hierarchy.tree</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <tree string="Team Structure"
+                <list string="Team Structure"
                       decoration-info="commission_role_sequence &gt;= 30"
                       decoration-success="commission_role_sequence == 20"
                       decoration-muted="commission_role_sequence &lt;= 10 or not commission_role_id"
@@ -21,7 +21,7 @@
                     <field name="commission_unpaid_total" string="Unpaid"/>
                     <field name="team_unpaid_total" string="Team Unpaid"/>
                     <field name="commission_manager_id" column_invisible="1"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -29,7 +29,7 @@
         <record id="action_team_hierarchy" model="ir.actions.act_window">
             <field name="name">Team Structure</field>
             <field name="res_model">res.users</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">list,form,kanban</field>
             <field name="domain">[('commission_role_id', '!=', False)]</field>
             <field name="context">{
                 'create': False,
@@ -37,7 +37,7 @@
             }</field>
             <field name="search_view_id" ref="view_team_hierarchy_search"/>
             <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'tree', 'view_id': ref('view_team_hierarchy_tree')}),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('view_team_hierarchy_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('view_team_hierarchy_form')}),
                 (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_team_hierarchy_kanban')})]"/>
             <field name="help" type="html">
