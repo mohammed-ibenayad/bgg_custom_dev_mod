@@ -157,6 +157,10 @@ class ResUsers(models.Model):
             'context': {'default_user_id': self.id}
         }
 
+    def action_view_commissions(self):
+        """Open the user's commissions (alias for action_view_my_commissions)"""
+        return self.action_view_my_commissions()
+
     def _get_all_subordinate_ids(self):
         """
         Get all subordinate user IDs recursively.
