@@ -141,10 +141,18 @@ class SaleCommission(models.Model):
         help='True if invoice is paid and commission is unpaid'
     )
 
-    claimable_together_count = fields.Integer(
-        string='Claimable Together',
-        compute='_compute_claimable_together_count',
-        help='Number of other commissions that can be claimed together with this one'
+    # Claim relation
+    claim_ids = fields.Many2many(
+        'sale.commission.claim',
+        string='Claims',
+        compute='_compute_claim_ids',
+        help='Claims that include this commission'
+    )
+
+    claim_count = fields.Integer(
+        string='Claim Count',
+        compute='_compute_claim_ids',
+        help='Number of claims this commission belongs to'
     )
 
     # Additional Info
@@ -227,21 +235,14 @@ class SaleCommission(models.Model):
                     commission.state == 'confirmed'
                 )
 
-    @api.depends('user_id', 'payment_status', 'state', 'can_be_paid')
-    def _compute_claimable_together_count(self):
-        """Count other commissions that can be claimed together"""
+    def _compute_claim_ids(self):
+        """Find claims that include this commission"""
         for commission in self:
-            if commission.user_id and commission.payment_status == 'unpaid' and commission.state == 'confirmed':
-                # Count other claimable commissions for the same user
-                commission.claimable_together_count = self.search_count([
-                    ('user_id', '=', commission.user_id.id),
-                    ('payment_status', '=', 'unpaid'),
-                    ('state', '=', 'confirmed'),
-                    ('can_be_paid', '=', True),
-                    ('id', '!=', commission.id)  # Exclude current commission
-                ])
-            else:
-                commission.claimable_together_count = 0
+            claims = self.env['sale.commission.claim'].search([
+                ('commission_ids', 'in', commission.id)
+            ])
+            commission.claim_ids = claims
+            commission.claim_count = len(claims)
 
     def action_confirm(self):
         """Confirm commission"""
@@ -255,90 +256,47 @@ class SaleCommission(models.Model):
         })
 
     def action_claim_payment(self):
-        """Claim this commission along with all other claimable commissions for the user"""
+        """Allow user to claim their commission"""
         self.ensure_one()
-
-        # Find all claimable commissions for this user (including current one)
-        all_claimable = self.env['sale.commission'].search([
-            ('user_id', '=', self.user_id.id),
-            ('payment_status', '=', 'unpaid'),
-            ('state', '=', 'confirmed'),
-            ('can_be_paid', '=', True)
-        ])
-
-        # Mark all as claimed
-        all_claimable.write({'payment_status': 'claimed'})
-
-        # Calculate total amount
-        total_amount = sum(all_claimable.mapped('commission_amount'))
-
-        # Create claim with all commissions
-        claim_notes = _('Batch claim for %s commission(s)') % len(all_claimable) if len(all_claimable) > 1 else _('Claim for commission %s') % self.name
-
-        claim = self.env['sale.commission.claim'].create({
-            'user_id': self.user_id.id,
-            'commission_ids': [(6, 0, all_claimable.ids)],
-            'notes': claim_notes
-        })
-
-        # Show notification if multiple commissions were included
-        if len(all_claimable) > 1:
-            message = _('Successfully claimed %s commissions together (Total: %s %s)') % (
-                len(all_claimable),
-                total_amount,
-                self.currency_id.symbol
-            )
+        if self.payment_status == 'unpaid':
+            self.payment_status = 'claimed'
+            # Create a claim record
+            claim = self.env['sale.commission.claim'].create({
+                'user_id': self.user_id.id,
+                'commission_ids': [(6, 0, [self.id])],
+                'notes': _('Claim for commission %s') % self.name
+            })
             return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Commissions Claimed'),
-                    'message': message,
-                    'type': 'success',
-                    'sticky': False,
-                    'next': {
-                        'type': 'ir.actions.act_window',
-                        'res_model': 'sale.commission.claim',
-                        'res_id': claim.id,
-                        'view_mode': 'form',
-                        'target': 'current',
-                    }
-                }
+                'type': 'ir.actions.act_window',
+                'res_model': 'sale.commission.claim',
+                'res_id': claim.id,
+                'view_mode': 'form',
+                'target': 'current',
             }
 
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.commission.claim',
-            'res_id': claim.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-
-    def action_view_claimable_together(self):
-        """View all commissions that can be claimed together"""
+    def action_view_claim(self):
+        """View the claim(s) this commission belongs to"""
         self.ensure_one()
 
-        # Find all claimable commissions for this user (including current one)
-        all_claimable = self.env['sale.commission'].search([
-            ('user_id', '=', self.user_id.id),
-            ('payment_status', '=', 'unpaid'),
-            ('state', '=', 'confirmed'),
-            ('can_be_paid', '=', True)
-        ])
-
-        return {
-            'name': _('Claimable Commissions'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.commission',
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', all_claimable.ids)],
-            'context': {
-                'default_user_id': self.user_id.id,
-            },
-            'help': """<p class="o_view_nocontent_smiling_face">
-                No claimable commissions found
-            </p>"""
-        }
+        if self.claim_count == 1:
+            # Open single claim
+            return {
+                'name': _('Commission Claim'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'sale.commission.claim',
+                'res_id': self.claim_ids[0].id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+        else:
+            # Open list of claims
+            return {
+                'name': _('Commission Claims'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'sale.commission.claim',
+                'view_mode': 'list,form',
+                'domain': [('id', 'in', self.claim_ids.ids)],
+            }
 
     def action_create_payment(self):
         """Create a payment record for this commission"""
