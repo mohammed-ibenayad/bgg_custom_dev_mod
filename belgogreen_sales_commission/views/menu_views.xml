@@ -40,29 +40,47 @@
                   sequence="20"
                   groups="belgogreen_sales_commission.group_commission_manager"/>
 
+        <!-- Stats Submenu -->
+        <menuitem id="menu_commission_stats"
+                  name="Statistics"
+                  parent="menu_commission_management"
+                  sequence="10"/>
+
         <menuitem id="menu_commission_all"
                   name="All Commissions"
-                  parent="menu_commission_management"
+                  parent="menu_commission_stats"
                   action="action_sale_commission_all"
                   sequence="10"/>
 
         <menuitem id="menu_commission_unpaid"
                   name="Unpaid Commissions"
-                  parent="menu_commission_management"
+                  parent="menu_commission_stats"
                   action="action_sale_commission_unpaid"
                   sequence="20"/>
 
+        <!-- Tracking Submenu (Suivi) -->
+        <menuitem id="menu_commission_tracking"
+                  name="Tracking"
+                  parent="menu_commission_management"
+                  sequence="20"/>
+
+        <menuitem id="menu_commission_deductions_management"
+                  name="Deductions"
+                  parent="menu_commission_tracking"
+                  action="action_commission_deduction"
+                  sequence="10"/>
+
         <menuitem id="menu_commission_payments"
                   name="Payments"
-                  parent="menu_commission_management"
+                  parent="menu_commission_tracking"
                   action="action_sale_commission_payment"
-                  sequence="30"/>
+                  sequence="20"/>
 
         <menuitem id="menu_commission_claims"
                   name="Claims"
-                  parent="menu_commission_management"
+                  parent="menu_commission_tracking"
                   action="action_sale_commission_claim_all"
-                  sequence="40"/>
+                  sequence="30"/>
 
         <!-- Configuration Menu -->
         <menuitem id="menu_commission_configuration"
@@ -71,30 +89,30 @@
                   sequence="100"
                   groups="belgogreen_sales_commission.group_commission_manager"/>
 
+        <!-- Plans Submenu -->
+        <menuitem id="menu_plans_management"
+                  name="Plans"
+                  parent="menu_commission_configuration"
+                  sequence="10"/>
+
         <menuitem id="menu_commission_plans"
                   name="Commission Plans"
-                  parent="menu_commission_configuration"
+                  parent="menu_plans_management"
                   action="action_sale_commission_plan"
                   sequence="10"/>
 
         <menuitem id="menu_commission_role_config"
-                  name="Role Configuration"
-                  parent="menu_commission_configuration"
+                  name="Tiers Configuration"
+                  parent="menu_plans_management"
                   action="action_hr_commission_role_config"
                   sequence="20"/>
 
+        <!-- Roles -->
         <menuitem id="menu_sale_commission_role"
                   name="Commission Roles"
                   parent="menu_commission_configuration"
                   action="action_sale_commission_role"
-                  sequence="15"
-                  groups="belgogreen_sales_commission.group_commission_manager"/>
-
-        <menuitem id="menu_commission_deductions"
-                  name="Deductions"
-                  parent="menu_commission_configuration"
-                  action="action_commission_deduction"
-                  sequence="25"
+                  sequence="20"
                   groups="belgogreen_sales_commission.group_commission_manager"/>
 
         <!-- Hierarchy Management Submenu -->

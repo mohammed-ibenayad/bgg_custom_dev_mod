@@ -754,6 +754,11 @@ msgid "Management"
 msgstr "Gestion"
 
 #. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_stats
+msgid "Statistics"
+msgstr "Statistiques"
+
+#. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_all
 msgid "All Commissions"
 msgstr "Toutes les commissions"
@@ -762,6 +767,16 @@ msgstr "Toutes les commissions"
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_unpaid
 msgid "Unpaid Commissions"
 msgstr "Commissions non payées"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_tracking
+msgid "Tracking"
+msgstr "Suivi"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_deductions_management
+msgid "Deductions"
+msgstr "Déductions"
 
 #. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_payments
@@ -779,14 +794,19 @@ msgid "Configuration"
 msgstr "Configuration"
 
 #. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_plans_management
+msgid "Plans"
+msgstr "Plans"
+
+#. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_plans
 msgid "Commission Plans"
 msgstr "Plans de commission"
 
 #. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_role_config
-msgid "Role Configuration"
-msgstr "Configuration des rôles"
+msgid "Tiers Configuration"
+msgstr "Configuration des paliers"
 
 #. module: belgogreen_sales_commission
 #: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_plan_form_inherit
