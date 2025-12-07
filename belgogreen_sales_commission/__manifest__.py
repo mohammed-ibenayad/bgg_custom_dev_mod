@@ -67,8 +67,15 @@ Main Features:
         'views/sale_commission_claim_views.xml',
         'views/sale_commission_views.xml',
         'views/account_move_views.xml',
+        'views/commission_dashboard_views.xml',
         'views/menu_views.xml',  # Load menu structure LAST - after all actions are defined
     ],
+    'assets': {
+        'web.assets_backend': [
+            'belgogreen_sales_commission/static/src/js/commission_dashboard.js',
+            'belgogreen_sales_commission/static/src/scss/commission_dashboard.scss',
+        ],
+    },
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
