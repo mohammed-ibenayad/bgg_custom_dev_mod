@@ -42,6 +42,9 @@
                         <button name="action_claim_payment" string="Claim Payment" type="object" class="oe_highlight"
                                 invisible="payment_status != 'unpaid' or state != 'confirmed'"
                                 groups="belgogreen_sales_commission.group_commission_user"/>
+                        <button name="action_view_claim" string="View Claim" type="object" class="oe_highlight"
+                                invisible="payment_status != 'claimed' or claim_count == 0"
+                                groups="belgogreen_sales_commission.group_commission_user"/>
                         <button name="action_create_payment" string="Create Payment" type="object" class="oe_highlight"
                                 invisible="not can_be_paid"
                                 groups="belgogreen_sales_commission.group_commission_manager"/>
@@ -49,14 +52,13 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button name="action_view_claimable_together"
+                            <button name="action_view_claim"
                                     type="object"
                                     class="oe_stat_button"
-                                    icon="fa-money"
-                                    invisible="claimable_together_count == 0"
-                                    groups="belgogreen_sales_commission.group_commission_user">
-                                <field name="claimable_together_count" widget="statinfo"
-                                       string="Can Claim Together"/>
+                                    icon="fa-files-o"
+                                    invisible="claim_count == 0">
+                                <field name="claim_count" widget="statinfo"
+                                       string="Claim"/>
                             </button>
                         </div>
                         <div class="oe_title">
