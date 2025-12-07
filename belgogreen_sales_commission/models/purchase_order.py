@@ -75,7 +75,7 @@ class PurchaseOrder(models.Model):
 
                 # Auto-create payment in draft state
                 payment = self.env['sale.commission.payment'].create({
-                    'user_id': po.partner_id.id,
+                    'user_id': po.claim_ids[0].user_id.id,  # Get user from claim, not PO partner
                     'purchase_order_id': po.id,
                     'commission_ids': [(6, 0, all_commissions.ids)],
                     'payment_amount': po.amount_total,  # Net amount from PO
