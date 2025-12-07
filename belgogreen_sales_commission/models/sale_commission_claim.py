@@ -312,20 +312,24 @@ class SaleCommissionClaim(models.Model):
         # Create draft Purchase Order (handles batch internally)
         po = self._create_purchase_order(vendor)
 
-        # Update all claims state (PO already linked by _create_purchase_order)
-        self.write({
-            'state': 'approved',
-            'processed_by': self.env.user.id,
-            'processed_date': fields.Datetime.now(),
-        })
-
-        # Mark all deductions as applied
+        # IMPORTANT: Mark deductions as applied BEFORE changing state to 'approved'
+        # This is critical because changing state triggers _compute_deductions which clears
+        # mandatory_deduction_ids when state is not 'draft' or 'pending', which in turn
+        # empties all_deduction_ids through _compute_totals
         for claim in self:
             claim.all_deduction_ids.write({
                 'state': 'applied',
                 'claim_id': claim.id,
                 'purchase_order_id': po.id
             })
+
+        # Update all claims state (PO already linked by _create_purchase_order)
+        # This MUST come after marking deductions to avoid computed field recalculation bug
+        self.write({
+            'state': 'approved',
+            'processed_by': self.env.user.id,
+            'processed_date': fields.Datetime.now(),
+        })
 
         # Notify claimants
         for claim in self:
