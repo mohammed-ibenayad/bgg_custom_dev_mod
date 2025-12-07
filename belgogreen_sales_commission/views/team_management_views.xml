@@ -2,13 +2,15 @@
 <odoo>
     <data>
 
-        <!-- Team Hierarchy Tree View (Hierarchical) -->
+        <!-- Team Hierarchy Tree View (Hierarchical with parent-child) -->
         <record id="view_team_hierarchy_tree" model="ir.ui.view">
             <field name="name">team.hierarchy.tree</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
-                <list string="Team Structure"
-                      decoration-muted="not commission_role_id"
+                <tree string="Team Structure"
+                      decoration-info="commission_role_sequence &gt;= 30"
+                      decoration-success="commission_role_sequence == 20"
+                      decoration-muted="commission_role_sequence &lt;= 10 or not commission_role_id"
                       create="false"
                       default_order="commission_role_sequence desc, name">
                     <field name="commission_role_sequence" column_invisible="1"/>
@@ -19,53 +21,50 @@
                     <field name="commission_unpaid_total" string="Unpaid"/>
                     <field name="team_unpaid_total" string="Team Unpaid"/>
                     <field name="commission_manager_id" column_invisible="1"/>
-                </list>
+                </tree>
             </field>
         </record>
 
-        <!-- Team Hierarchy Parent-Child Tree View (Nested) -->
-        <record id="view_team_hierarchy_tree_nested" model="ir.ui.view">
-            <field name="name">team.hierarchy.tree.nested</field>
-            <field name="model">res.users</field>
-            <field name="arch" type="xml">
-                <list string="Team Hierarchy"
-                      decoration-info="commission_role_sequence &gt;= 30"
-                      decoration-success="commission_role_sequence == 20"
-                      decoration-muted="commission_role_sequence &lt;= 10 or not commission_role_id"
-                      create="false">
-                    <field name="commission_role_sequence" column_invisible="1"/>
-                    <field name="name" string="Name"/>
-                    <field name="commission_role_id" string="Role"/>
-                    <field name="subordinate_count" string="Direct Reports"/>
-                    <field name="active_commission_count" string="Active Comm."/>
-                    <field name="commission_unpaid_total" string="Unpaid"/>
-                    <field name="team_unpaid_total" string="Team Unpaid"/>
-                    <field name="commission_subordinate_ids" column_invisible="1"/>
-                </list>
+        <!-- Team Hierarchy Action (Simple List) -->
+        <record id="action_team_hierarchy" model="ir.actions.act_window">
+            <field name="name">Team Structure</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="domain">[('commission_role_id', '!=', False)]</field>
+            <field name="context">{
+                'create': False,
+                'search_default_group_role_level': 1
+            }</field>
+            <field name="search_view_id" ref="view_team_hierarchy_search"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('view_team_hierarchy_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('view_team_hierarchy_form')}),
+                (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_team_hierarchy_kanban')})]"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No commission hierarchy defined
+                </p>
+                <p>
+                    Set up your sales team hierarchy by assigning commission roles to users.
+                </p>
+                <p>
+                    The view is grouped by role level (Directors → Team Leaders → Salespeople).
+                </p>
             </field>
         </record>
 
-        <!-- Team Hierarchy Form View (Shows Nested Subordinates) -->
+        <!-- Team Hierarchy Form View -->
         <record id="view_team_hierarchy_form" model="ir.ui.view">
             <field name="name">team.hierarchy.form</field>
             <field name="model">res.users</field>
             <field name="arch" type="xml">
                 <form string="Team Member">
                     <sheet>
-                        <div class="oe_button_box" name="button_box">
-                            <button name="action_view_commissions"
-                                    type="object"
-                                    class="oe_stat_button"
-                                    icon="fa-money"
-                                    invisible="active_commission_count == 0">
-                                <field name="active_commission_count" widget="statinfo" string="Active Comm."/>
-                            </button>
-                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name"/>
                             </h1>
-                            <field name="commission_role_id" placeholder="Commission Role"/>
+                            <field name="commission_role_id"/>
                         </div>
                         <group>
                             <group string="Hierarchy">
@@ -78,33 +77,6 @@
                                 <field name="team_unpaid_total"/>
                             </group>
                         </group>
-                        <notebook>
-                            <page string="Direct Reports" invisible="subordinate_count == 0">
-                                <field name="commission_subordinate_ids" mode="tree">
-                                    <list decoration-info="commission_role_sequence &gt;= 30"
-                                          decoration-success="commission_role_sequence == 20"
-                                          decoration-muted="commission_role_sequence &lt;= 10">
-                                        <field name="commission_role_sequence" column_invisible="1"/>
-                                        <field name="name"/>
-                                        <field name="commission_role_id"/>
-                                        <field name="subordinate_count" string="Their Reports"/>
-                                        <field name="active_commission_count" string="Active Comm."/>
-                                        <field name="commission_unpaid_total" string="Unpaid"/>
-                                        <field name="team_unpaid_total" string="Team Total"/>
-                                    </list>
-                                </field>
-                            </page>
-                            <page string="Commissions">
-                                <field name="my_commission_ids">
-                                    <list>
-                                        <field name="name"/>
-                                        <field name="date"/>
-                                        <field name="commission_amount"/>
-                                        <field name="payment_status"/>
-                                    </list>
-                                </field>
-                            </page>
-                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -124,7 +96,7 @@
                     <field name="commission_unpaid_total"/>
                     <field name="team_unpaid_total"/>
                     <templates>
-                        <t t-name="card">
+                        <t t-name="kanban-box">
                             <div class="oe_kanban_global_click">
                                 <div class="o_kanban_record_top">
                                     <div class="o_kanban_record_headings">
@@ -178,37 +150,6 @@
                         <filter string="Manager" name="group_manager" context="{'group_by': 'commission_manager_id'}"/>
                     </group>
                 </search>
-            </field>
-        </record>
-
-        <!-- Team Hierarchy Action (Hierarchical Navigation) -->
-        <record id="action_team_hierarchy" model="ir.actions.act_window">
-            <field name="name">Team Structure</field>
-            <field name="res_model">res.users</field>
-            <field name="view_mode">list,form,kanban</field>
-            <field name="domain">[('commission_role_id', '!=', False), ('commission_manager_id', '=', False)]</field>
-            <field name="context">{
-                'create': False,
-                'hierarchical_naming': False
-            }</field>
-            <field name="search_view_id" ref="view_team_hierarchy_search"/>
-            <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('view_team_hierarchy_tree_nested')}),
-                (0, 0, {'view_mode': 'form', 'view_id': ref('view_team_hierarchy_form')}),
-                (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_team_hierarchy_kanban')})]"/>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No commission hierarchy defined
-                </p>
-                <p>
-                    Set up your sales team hierarchy by assigning commission roles to users.
-                </p>
-                <p>
-                    <strong>To explore the hierarchy:</strong><br/>
-                    • This view shows top-level managers (users without a manager)<br/>
-                    • Click on a manager to see their direct reports in the "Direct Reports" tab<br/>
-                    • Click on any subordinate to drill down further in the hierarchy
-                </p>
             </field>
         </record>
 
