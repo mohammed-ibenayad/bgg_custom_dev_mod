@@ -2618,3 +2618,268 @@ msgstr "Le paiement %s a été créé automatiquement et est prêt pour le trait
 msgid "Payment Ready"
 msgstr "Paiement prêt"
 
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_users_form_inherit_commission
+msgid "Direct Subordinates"
+msgstr "Subordonnés directs"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_users_form_inherit_commission
+msgid "Name"
+msgstr "Nom"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_list
+msgid "Direct Sale %"
+msgstr "Vente directe %"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_list
+msgid "Override %"
+msgstr "Remplacement %"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Explanation"
+msgstr "Explication"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Direct Sale %:"
+msgstr "Vente directe % :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Applied when a user with this role makes their own sale."
+msgstr "Appliqué lorsqu'un utilisateur avec ce rôle effectue sa propre vente."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Override %:"
+msgstr "Remplacement % :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Applied when a user receives commission on a subordinate's sale."
+msgstr "Appliqué lorsqu'un utilisateur reçoit une commission sur la vente d'un subordonné."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Example:"
+msgstr "Exemple :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "If Team Leader has Direct=5% and Override=2%:"
+msgstr "Si le chef d'équipe a Directe=5% et Remplacement=2% :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Team Leader makes $1000 sale → Gets $50 (5%)"
+msgstr "Le chef d'équipe réalise une vente de 1000$ → Obtient 50$ (5%)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hr_commission_role_config_form
+msgid "Salesperson makes $1000 sale → Team Leader gets $20 (2%)"
+msgstr "Le commercial réalise une vente de 1000$ → Le chef d'équipe obtient 20$ (2%)"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Team Structure"
+msgstr "Structure de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Direct Reports"
+msgstr "Rapports directs"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Active Comm."
+msgstr "Comm. actives"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_tree
+msgid "Team Unpaid"
+msgstr "Équipe non payée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_form
+msgid "Team Member"
+msgstr "Membre de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_form
+msgid "Commission Stats"
+msgstr "Stats commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Manager:"
+msgstr "Manager :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_kanban
+msgid "Active Comm.:"
+msgstr "Comm. actives :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "With Commission Role"
+msgstr "Avec rôle de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "With Manager"
+msgstr "Avec manager"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Role Level"
+msgstr "Niveau de rôle"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
+msgid "Manager"
+msgstr "Manager"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_team_hierarchy
+msgid "Team Structure"
+msgstr "Structure de l'équipe"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Define commission percentages for each role within a commission plan."
+msgstr "Définir les pourcentages de commission pour chaque rôle dans un plan de commission."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Each role has two percentages:"
+msgstr "Chaque rôle a deux pourcentages :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Direct Sale %"
+msgstr "Vente directe %"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "When the user makes their own sale"
+msgstr "Lorsque l'utilisateur effectue sa propre vente"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "Override %"
+msgstr "Remplacement %"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hr_commission_role_config
+msgid "When they receive commission on subordinate's sale"
+msgstr "Lorsqu'ils reçoivent une commission sur la vente d'un subordonné"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
+msgid "No commission hierarchy defined"
+msgstr "Aucune hiérarchie de commission définie"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
+msgid "Set up your sales team hierarchy by assigning commission roles to users."
+msgstr "Configurez la hiérarchie de votre équipe de vente en attribuant des rôles de commission aux utilisateurs."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
+msgid "The view is grouped by role level (Directors → Team Leaders → Salespeople)."
+msgstr "La vue est regroupée par niveau de rôle (Directeurs → Chefs d'équipe → Commerciaux)."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_tree
+msgid "Hierarchy Anomalies"
+msgstr "Anomalies hiérarchiques"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_tree
+msgid "Anomaly Type"
+msgstr "Type d'anomalie"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_tree
+msgid "Description"
+msgstr "Description"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_tree
+msgid "Subordinates"
+msgstr "Subordonnés"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_search
+msgid "Missing Manager"
+msgstr "Manager manquant"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_search
+msgid "Top Role with Manager"
+msgstr "Rôle supérieur avec manager"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_search
+msgid "No Role with Manager"
+msgstr "Aucun rôle avec manager"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_search
+msgid "Lower Level Manager"
+msgstr "Manager de niveau inférieur"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_hierarchy_anomalies_search
+msgid "Circular Hierarchy"
+msgstr "Hiérarchie circulaire"
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Hierarchy Anomalies"
+msgstr "Anomalies hiérarchiques"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "No hierarchy anomalies detected"
+msgstr "Aucune anomalie hiérarchique détectée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Users with hierarchy assignment issues will appear here."
+msgstr "Les utilisateurs avec des problèmes d'attribution hiérarchique apparaîtront ici."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Detected anomaly types:"
+msgstr "Types d'anomalies détectés :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Missing Manager: Role requires a manager but none assigned"
+msgstr "Manager manquant : Le rôle nécessite un manager mais aucun n'est attribué"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Top Role with Manager: Top-level role should not have a manager"
+msgstr "Rôle supérieur avec manager : Le rôle de niveau supérieur ne devrait pas avoir de manager"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "No Role with Manager: Manager assigned without commission role"
+msgstr "Aucun rôle avec manager : Manager attribué sans rôle de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Lower Level Manager: Manager has a lower hierarchy level"
+msgstr "Manager de niveau inférieur : Le manager a un niveau hiérarchique inférieur"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_hierarchy_anomalies
+msgid "Circular Hierarchy: User is in their own management chain"
+msgstr "Hiérarchie circulaire : L'utilisateur est dans sa propre chaîne de gestion"
+
