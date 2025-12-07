@@ -2015,3 +2015,428 @@ msgstr "Performance de l'équipe"
 msgid "⚠️ Hierarchy Issues:"
 msgstr "⚠️ Problèmes hiérarchiques :"
 
+
+#. module: belgogreen_sales_commission
+#: model:product.product,name:belgogreen_sales_commission.product_commission_service
+msgid "Commission Payment Service"
+msgstr "Service de paiement de commission"
+
+#. module: belgogreen_sales_commission
+#: model:product.product,description:belgogreen_sales_commission.product_commission_service
+msgid "Service product used for commission payment purchase orders.\nThis product represents commission payments to salespeople."
+msgstr "Produit de service utilisé pour les bons de commande de paiement de commission.\nCe produit représente les paiements de commission aux commerciaux."
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_commission_deductions
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_commission_deduction
+msgid "Deductions"
+msgstr "Déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_hierarchy_management
+msgid "Hierarchy"
+msgstr "Hiérarchie"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_sale_commission_role
+msgid "Commission Roles"
+msgstr "Rôles de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_hierarchy_anomalies
+msgid "Hierarchy Anomalies"
+msgstr "Anomalies de hiérarchie"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model,name:belgogreen_sales_commission.model_commission_deduction
+msgid "Commission Deduction"
+msgstr "Déduction de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__deduction_type
+msgid "Type"
+msgstr "Type"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__down_payment
+msgid "Down Payment / Advance"
+msgstr "Acompte / Avance"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__service_fee
+msgid "Service Fee"
+msgstr "Frais de service"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__appointment
+msgid "Appointment Scheduling"
+msgstr "Planification de rendez-vous"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__leads
+msgid "Lead Generation"
+msgstr "Génération de prospects"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__materials
+msgid "Marketing Materials"
+msgstr "Matériel marketing"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__training
+msgid "Training Course"
+msgstr "Formation"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_type__other
+msgid "Other"
+msgstr "Autre"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__deduction_category
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_category__mandatory
+msgid "Mandatory"
+msgstr "Obligatoire"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__deduction_category__optional
+msgid "Optional"
+msgstr "Optionnel"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__state__pending
+msgid "Pending"
+msgstr "En attente"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__state__applied
+msgid "Applied to Payment"
+msgstr "Appliqué au paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__state__waived
+msgid "Waived"
+msgstr "Exonéré"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields.selection,name:belgogreen_sales_commission.selection__commission_deduction__state__cancelled
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__amount
+msgid "Amount"
+msgstr "Montant"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__date
+msgid "Date"
+msgstr "Date"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__description
+msgid "Description"
+msgstr "Description"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__reference
+msgid "External Reference"
+msgstr "Référence externe"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_deduction__reference
+msgid "PO number, payment reference, invoice number, etc."
+msgstr "Numéro de BC, référence de paiement, numéro de facture, etc."
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__user_id
+msgid "Salesperson"
+msgstr "Commercial"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_deduction__user_id
+msgid "Salesperson to whom this deduction applies"
+msgstr "Commercial auquel cette déduction s'applique"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__claim_id
+msgid "Commission Claim"
+msgstr "Demande de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_deduction__claim_id
+msgid "Claim where this deduction was applied"
+msgstr "Demande où cette déduction a été appliquée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__purchase_order_id
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_deduction__purchase_order_id
+msgid "Purchase order where this deduction was applied"
+msgstr "Bon de commande où cette déduction a été appliquée"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__waived_by
+msgid "Waived By"
+msgstr "Exonéré par"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__waive_reason
+msgid "Waiver Reason"
+msgstr "Raison de l'exonération"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__waive_date
+msgid "Waived Date"
+msgstr "Date d'exonération"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_commission_deduction__notes
+msgid "Notes"
+msgstr "Notes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_commission_deduction__deduction_category
+msgid "Mandatory: Auto-applied to claims\nOptional: User can choose to include"
+msgstr "Obligatoire : Appliqué automatiquement aux demandes\nOptionnel : L'utilisateur peut choisir d'inclure"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__mandatory_deduction_ids
+msgid "Mandatory Deductions"
+msgstr "Déductions obligatoires"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__optional_deduction_ids
+msgid "Optional Deductions"
+msgstr "Déductions optionnelles"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__all_deduction_ids
+msgid "All Deductions"
+msgstr "Toutes les déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__total_mandatory_deductions
+msgid "Total Mandatory Deductions"
+msgstr "Total déductions obligatoires"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__total_optional_deductions
+msgid "Total Optional Deductions"
+msgstr "Total déductions optionnelles"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__total_deductions
+msgid "Total Deductions"
+msgstr "Total déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__net_amount
+msgid "Net Amount"
+msgstr "Montant net"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__net_amount
+msgid "Amount after all deductions"
+msgstr "Montant après toutes les déductions"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Waive"
+msgstr "Exonérer"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Are you sure you want to waive this deduction?"
+msgstr "Êtes-vous sûr de vouloir exonérer cette déduction ?"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Reset to Pending"
+msgstr "Réinitialiser en attente"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Are you sure you want to cancel this deduction?"
+msgstr "Êtes-vous sûr de vouloir annuler cette déduction ?"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Deduction Information"
+msgstr "Informations sur la déduction"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Waiver Information"
+msgstr "Informations sur l'exonération"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Application"
+msgstr "Application"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Enter deduction details..."
+msgstr "Entrer les détails de la déduction..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_form
+msgid "Additional notes..."
+msgstr "Notes supplémentaires..."
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "Commission Deductions"
+msgstr "Déductions de commission"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "Applied"
+msgstr "Appliqué"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "Down Payments"
+msgstr "Acomptes"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "Service Fees"
+msgstr "Frais de service"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "This Month"
+msgstr "Ce mois"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_commission_deduction_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_commission_deduction
+msgid "No deductions found"
+msgstr "Aucune déduction trouvée"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_commission_deduction
+msgid "Create deductions to track down payments, service fees, and other amounts\nto be deducted from commission payments."
+msgstr "Créer des déductions pour suivre les acomptes, frais de service et autres montants\nà déduire des paiements de commission."
+
+#. module: belgogreen_sales_commission
+#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_commission_deduction_pending
+msgid "Pending Deductions"
+msgstr "Déductions en attente"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Approve &amp; Create PO"
+msgstr "Approuver et créer BC"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "View Purchase Order"
+msgstr "Voir le bon de commande"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Financial Summary"
+msgstr "Résumé financier"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/commission_deduction.py:0
+#, python-format
+msgid "Waive Deduction"
+msgstr "Exonérer la déduction"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/commission_deduction.py:0
+#, python-format
+msgid "Cannot cancel a deduction that has been applied to a payment."
+msgstr "Impossible d'annuler une déduction qui a été appliquée à un paiement."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/commission_deduction.py:0
+#, python-format
+msgid "Deduction amount must be greater than zero."
+msgstr "Le montant de la déduction doit être supérieur à zéro."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Commission Payment - %s"
+msgstr "Paiement de commission - %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Deduction: %s - %s"
+msgstr "Déduction : %s - %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Commission Payment Details"
+msgstr "Détails du paiement de commission"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Claim Reference: %s"
+msgstr "Référence de demande : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Claimant: %s"
+msgstr "Demandeur : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Number of Commissions: %s"
+msgstr "Nombre de commissions : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Gross Commissions: %s %s"
+msgstr "Commissions brutes : %s %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Total Deductions: -%s %s"
+msgstr "Total déductions : -%s %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "NET AMOUNT: %s %s"
+msgstr "MONTANT NET : %s %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Claimant Notes:\n%s"
+msgstr "Notes du demandeur :\n%s"
+
