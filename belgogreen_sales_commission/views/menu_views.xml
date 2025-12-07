@@ -132,11 +132,5 @@
                   action="belgogreen_sales_commission.action_hierarchy_anomalies"
                   sequence="30"/>
 
-        <menuitem id="menu_team_management_dashboard"
-                  name="Manager Management"
-                  parent="menu_hierarchy_management"
-                  action="action_team_management_dashboard"
-                  sequence="40"/>
-
     </data>
 </odoo>

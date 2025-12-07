@@ -1925,12 +1925,6 @@ msgid "Team Hierarchy"
 msgstr "Hiérarchie des équipes"
 
 #. module: belgogreen_sales_commission
-#: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_management_dashboard
-#: model:ir.actions.act_window,name:belgogreen_sales_commission.action_team_management_dashboard
-msgid "Manager Management"
-msgstr "Statistiques"
-
-#. module: belgogreen_sales_commission
 #: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
 msgid "No commission hierarchy defined yet"
 msgstr "Aucune hiérarchie de commission définie pour le moment"
@@ -1939,16 +1933,6 @@ msgstr "Aucune hiérarchie de commission définie pour le moment"
 #: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy
 msgid "Set up your sales team hierarchy by assigning commission roles to users."
 msgstr "Configurez la hiérarchie de votre équipe de vente en attribuant des rôles de commission aux utilisateurs."
-
-#. module: belgogreen_sales_commission
-#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_management_dashboard
-msgid "No teams found"
-msgstr "Aucune équipe trouvée"
-
-#. module: belgogreen_sales_commission
-#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_management_dashboard
-msgid "Teams will appear here once you assign Team Leaders and Sales Directors."
-msgstr "Les équipes apparaîtront ici une fois que vous aurez attribué des chefs d'équipe et des directeurs commerciaux."
 
 #. module: belgogreen_sales_commission
 #: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_team_hierarchy_search
