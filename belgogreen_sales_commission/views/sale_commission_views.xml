@@ -48,6 +48,17 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_claimable_together"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-money"
+                                    invisible="claimable_together_count == 0"
+                                    groups="belgogreen_sales_commission.group_commission_user">
+                                <field name="claimable_together_count" widget="statinfo"
+                                       string="Can Claim Together"/>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
