@@ -168,6 +168,21 @@ class SaleCommissionClaim(models.Model):
         store=True
     )
 
+    # Payment fields
+    payment_id = fields.Many2one(
+        'sale.commission.payment',
+        string='Payment',
+        readonly=True,
+        copy=False,
+        help='Payment record generated from this claim'
+    )
+
+    payment_state = fields.Selection(
+        related='payment_id.state',
+        string='Payment Status',
+        store=True
+    )
+
     # Enhanced state to track PO confirmation
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -279,34 +294,44 @@ class SaleCommissionClaim(models.Model):
         return True
 
     def action_approve(self):
-        """Approve claim and create draft PO"""
-        self.ensure_one()
+        """Approve claim(s) and create draft PO
 
-        # Ensure user is set up as vendor
-        vendor = self._ensure_user_as_vendor()
+        Supports both single claim and batch claims (multiple claims from same employee)
+        """
+        # Validate all claims are in pending state
+        if any(claim.state != 'pending' for claim in self):
+            raise UserError(_('All claims must be in pending state to approve.'))
 
-        # Create draft Purchase Order
+        # Validate no existing POs
+        if any(claim.purchase_order_id for claim in self):
+            raise UserError(_('Some claims already have purchase orders.'))
+
+        # Ensure user is set up as vendor (use first claim's user, already validated same user in _create_purchase_order)
+        vendor = self[0]._ensure_user_as_vendor()
+
+        # Create draft Purchase Order (handles batch internally)
         po = self._create_purchase_order(vendor)
 
-        # Update claim state
+        # Update all claims state (PO already linked by _create_purchase_order)
         self.write({
             'state': 'approved',
             'processed_by': self.env.user.id,
             'processed_date': fields.Datetime.now(),
-            'purchase_order_id': po.id
         })
 
-        # Mark deductions as applied
-        self.all_deduction_ids.write({
-            'state': 'applied',
-            'claim_id': self.id,
-            'purchase_order_id': po.id
-        })
+        # Mark all deductions as applied
+        for claim in self:
+            claim.all_deduction_ids.write({
+                'state': 'applied',
+                'claim_id': claim.id,
+                'purchase_order_id': po.id
+            })
 
-        # Notify claimant
-        self._notify_claimant('approved')
+        # Notify claimants
+        for claim in self:
+            claim._notify_claimant('approved')
 
-        # Open PO for manager to review/edit
+        # Open PO for manager to review
         return {
             'name': _('Review Purchase Order'),
             'type': 'ir.actions.act_window',
@@ -314,9 +339,6 @@ class SaleCommissionClaim(models.Model):
             'res_id': po.id,
             'view_mode': 'form',
             'target': 'current',
-            'context': {
-                'default_commission_claim_id': self.id,
-            }
         }
 
     def action_reject(self):
@@ -411,9 +433,10 @@ class SaleCommissionClaim(models.Model):
         return partner
 
     def _create_purchase_order(self, vendor):
-        """Create draft purchase order for commission payment with deduction lines"""
-        self.ensure_one()
+        """Create draft purchase order for commission payment with deduction lines
 
+        Supports both single claim and batch claims (multiple claims from same employee)
+        """
         # Get commission service product
         product = self.env.ref('belgogreen_sales_commission.product_commission_service', raise_if_not_found=False)
         if not product:
@@ -422,76 +445,142 @@ class SaleCommissionClaim(models.Model):
                 'Please contact your administrator to configure the commission service product.'
             ))
 
+        # Validate all claims are from same user
+        users = self.mapped('user_id')
+        if len(users) > 1:
+            raise UserError(_(
+                'Cannot create purchase order for claims from different employees.\n'
+                'All claims must belong to the same employee.\n\n'
+                'Selected claims by employee:\n%s'
+            ) % '\n'.join([f'- {u.name}: {self.filtered(lambda c: c.user_id == u).mapped("name")}'
+                           for u in users]))
+
+        # Calculate totals
+        total_gross = sum(self.mapped('total_amount'))
+        total_deductions = sum(self.mapped('total_deductions'))
+
         # Create PO
         po_vals = {
             'partner_id': vendor.id,
-            'origin': self.name,
-            'commission_claim_id': self.id,
+            'origin': ', '.join(self.mapped('name')),
             'state': 'draft',
-            'company_id': self.company_id.id,
-            'currency_id': self.currency_id.id,
-            'notes': self._generate_po_notes(),
+            'company_id': self[0].company_id.id,
+            'currency_id': self[0].currency_id.id,
+            'notes': self._generate_batch_po_notes(),
         }
 
         po = self.env['purchase.order'].create(po_vals)
 
-        # Create main PO line with gross commission amount
+        # Link all claims to this PO
+        self.write({'purchase_order_id': po.id})
+
+        # Create main PO line with total gross commission amount
+        if len(self) == 1:
+            line_name = _('Commission Payment - %s') % self.name
+        else:
+            line_name = _('Commission Payment - %s claims') % len(self)
+
         self.env['purchase.order.line'].create({
             'order_id': po.id,
             'product_id': product.id,
-            'name': _('Commission Payment - %s') % self.name,
+            'name': line_name,
             'product_qty': 1,
-            'price_unit': self.total_amount,  # Gross amount
+            'price_unit': total_gross,
             'date_planned': fields.Date.today(),
         })
 
-        # Create negative PO lines for each deduction
-        for deduction in self.all_deduction_ids:
-            # Get human-readable deduction type name
-            deduction_type_name = dict(deduction._fields['deduction_type'].selection).get(
-                deduction.deduction_type,
-                deduction.deduction_type
-            )
-            self.env['purchase.order.line'].create({
-                'order_id': po.id,
-                'product_id': product.id,
-                'name': _('Deduction: %s - %s') % (deduction_type_name, deduction.name),
-                'product_qty': 1,
-                'price_unit': -deduction.amount,  # Negative amount
-                'date_planned': fields.Date.today(),
-            })
+        # Create negative PO lines for each deduction from all claims
+        for claim in self:
+            for deduction in claim.all_deduction_ids:
+                # Get human-readable deduction type name
+                deduction_type_name = dict(deduction._fields['deduction_type'].selection).get(
+                    deduction.deduction_type,
+                    deduction.deduction_type
+                )
+
+                # Include claim reference if batch
+                if len(self) > 1:
+                    deduction_line_name = _('Deduction: %s - %s (Claim: %s)') % (
+                        deduction_type_name,
+                        deduction.name,
+                        claim.name
+                    )
+                else:
+                    deduction_line_name = _('Deduction: %s - %s') % (deduction_type_name, deduction.name)
+
+                self.env['purchase.order.line'].create({
+                    'order_id': po.id,
+                    'product_id': product.id,
+                    'name': deduction_line_name,
+                    'product_qty': 1,
+                    'price_unit': -deduction.amount,
+                    'date_planned': fields.Date.today(),
+                })
 
         return po
 
     def _generate_po_notes(self):
-        """Generate notes for PO with deduction breakdown"""
+        """Generate notes for PO with deduction breakdown (single claim - deprecated, use _generate_batch_po_notes)"""
         self.ensure_one()
+        return self._generate_batch_po_notes()
 
+    def _generate_batch_po_notes(self):
+        """Generate notes for PO with deduction breakdown (supports single and batch)"""
         notes = _('Commission Payment Details\n')
         notes += _('═' * 50) + '\n\n'
-        notes += _('Claim Reference: %s\n') % self.name
-        notes += _('Claimant: %s\n') % self.user_id.name
-        notes += _('Number of Commissions: %s\n\n') % self.commission_count
+
+        if len(self) == 1:
+            # Single claim
+            notes += _('Claim Reference: %s\n') % self.name
+            notes += _('Claimant: %s\n') % self.user_id.name
+            notes += _('Number of Commissions: %s\n\n') % self.commission_count
+        else:
+            # Batch claims
+            notes += _('Batch Payment - %s Claims\n') % len(self)
+            notes += _('Claims: %s\n') % ', '.join(self.mapped('name'))
+            notes += _('Employee: %s\n') % self[0].user_id.name
+            notes += _('Total Commissions: %s\n\n') % sum(self.mapped('commission_count'))
 
         notes += _('Financial Breakdown:\n')
         notes += _('─' * 50) + '\n'
-        notes += _('Gross Commissions: %s %s\n') % (self.total_amount, self.currency_id.symbol)
 
-        if self.all_deduction_ids:
+        total_gross = sum(self.mapped('total_amount'))
+        total_deductions = sum(self.mapped('total_deductions'))
+        total_net = sum(self.mapped('net_amount'))
+
+        notes += _('Gross Commissions: %s %s\n') % (total_gross, self[0].currency_id.symbol)
+
+        # List all deductions
+        all_deductions = self.mapped('all_deduction_ids')
+        if all_deductions:
             notes += _('\nDeductions:\n')
-            for deduction in self.all_deduction_ids:
-                notes += _('  • %s: -%s %s\n') % (
-                    deduction.deduction_type.replace('_', ' ').title(),
-                    deduction.amount,
-                    self.currency_id.symbol
-                )
+            for claim in self:
+                if claim.all_deduction_ids:
+                    if len(self) > 1:
+                        notes += _('  Claim %s:\n') % claim.name
+                    for deduction in claim.all_deduction_ids:
+                        indent = '    ' if len(self) > 1 else '  '
+                        notes += _('%s• %s (%s): -%s %s\n') % (
+                            indent,
+                            deduction.deduction_type.replace('_', ' ').title(),
+                            deduction.name,
+                            deduction.amount,
+                            self[0].currency_id.symbol
+                        )
             notes += _('─' * 50) + '\n'
-            notes += _('Total Deductions: -%s %s\n') % (self.total_deductions, self.currency_id.symbol)
+            notes += _('Total Deductions: -%s %s\n') % (total_deductions, self[0].currency_id.symbol)
 
         notes += _('═' * 50) + '\n'
-        notes += _('NET AMOUNT: %s %s\n') % (self.net_amount, self.currency_id.symbol)
+        notes += _('NET AMOUNT: %s %s\n') % (total_net, self[0].currency_id.symbol)
 
-        if self.notes:
-            notes += _('\nClaimant Notes:\n%s\n') % self.notes
+        # Add claimant notes if any
+        claim_notes = self.filtered(lambda c: c.notes)
+        if claim_notes:
+            notes += _('\nClaimant Notes:\n')
+            for claim in claim_notes:
+                if len(self) > 1:
+                    notes += _('%s: %s\n') % (claim.name, claim.notes)
+                else:
+                    notes += _('%s\n') % claim.notes
 
         return notes

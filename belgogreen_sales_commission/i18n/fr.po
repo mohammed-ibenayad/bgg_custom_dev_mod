@@ -2440,3 +2440,177 @@ msgstr "MONTANT NET : %s %s"
 msgid "Claimant Notes:\n%s"
 msgstr "Notes du demandeur :\n%s"
 
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__payment_id
+msgid "Payment"
+msgstr "Paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_claim__payment_id
+msgid "Payment record generated from this claim"
+msgstr "Enregistrement de paiement généré à partir de cette demande"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_claim__payment_state
+msgid "Payment Status"
+msgstr "Statut de paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__purchase_order_id
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__purchase_order_id
+msgid "Purchase order that generated this payment"
+msgstr "Bon de commande qui a généré ce paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__claim_ids
+msgid "Claims"
+msgstr "Demandes"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__claim_ids
+msgid "Commission claims associated with this payment"
+msgstr "Demandes de commission associées à ce paiement"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__gross_amount
+msgid "Gross Amount"
+msgstr "Montant brut"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__gross_amount
+msgid "Total commission amount before deductions"
+msgstr "Montant total de commission avant déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__deduction_amount
+msgid "Deductions"
+msgstr "Déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__deduction_amount
+msgid "Total deduction amount"
+msgstr "Montant total des déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_sale_commission_payment__payment_amount
+msgid "Net Amount"
+msgstr "Montant net"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_sale_commission_payment__payment_amount
+msgid "Amount to be paid after deductions"
+msgstr "Montant à payer après déductions"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,field_description:belgogreen_sales_commission.field_purchase_order__claim_ids
+msgid "Commission Claims"
+msgstr "Demandes de commission"
+
+#. module: belgogreen_sales_commission
+#: model:ir.model.fields,help:belgogreen_sales_commission.field_purchase_order__claim_ids
+msgid "Commission claims associated with this purchase order"
+msgstr "Demandes de commission associées à ce bon de commande"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_form
+msgid "Payment:"
+msgstr "Paiement :"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_payment_form
+msgid "Amount Breakdown"
+msgstr "Répartition du montant"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_tree
+msgid "Gross"
+msgstr "Brut"
+
+#. module: belgogreen_sales_commission
+#: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.view_sale_commission_claim_tree
+msgid "Net"
+msgstr "Net"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Cannot create purchase order for claims from different employees.\nAll claims must belong to the same employee.\n\nSelected claims by employee:\n%s"
+msgstr "Impossible de créer un bon de commande pour des demandes d'employés différents.\nToutes les demandes doivent appartenir au même employé.\n\nDemandes sélectionnées par employé :\n%s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Commission Payment - %s claims"
+msgstr "Paiement de commission - %s demandes"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Deduction: %s - %s (Claim: %s)"
+msgstr "Déduction : %s - %s (Demande : %s)"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "All claims must be in pending state to approve."
+msgstr "Toutes les demandes doivent être en attente pour être approuvées."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Some claims already have purchase orders."
+msgstr "Certaines demandes ont déjà des bons de commande."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Batch Payment - %s Claims"
+msgstr "Paiement groupé - %s demandes"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "Total Commissions: %s"
+msgstr "Total commissions : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/sale_commission_claim.py:0
+#, python-format
+msgid "  Claim %s:"
+msgstr "  Demande %s :"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/purchase_order.py:0
+#, python-format
+msgid "Cannot modify purchase order lines for commission payments.\n\nThis PO is generated from commission claims and contains:\n- Gross commission amounts\n- Deduction lines\n\nIf you need to make changes:\n1. Cancel this PO\n2. Adjust the claim deductions\n3. Recreate the claim approval"
+msgstr "Impossible de modifier les lignes de bon de commande pour les paiements de commission.\n\nCe BC est généré à partir de demandes de commission et contient :\n- Montants bruts de commission\n- Lignes de déduction\n\nSi vous devez apporter des modifications :\n1. Annulez ce BC\n2. Ajustez les déductions de la demande\n3. Recréez l'approbation de la demande"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/purchase_order.py:0
+#, python-format
+msgid "Payment %s already exists for this purchase order.\n\nPO: %s\nPayment: %s"
+msgstr "Le paiement %s existe déjà pour ce bon de commande.\n\nBC : %s\nPaiement : %s"
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/purchase_order.py:0
+#, python-format
+msgid "Auto-generated from Purchase Order %s\nClaims: %s\n\nThis payment was automatically created when the employee confirmed the PO.\nPlease review and confirm to proceed with payment."
+msgstr "Généré automatiquement à partir du bon de commande %s\nDemandes : %s\n\nCe paiement a été créé automatiquement lorsque l'employé a confirmé le BC.\nVeuillez examiner et confirmer pour procéder au paiement."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/purchase_order.py:0
+#, python-format
+msgid "Payment %s was automatically created and is ready for processing."
+msgstr "Le paiement %s a été créé automatiquement et est prêt pour le traitement."
+
+#. module: belgogreen_sales_commission
+#: code:addons/belgogreen_sales_commission/models/purchase_order.py:0
+#, python-format
+msgid "Payment Ready"
+msgstr "Paiement prêt"
+

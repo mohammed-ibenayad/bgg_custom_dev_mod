@@ -13,9 +13,10 @@
                     <field name="user_id" string="User" width="150px"/>
                     <field name="payment_date" string="Date" width="100px"/>
                     <field name="commission_count" string="# Comm." width="80px"/>
-                    <field name="total_amount" string="Amount" sum="Total" width="110px"/>
+                    <field name="payment_amount" string="Net Amount" sum="Total" width="110px"/>
                     <field name="payment_method" string="Method" width="110px"/>
                     <field name="state" string="State" width="90px"/>
+                    <field name="purchase_order_id" optional="show" string="PO" width="100px"/>
                 </list>
             </field>
         </record>
@@ -41,6 +42,14 @@
                                 <field name="commission_count" widget="statinfo" string="Commissions"/>
                             </button>
                         </div>
+
+                        <!-- PO & Claim Status Alerts -->
+                        <div class="alert alert-info" role="alert" invisible="not purchase_order_id">
+                            <strong>📄 Purchase Order:</strong> <field name="purchase_order_id" readonly="1"/>
+                            <br/>
+                            <strong>📋 Claims:</strong> <field name="claim_ids" readonly="1" widget="many2many_tags"/>
+                        </div>
+
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -52,8 +61,18 @@
                                 <field name="payment_date" readonly="state == 'paid'"/>
                                 <field name="payment_method" readonly="state == 'paid'"/>
                             </group>
-                            <group string="Amount">
-                                <field name="total_amount" class="oe_subtotal_footer_separator"/>
+                            <group string="Amount Breakdown">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="gross_amount" readonly="1"
+                                       invisible="not purchase_order_id"
+                                       help="Total commission amount before deductions"/>
+                                <field name="deduction_amount" readonly="1"
+                                       invisible="not purchase_order_id"
+                                       decoration-danger="deduction_amount &gt; 0"
+                                       help="Total deductions applied"/>
+                                <field name="payment_amount" class="oe_subtotal_footer_separator"
+                                       readonly="state != 'draft'"
+                                       help="Net amount to pay (after deductions)"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
