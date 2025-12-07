@@ -5,6 +5,7 @@
         <!-- Commission Service Product -->
         <record id="product_commission_service" model="product.product">
             <field name="name">Commission Payment Service</field>
+            <field name="default_code">COMM-SVC-001</field>
             <field name="type">service</field>
             <field name="categ_id" ref="product.product_category_all"/>
             <field name="list_price">0.0</field>
