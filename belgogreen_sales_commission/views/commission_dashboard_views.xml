@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Load Chart.js -->
+        <template id="assets_backend" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+            </xpath>
+        </template>
+
+        <!-- Dashboard Template -->
+        <template id="commission_dashboard_template" name="Commission Dashboard">
+            <t t-name="commission.dashboard">
+                <div class="commission_dashboard">
+                    <div class="o_dashboard_header">
+                        <h1>Commission Dashboard</h1>
+                        <button class="btn btn-primary dashboard_refresh">
+                            <i class="fa fa-refresh"/> Refresh
+                        </button>
+                    </div>
+
+                    <!-- KPI Cards Section -->
+                    <div class="dashboard_kpi_section">
+                        <div class="row">
+                            <!-- My Commissions Card -->
+                            <div class="col-md-3 col-sm-6">
+                                <div class="dashboard_card kpi_card card_blue">
+                                    <div class="card_icon">
+                                        <i class="fa fa-money fa-3x"/>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="kpi_value" id="my_total">$0</h3>
+                                        <p class="kpi_label">My Total Commissions</p>
+                                        <div class="kpi_stats">
+                                            <span class="stat_item">
+                                                <i class="fa fa-hourglass-half"/>
+                                                <span id="my_pending">$0</span> Pending
+                                            </span>
+                                            <span class="stat_item">
+                                                <i class="fa fa-check"/>
+                                                <span id="my_count">0</span> Total
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- This Month Card -->
+                            <div class="col-md-3 col-sm-6">
+                                <div class="dashboard_card kpi_card card_green">
+                                    <div class="card_icon">
+                                        <i class="fa fa-calendar fa-3x"/>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="kpi_value" id="month_total">$0</h3>
+                                        <p class="kpi_label">This Month</p>
+                                        <div class="kpi_stats">
+                                            <span class="stat_item">
+                                                <i class="fa fa-list"/>
+                                                <span id="month_count">0</span> Commissions
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Team Performance Card -->
+                            <div class="col-md-3 col-sm-6">
+                                <div class="dashboard_card kpi_card card_orange">
+                                    <div class="card_icon">
+                                        <i class="fa fa-users fa-3x"/>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="kpi_value" id="team_total">$0</h3>
+                                        <p class="kpi_label">Team Commissions</p>
+                                        <div class="kpi_stats">
+                                            <span class="stat_item">
+                                                <i class="fa fa-user"/>
+                                                <span id="team_members">0</span> Members
+                                            </span>
+                                            <span class="stat_item">
+                                                <i class="fa fa-hourglass-half"/>
+                                                <span id="team_pending">$0</span> Pending
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Actions Card -->
+                            <div class="col-md-3 col-sm-6">
+                                <div class="dashboard_card kpi_card card_red">
+                                    <div class="card_icon">
+                                        <i class="fa fa-bell fa-3x"/>
+                                    </div>
+                                    <div class="card_content">
+                                        <h3 class="kpi_value" id="pending_claims">0</h3>
+                                        <p class="kpi_label">Pending Approvals</p>
+                                        <div class="kpi_stats">
+                                            <span class="stat_item">
+                                                <i class="fa fa-exclamation-triangle"/>
+                                                Needs Action
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="dashboard_charts_section">
+                        <div class="row">
+                            <!-- Monthly Trend Chart -->
+                            <div class="col-md-8">
+                                <div class="dashboard_card chart_card">
+                                    <div class="card_header">
+                                        <h4><i class="fa fa-line-chart"/> Commission Trend (Last 6 Months)</h4>
+                                    </div>
+                                    <div class="card_body">
+                                        <canvas id="trend_chart" height="80"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- State Distribution Chart -->
+                            <div class="col-md-4">
+                                <div class="dashboard_card chart_card">
+                                    <div class="card_header">
+                                        <h4><i class="fa fa-pie-chart"/> By Status</h4>
+                                    </div>
+                                    <div class="card_body">
+                                        <canvas id="status_chart" height="180"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Team Performance Chart -->
+                            <div class="col-md-12">
+                                <div class="dashboard_card chart_card">
+                                    <div class="card_header">
+                                        <h4><i class="fa fa-bar-chart"/> Team Performance (This Month)</h4>
+                                    </div>
+                                    <div class="card_body">
+                                        <canvas id="team_chart" height="60"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tables Section -->
+                    <div class="dashboard_tables_section">
+                        <div class="row">
+                            <!-- Recent Commissions -->
+                            <div class="col-md-6">
+                                <div class="dashboard_card table_card">
+                                    <div class="card_header">
+                                        <h4><i class="fa fa-history"/> Recent Commissions</h4>
+                                    </div>
+                                    <div class="card_body">
+                                        <table class="table table-hover" id="recent_commissions_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Order</th>
+                                                    <th>Amount</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Team Members -->
+                            <div class="col-md-6">
+                                <div class="dashboard_card table_card">
+                                    <div class="card_header">
+                                        <h4><i class="fa fa-users"/> My Team</h4>
+                                    </div>
+                                    <div class="card_body">
+                                        <table class="table table-hover" id="team_members_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Role</th>
+                                                    <th>Unpaid</th>
+                                                    <th>Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Populated by JS -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Dashboard Action -->
+        <record id="action_commission_dashboard" model="ir.actions.client">
+            <field name="name">Dashboard</field>
+            <field name="tag">commission_dashboard</field>
+            <field name="target">current</field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_commission_dashboard"
+                  name="Dashboard"
+                  parent="menu_commissions_root"
+                  action="action_commission_dashboard"
+                  sequence="1"/>
+
+    </data>
+</odoo>

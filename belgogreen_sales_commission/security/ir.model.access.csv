@@ -13,3 +13,5 @@ access_commission_claim_wizard_user,commission.claim.wizard.user,model_commissio
 access_commission_claim_wizard_manager,commission.claim.wizard.manager,model_commission_claim_wizard,group_commission_manager,1,1,1,1
 access_commission_deduction_user,commission.deduction.user,model_commission_deduction,group_commission_user,1,0,0,0
 access_commission_deduction_manager,commission.deduction.manager,model_commission_deduction,group_commission_manager,1,1,1,1
+access_commission_dashboard_user,commission.dashboard.user,model_commission_dashboard,group_commission_user,1,1,1,1
+access_commission_dashboard_manager,commission.dashboard.manager,model_commission_dashboard,group_commission_manager,1,1,1,1
