@@ -167,16 +167,66 @@ class AccountMove(models.Model):
             })
 
     def write(self, vals):
-        """Override write to trigger commission creation on payment"""
+        """Override write to trigger commission creation on payment and auto-confirm commission payments"""
         result = super(AccountMove, self).write(vals)
 
-        # If payment_state changed to paid, create commissions
+        # If payment_state changed to paid
         if 'payment_state' in vals:
             for move in self:
                 if move.payment_state in ['paid', 'in_payment']:
-                    move._create_hierarchical_commissions()
+                    # Create commissions for customer invoices
+                    if move.move_type == 'out_invoice':
+                        move._create_hierarchical_commissions()
+
+                    # Auto-confirm commission payments for vendor bills
+                    elif move.move_type == 'in_invoice':
+                        move._auto_confirm_commission_payment()
 
         return result
+
+    def _auto_confirm_commission_payment(self):
+        """Auto-confirm and mark commission payment as paid when vendor bill is paid"""
+        self.ensure_one()
+
+        # Check if this bill is from a commission PO
+        if not self.invoice_origin:
+            return
+
+        # Find the PO
+        po = self.env['purchase.order'].search([
+            ('name', '=', self.invoice_origin)
+        ], limit=1)
+
+        if not po or not po.claim_ids:
+            return
+
+        # Find the related payment
+        payment = self.env['sale.commission.payment'].search([
+            ('purchase_order_id', '=', po.id)
+        ], limit=1)
+
+        if not payment:
+            return
+
+        # Auto-confirm and mark as paid
+        try:
+            if payment.state == 'draft':
+                payment.action_confirm()
+
+            if payment.state == 'confirmed':
+                payment.action_mark_paid()
+
+                # Log in the invoice that payment was auto-completed
+                self.message_post(
+                    body=_('Commission payment %s was automatically confirmed and marked as paid.') % payment.name,
+                    subject=_('Commission Payment Completed'),
+                )
+        except Exception as e:
+            # Log error but don't fail the invoice payment
+            self.message_post(
+                body=_('Failed to auto-complete commission payment %s: %s') % (payment.name, str(e)),
+                subject=_('Commission Payment Error'),
+            )
 
     def action_view_commissions(self):
         """View commissions for this invoice"""
