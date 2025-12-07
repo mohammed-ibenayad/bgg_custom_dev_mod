@@ -12,9 +12,12 @@
                     <field name="user_id" string="User" width="150px"/>
                     <field name="claim_date" string="Date" width="100px"/>
                     <field name="commission_count" string="# Comm." width="80px"/>
-                    <field name="total_amount" string="Amount" sum="Total" width="110px"/>
+                    <field name="total_amount" string="Gross" sum="Total" width="100px"/>
+                    <field name="total_deductions" string="Deductions" sum="Total" width="100px" optional="show" decoration-danger="total_deductions &gt; 0"/>
+                    <field name="net_amount" string="Net" sum="Total" width="110px"/>
                     <field name="state" string="State" width="90px"/>
-                    <field name="processed_by" string="Processed By" width="130px"/>
+                    <field name="processed_by" string="Processed By" width="130px" optional="hide"/>
+                    <field name="payment_id" string="Payment" width="100px" optional="show"/>
                 </list>
             </field>
         </record>
@@ -54,6 +57,12 @@
                         <div class="alert alert-info" role="alert" invisible="not purchase_order_id">
                             <strong>📄 Purchase Order:</strong> <field name="purchase_order_id" readonly="1"/>
                             <span> - Status: <field name="purchase_order_state" readonly="1"/></span>
+                        </div>
+
+                        <!-- Payment Status Alert -->
+                        <div class="alert alert-success" role="alert" invisible="not payment_id">
+                            <strong>💰 Payment:</strong> <field name="payment_id" readonly="1"/>
+                            <span> - Status: <field name="payment_state" readonly="1"/></span>
                         </div>
 
                         <div class="oe_title">
