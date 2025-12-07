@@ -2059,13 +2059,13 @@ msgstr "Hiérarchie"
 
 #. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_sale_commission_role
-msgid "Commission Roles"
-msgstr "Rôles de commission"
+msgid "Role Management"
+msgstr "Gestion des rôles"
 
 #. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_hierarchy_anomalies
-msgid "Hierarchy Anomalies"
-msgstr "Anomalies de hiérarchie"
+msgid "Anomalies"
+msgstr "Anomalies"
 
 #. module: belgogreen_sales_commission
 #: model:ir.model,name:belgogreen_sales_commission.model_commission_deduction
