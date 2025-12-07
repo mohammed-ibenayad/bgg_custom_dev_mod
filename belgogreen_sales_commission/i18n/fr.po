@@ -1927,8 +1927,8 @@ msgstr "Hiérarchie des équipes"
 #. module: belgogreen_sales_commission
 #: model:ir.ui.menu,name:belgogreen_sales_commission.menu_team_management_dashboard
 #: model:ir.actions.act_window,name:belgogreen_sales_commission.action_team_management_dashboard
-msgid "Team Management"
-msgstr "Gestion des équipes"
+msgid "Manager Management"
+msgstr "Statistiques"
 
 #. module: belgogreen_sales_commission
 #: model_terms:ir.ui.view,arch_db:belgogreen_sales_commission.action_team_hierarchy

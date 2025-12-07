@@ -119,23 +119,23 @@
                   action="action_team_hierarchy"
                   sequence="10"/>
 
-        <menuitem id="menu_team_management_dashboard"
-                  name="Manager Management"
-                  parent="menu_hierarchy_management"
-                  action="action_team_management_dashboard"
-                  sequence="20"/>
-
         <menuitem id="menu_sale_commission_role"
                   name="Role Management"
                   parent="menu_hierarchy_management"
                   action="action_sale_commission_role"
-                  sequence="30"
+                  sequence="20"
                   groups="belgogreen_sales_commission.group_commission_manager"/>
 
         <menuitem id="menu_hierarchy_anomalies"
                   name="Anomalies"
                   parent="menu_hierarchy_management"
                   action="belgogreen_sales_commission.action_hierarchy_anomalies"
+                  sequence="30"/>
+
+        <menuitem id="menu_team_management_dashboard"
+                  name="Manager Management"
+                  parent="menu_hierarchy_management"
+                  action="action_team_management_dashboard"
                   sequence="40"/>
 
     </data>
