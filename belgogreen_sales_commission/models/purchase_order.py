@@ -101,16 +101,47 @@ class PurchaseOrder(models.Model):
         return res
 
     def button_cancel(self):
-        """Override to handle claim cancellation"""
+        """Override to handle claim cancellation and reset deductions"""
+        # Store claims before cancellation
+        claims_to_reset = {}
+        for po in self:
+            if po.claim_ids:
+                # Store claims and their deductions
+                claims_to_reset[po.id] = {
+                    'claims': po.claim_ids,
+                    'deductions': po.claim_ids.mapped('all_deduction_ids').filtered(
+                        lambda d: d.state == 'applied' and d.purchase_order_id == po
+                    )
+                }
+
         res = super(PurchaseOrder, self).button_cancel()
 
-        # Update related commission claim
+        # Reset claims and deductions after cancellation
         for po in self:
-            if po.commission_claim_id and po.commission_claim_id.state in ['approved', 'po_sent']:
-                # Optionally reset claim or notify manager
-                po.commission_claim_id.message_post(
-                    body=_('Purchase Order %s was cancelled.') % po.name,
-                    subject=_('PO Cancelled'),
-                )
+            if po.id in claims_to_reset:
+                data = claims_to_reset[po.id]
+
+                # Reset deductions to pending
+                if data['deductions']:
+                    data['deductions'].write({
+                        'state': 'pending',
+                        'claim_id': False,
+                        'purchase_order_id': False
+                    })
+
+                # Reset claims to pending state
+                data['claims'].write({
+                    'state': 'pending',
+                    'purchase_order_id': False,
+                    'processed_by': False,
+                    'processed_date': False
+                })
+
+                # Notify manager
+                for claim in data['claims']:
+                    claim.message_post(
+                        body=_('Purchase Order %s was cancelled. Claim and deductions have been reset to pending.') % po.name,
+                        subject=_('PO Cancelled - Claim Reset'),
+                    )
 
         return res

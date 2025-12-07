@@ -342,14 +342,23 @@ class SaleCommissionClaim(models.Model):
         }
 
     def action_reject(self):
-        """Reject the claim"""
+        """Reject the claim and reset deductions"""
         for claim in self:
+            # Reset deductions to pending if they were applied
+            if claim.all_deduction_ids:
+                claim.all_deduction_ids.filtered(lambda d: d.state == 'applied').write({
+                    'state': 'pending',
+                    'claim_id': False,
+                    'purchase_order_id': False
+                })
+
             claim.write({
                 'state': 'rejected',
                 'processed_by': self.env.user.id,
                 'processed_date': fields.Datetime.now()
             })
             claim.commission_ids.write({'payment_status': 'unpaid'})
+
             # Send notification to claimant
             claim._notify_claimant('rejected')
 
