@@ -72,7 +72,7 @@ class CommissionDashboard(models.TransientModel):
 
         # Pending actions (claims to approve)
         pending_claims = self.env['sale.commission.claim'].search_count([
-            ('state', '=', 'submitted'),
+            ('state', '=', 'pending'),
             ('user_id.commission_manager_id', '=', self.env.user.id)
         ])
 
