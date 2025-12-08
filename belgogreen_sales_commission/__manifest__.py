@@ -73,6 +73,7 @@ Main Features:
     'assets': {
         'web.assets_backend': [
             'belgogreen_sales_commission/static/src/js/commission_dashboard.js',
+            'belgogreen_sales_commission/static/src/xml/commission_dashboard.xml',
             'belgogreen_sales_commission/static/src/scss/commission_dashboard.scss',
         ],
     },
