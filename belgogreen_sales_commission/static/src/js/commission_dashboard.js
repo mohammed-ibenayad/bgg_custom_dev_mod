@@ -19,7 +19,7 @@ export class CommissionDashboard extends Component {
             this.orm = useService("orm");
             this.actionService = useService("action");
         } catch (e) {
-            console.error("Services not available:", e);
+            console.log("Services not available, will use fallback:", e.message);
             // Services might not be available yet, we'll use fallback
             this.rpc = null;
         }
@@ -35,8 +35,24 @@ export class CommissionDashboard extends Component {
             try {
                 // Load Chart.js library
                 await this.loadChartJS();
+                console.log("Chart.js loaded successfully");
+            } catch (error) {
+                console.error("Error loading Chart.js:", error);
+                this.state.error = error.message;
+            }
+        });
 
-                // Try to load data
+        onMounted(async () => {
+            console.log("Component mounted, loading dashboard data...");
+
+            // Refresh button click handler
+            const refreshBtn = this.root.el?.querySelector('.dashboard_refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => this.onRefreshClick());
+            }
+
+            // Load data after DOM is ready
+            try {
                 if (this.rpc) {
                     await this.loadDashboardData();
                 } else {
@@ -44,22 +60,16 @@ export class CommissionDashboard extends Component {
                     await this.loadDashboardDataFallback();
                 }
             } catch (error) {
-                console.error("Error in onWillStart:", error);
+                console.error("Error loading dashboard data:", error);
                 this.state.error = error.message;
-            }
-        });
-
-        onMounted(() => {
-            // Refresh button click handler
-            const refreshBtn = this.root.el?.querySelector('.dashboard_refresh');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', () => this.onRefreshClick());
+                this.state.loading = false;
             }
         });
     }
 
     async loadDashboardDataFallback() {
         // Fallback: use fetch API directly
+        console.log("Using fallback method to load data...");
         try {
             const response = await fetch('/commission/dashboard/data', {
                 method: 'POST',
@@ -73,21 +83,39 @@ export class CommissionDashboard extends Component {
                 })
             });
 
+            console.log("Fetch response status:", response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const result = await response.json();
+            console.log("Raw response:", result);
+
             const data = result.result;
 
+            if (!data) {
+                throw new Error("No data received from server");
+            }
+
+            console.log("Dashboard data received:", data);
             this.state.data = data;
 
             // Add null checks before accessing nested properties
             if (data && data.kpis) {
+                console.log("Updating KPIs...", data.kpis);
                 this.updateKPIs(data.kpis);
             }
             if (data && data.charts) {
+                console.log("Updating charts...", data.charts);
                 this.updateCharts(data.charts);
             }
             if (data && data.recent && data.team) {
+                console.log("Updating tables...");
                 this.updateTables(data.recent, data.team);
             }
+
+            console.log("Dashboard updated successfully!");
         } catch (error) {
             console.error('Error loading dashboard data (fallback):', error);
             this.state.error = error.message;
