@@ -7,6 +7,10 @@ import { loadJS } from "@web/core/assets";
 
 export class CommissionDashboard extends Component {
     static template = "commission.dashboard";
+    static props = {
+        action: { type: Object, optional: true },
+        className: { type: String, optional: true },
+    };
 
     setup() {
         this.rpc = useService("rpc");
