@@ -77,9 +77,17 @@ export class CommissionDashboard extends Component {
             const data = result.result;
 
             this.state.data = data;
-            this.updateKPIs(data.kpis);
-            this.updateCharts(data.charts);
-            this.updateTables(data.recent, data.team);
+
+            // Add null checks before accessing nested properties
+            if (data && data.kpis) {
+                this.updateKPIs(data.kpis);
+            }
+            if (data && data.charts) {
+                this.updateCharts(data.charts);
+            }
+            if (data && data.recent && data.team) {
+                this.updateTables(data.recent, data.team);
+            }
         } catch (error) {
             console.error('Error loading dashboard data (fallback):', error);
             this.state.error = error.message;
@@ -106,11 +114,20 @@ export class CommissionDashboard extends Component {
         try {
             const data = await this.rpc('/commission/dashboard/data', {});
             this.state.data = data;
-            this.updateKPIs(data.kpis);
-            this.updateCharts(data.charts);
-            this.updateTables(data.recent, data.team);
+
+            // Add null checks before accessing nested properties
+            if (data && data.kpis) {
+                this.updateKPIs(data.kpis);
+            }
+            if (data && data.charts) {
+                this.updateCharts(data.charts);
+            }
+            if (data && data.recent && data.team) {
+                this.updateTables(data.recent, data.team);
+            }
         } catch (error) {
             console.error('Error loading dashboard data:', error);
+            this.state.error = error.message;
         } finally {
             this.state.loading = false;
         }
@@ -163,8 +180,8 @@ export class CommissionDashboard extends Component {
                 datasets: [{
                     label: 'Commission Amount',
                     data: data.map(d => d.amount),
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderColor: '#017e84',
+                    backgroundColor: 'rgba(1, 126, 132, 0.1)',
                     tension: 0.4,
                     fill: true,
                 }]
@@ -205,10 +222,10 @@ export class CommissionDashboard extends Component {
         }
 
         const colors = {
-            pending: '#f39c12',
-            approved: '#3498db',
-            paid: '#27ae60',
-            cancelled: '#e74c3c'
+            pending: '#ffc107',
+            approved: '#17a2b8',
+            paid: '#28a745',
+            cancelled: '#dc3545'
         };
 
         window.statusChart = new Chart(ctx, {
@@ -256,7 +273,7 @@ export class CommissionDashboard extends Component {
                 datasets: [{
                     label: 'Commission Amount',
                     data: data.map(d => d.amount),
-                    backgroundColor: '#9b59b6',
+                    backgroundColor: '#017e84',
                 }]
             },
             options: {

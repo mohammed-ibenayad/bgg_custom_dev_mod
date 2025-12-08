@@ -1,8 +1,8 @@
-/* Commission Dashboard Styles */
+/* Commission Dashboard Styles - Clean Odoo Colors */
 
 .commission_dashboard {
     padding: 20px;
-    background-color: #f5f6fa;
+    background-color: #f9f9f9;
     min-height: 100vh;
 
     .o_dashboard_header {
@@ -15,24 +15,24 @@
 
         h1 {
             color: #2c3e50;
-            font-weight: 700;
+            font-weight: 600;
             margin: 0;
-            font-size: 32px;
+            font-size: 28px;
         }
 
         .dashboard_refresh {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #017e84;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 4px;
             color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(1, 126, 132, 0.2);
 
             &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                background: #01666b;
+                box-shadow: 0 4px 8px rgba(1, 126, 132, 0.3);
             }
 
             i {
@@ -44,19 +44,17 @@
     /* Dashboard Card Base Styles */
     .dashboard_card {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         margin-bottom: 24px;
-        transition: all 0.3s ease;
-        overflow: hidden;
+        transition: all 0.2s ease;
 
         &:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
     }
 
-    /* KPI Cards */
+    /* KPI Cards - Clean Odoo Colors */
     .dashboard_kpi_section {
         margin-bottom: 30px;
 
@@ -64,46 +62,37 @@
             display: flex;
             align-items: center;
             padding: 24px;
-            position: relative;
-            overflow: hidden;
-
-            &::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                right: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
-                pointer-events: none;
-            }
+            border-left: 4px solid;
 
             .card_icon {
                 flex-shrink: 0;
                 margin-right: 20px;
-                opacity: 0.2;
+                opacity: 0.15;
+                width: 60px;
+                text-align: center;
 
                 i {
-                    color: white;
+                    color: inherit;
                 }
             }
 
             .card_content {
                 flex: 1;
-                color: white;
 
                 .kpi_value {
-                    font-size: 32px;
-                    font-weight: 700;
+                    font-size: 28px;
+                    font-weight: 600;
                     margin: 0 0 5px 0;
-                    color: white;
+                    color: inherit;
                 }
 
                 .kpi_label {
-                    font-size: 14px;
+                    font-size: 13px;
                     margin: 0 0 12px 0;
-                    opacity: 0.9;
+                    opacity: 0.7;
                     font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
                 }
 
                 .kpi_stats {
@@ -113,7 +102,7 @@
 
                     .stat_item {
                         font-size: 12px;
-                        opacity: 0.85;
+                        opacity: 0.75;
 
                         i {
                             margin-right: 5px;
@@ -122,20 +111,45 @@
                 }
             }
 
-            &.card_blue {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            // Clean Odoo-inspired colors
+            &.card_primary {
+                border-left-color: #017e84;
+                color: #017e84;
+                background: linear-gradient(to right, rgba(1, 126, 132, 0.05), white);
+
+                .card_icon i {
+                    color: #017e84;
+                }
             }
 
-            &.card_green {
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            &.card_success {
+                border-left-color: #28a745;
+                color: #28a745;
+                background: linear-gradient(to right, rgba(40, 167, 69, 0.05), white);
+
+                .card_icon i {
+                    color: #28a745;
+                }
             }
 
-            &.card_orange {
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            &.card_info {
+                border-left-color: #17a2b8;
+                color: #17a2b8;
+                background: linear-gradient(to right, rgba(23, 162, 184, 0.05), white);
+
+                .card_icon i {
+                    color: #17a2b8;
+                }
             }
 
-            &.card_red {
-                background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            &.card_warning {
+                border-left-color: #ffc107;
+                color: #d39e00;
+                background: linear-gradient(to right, rgba(255, 193, 7, 0.05), white);
+
+                .card_icon i {
+                    color: #ffc107;
+                }
             }
         }
     }
@@ -146,20 +160,22 @@
 
         .chart_card {
             padding: 0;
+            border-top: 3px solid #017e84;
 
             .card_header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
+                background: #f8f9fa;
+                color: #2c3e50;
                 padding: 16px 24px;
-                border-bottom: none;
+                border-bottom: 1px solid #e1e8ed;
 
                 h4 {
                     margin: 0;
-                    font-size: 18px;
+                    font-size: 16px;
                     font-weight: 600;
 
                     i {
                         margin-right: 8px;
+                        color: #017e84;
                     }
                 }
             }
@@ -178,19 +194,21 @@
     .dashboard_tables_section {
         .table_card {
             padding: 0;
+            border-top: 3px solid #017e84;
 
             .card_header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
+                background: #f8f9fa;
+                color: #2c3e50;
                 padding: 16px 24px;
 
                 h4 {
                     margin: 0;
-                    font-size: 18px;
+                    font-size: 16px;
                     font-weight: 600;
 
                     i {
                         margin-right: 8px;
+                        color: #017e84;
                     }
                 }
             }
