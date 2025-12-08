@@ -19,7 +19,7 @@
                 <div class="row">
                     <!-- My Commissions Card -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="dashboard_card kpi_card card_blue">
+                        <div class="dashboard_card kpi_card card_primary">
                             <div class="card_icon">
                                 <i class="fa fa-money fa-3x"/>
                             </div>
@@ -42,7 +42,7 @@
 
                     <!-- This Month Card -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="dashboard_card kpi_card card_green">
+                        <div class="dashboard_card kpi_card card_success">
                             <div class="card_icon">
                                 <i class="fa fa-calendar fa-3x"/>
                             </div>
@@ -61,7 +61,7 @@
 
                     <!-- Team Performance Card -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="dashboard_card kpi_card card_orange">
+                        <div class="dashboard_card kpi_card card_info">
                             <div class="card_icon">
                                 <i class="fa fa-users fa-3x"/>
                             </div>
@@ -84,7 +84,7 @@
 
                     <!-- Pending Actions Card -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="dashboard_card kpi_card card_red">
+                        <div class="dashboard_card kpi_card card_warning">
                             <div class="card_icon">
                                 <i class="fa fa-bell fa-3x"/>
                             </div>
