@@ -1,8 +1,9 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { loadJS } from "@web/core/assets";
 
 export class CommissionDashboard extends Component {
     setup() {
@@ -13,11 +14,35 @@ export class CommissionDashboard extends Component {
         this.state = useState({
             data: null,
             loading: true,
+            chartLoaded: false,
         });
 
         onWillStart(async () => {
+            // Load Chart.js library
+            await this.loadChartJS();
             await this.loadDashboardData();
         });
+
+        onMounted(() => {
+            // Refresh button click handler
+            const refreshBtn = document.querySelector('.dashboard_refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => this.onRefreshClick());
+            }
+        });
+    }
+
+    async loadChartJS() {
+        try {
+            // Load Chart.js from CDN
+            if (typeof Chart === 'undefined') {
+                await loadJS("https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js");
+            }
+            this.state.chartLoaded = true;
+        } catch (error) {
+            console.error('Error loading Chart.js:', error);
+            this.state.chartLoaded = false;
+        }
     }
 
     async loadDashboardData() {
@@ -52,6 +77,11 @@ export class CommissionDashboard extends Component {
     }
 
     updateCharts(charts) {
+        if (!this.state.chartLoaded || typeof Chart === 'undefined') {
+            console.warn('Chart.js not loaded yet');
+            return;
+        }
+
         // Monthly Trend Chart
         this.createTrendChart(charts.monthly_trend);
 
@@ -64,7 +94,7 @@ export class CommissionDashboard extends Component {
 
     createTrendChart(data) {
         const ctx = document.getElementById('trend_chart');
-        if (!ctx) return;
+        if (!ctx || typeof Chart === 'undefined') return;
 
         if (window.trendChart) {
             window.trendChart.destroy();
@@ -112,7 +142,7 @@ export class CommissionDashboard extends Component {
 
     createStatusChart(data) {
         const ctx = document.getElementById('status_chart');
-        if (!ctx) return;
+        if (!ctx || typeof Chart === 'undefined') return;
 
         if (window.statusChart) {
             window.statusChart.destroy();
@@ -157,7 +187,7 @@ export class CommissionDashboard extends Component {
 
     createTeamChart(data) {
         const ctx = document.getElementById('team_chart');
-        if (!ctx || !data || data.length === 0) return;
+        if (!ctx || !data || data.length === 0 || typeof Chart === 'undefined') return;
 
         if (window.teamChart) {
             window.teamChart.destroy();
