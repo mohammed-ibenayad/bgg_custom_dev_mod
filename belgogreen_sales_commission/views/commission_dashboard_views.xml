@@ -207,12 +207,5 @@
             <field name="target">current</field>
         </record>
 
-        <!-- Menu Item -->
-        <menuitem id="menu_commission_dashboard"
-                  name="Dashboard"
-                  parent="menu_commissions_root"
-                  action="action_commission_dashboard"
-                  sequence="1"/>
-
     </data>
 </odoo>
