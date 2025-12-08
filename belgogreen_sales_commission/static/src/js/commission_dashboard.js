@@ -1,45 +1,91 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
+import { Component, onWillStart, onMounted, useState, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { loadJS } from "@web/core/assets";
 
 export class CommissionDashboard extends Component {
     static template = "commission.dashboard";
-    static props = {
-        action: { type: Object, optional: true },
-        className: { type: String, optional: true },
-    };
+    static props = ["*"];
 
     setup() {
-        this.rpc = useService("rpc");
-        this.orm = useService("orm");
-        this.action = useService("action");
+        // Use refs for DOM access
+        this.root = useRef("root");
+
+        // Try to access services safely
+        try {
+            this.rpc = useService("rpc");
+            this.orm = useService("orm");
+            this.actionService = useService("action");
+        } catch (e) {
+            console.error("Services not available:", e);
+            // Services might not be available yet, we'll use fallback
+            this.rpc = null;
+        }
 
         this.state = useState({
             data: null,
             loading: true,
             chartLoaded: false,
+            error: null,
         });
 
         onWillStart(async () => {
-            // Load Chart.js library
-            await this.loadChartJS();
-            await this.loadDashboardData();
+            try {
+                // Load Chart.js library
+                await this.loadChartJS();
+
+                // Try to load data
+                if (this.rpc) {
+                    await this.loadDashboardData();
+                } else {
+                    // If RPC not available, try alternative approach
+                    await this.loadDashboardDataFallback();
+                }
+            } catch (error) {
+                console.error("Error in onWillStart:", error);
+                this.state.error = error.message;
+            }
         });
 
         onMounted(() => {
             // Refresh button click handler
-            const refreshBtn = this.el.querySelector('.dashboard_refresh');
+            const refreshBtn = this.root.el?.querySelector('.dashboard_refresh');
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', () => this.onRefreshClick());
             }
         });
     }
 
-    get el() {
-        return this.__owl__.bdom?.el;
+    async loadDashboardDataFallback() {
+        // Fallback: use fetch API directly
+        try {
+            const response = await fetch('/commission/dashboard/data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    method: "call",
+                    params: {}
+                })
+            });
+
+            const result = await response.json();
+            const data = result.result;
+
+            this.state.data = data;
+            this.updateKPIs(data.kpis);
+            this.updateCharts(data.charts);
+            this.updateTables(data.recent, data.team);
+        } catch (error) {
+            console.error('Error loading dashboard data (fallback):', error);
+            this.state.error = error.message;
+        } finally {
+            this.state.loading = false;
+        }
     }
 
     async loadChartJS() {
@@ -303,27 +349,35 @@ export class CommissionDashboard extends Component {
     }
 
     async onRefreshClick() {
-        await this.loadDashboardData();
+        if (this.rpc) {
+            await this.loadDashboardData();
+        } else {
+            await this.loadDashboardDataFallback();
+        }
     }
 
     async openCommission(id) {
-        await this.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'sale.commission',
-            res_id: id,
-            views: [[false, 'form']],
-            target: 'current',
-        });
+        if (this.actionService) {
+            await this.actionService.doAction({
+                type: 'ir.actions.act_window',
+                res_model: 'sale.commission',
+                res_id: id,
+                views: [[false, 'form']],
+                target: 'current',
+            });
+        }
     }
 
     async openUser(id) {
-        await this.action.doAction({
-            type: 'ir.actions.act_window',
-            res_model: 'res.users',
-            res_id: id,
-            views: [[false, 'form']],
-            target: 'current',
-        });
+        if (this.actionService) {
+            await this.actionService.doAction({
+                type: 'ir.actions.act_window',
+                res_model: 'res.users',
+                res_id: id,
+                views: [[false, 'form']],
+                target: 'current',
+            });
+        }
     }
 }
 
