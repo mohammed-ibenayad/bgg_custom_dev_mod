@@ -6,6 +6,8 @@ import { useService } from "@web/core/utils/hooks";
 import { loadJS } from "@web/core/assets";
 
 export class CommissionDashboard extends Component {
+    static template = "commission.dashboard";
+
     setup() {
         this.rpc = useService("rpc");
         this.orm = useService("orm");
@@ -25,11 +27,15 @@ export class CommissionDashboard extends Component {
 
         onMounted(() => {
             // Refresh button click handler
-            const refreshBtn = document.querySelector('.dashboard_refresh');
+            const refreshBtn = this.el.querySelector('.dashboard_refresh');
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', () => this.onRefreshClick());
             }
         });
+    }
+
+    get el() {
+        return this.__owl__.bdom?.el;
     }
 
     async loadChartJS() {
@@ -316,7 +322,5 @@ export class CommissionDashboard extends Component {
         });
     }
 }
-
-CommissionDashboard.template = "commission.dashboard";
 
 registry.category("actions").add("commission_dashboard", CommissionDashboard);
