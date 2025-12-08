@@ -4,6 +4,27 @@
     padding: 20px;
     background-color: #f0f0f0;
     min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Custom scrollbar for better appearance */
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+
+        &:hover {
+            background: #555;
+        }
+    }
 
     .o_dashboard_header {
         display: flex;
