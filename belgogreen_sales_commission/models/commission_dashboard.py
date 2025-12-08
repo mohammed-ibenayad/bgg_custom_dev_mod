@@ -22,12 +22,12 @@ class CommissionDashboard(models.TransientModel):
 
         # Get user's commissions
         my_commissions = self.env['sale.commission'].search([
-            ('salesperson_id', '=', user.id)
+            ('user_id', '=', user.id)
         ])
 
         # Get team commissions (if user is a manager)
         team_commissions = self.env['sale.commission'].search([
-            ('salesperson_id.commission_manager_id', '=', user.id)
+            ('user_id.commission_manager_id', '=', user.id)
         ])
 
         # Calculate KPIs
@@ -57,18 +57,18 @@ class CommissionDashboard(models.TransientModel):
     def _compute_kpis(self, my_commissions, team_commissions, first_day_month):
         """Compute KPI metrics"""
         # My Commissions
-        my_total = sum(my_commissions.mapped('amount'))
-        my_pending = sum(my_commissions.filtered(lambda c: c.state == 'pending').mapped('amount'))
-        my_paid = sum(my_commissions.filtered(lambda c: c.state == 'paid').mapped('amount'))
+        my_total = sum(my_commissions.mapped('commission_amount'))
+        my_pending = sum(my_commissions.filtered(lambda c: c.payment_status == 'unpaid').mapped('commission_amount'))
+        my_paid = sum(my_commissions.filtered(lambda c: c.payment_status == 'paid').mapped('commission_amount'))
 
         # This Month
-        my_month_comms = my_commissions.filtered(lambda c: c.commission_date >= first_day_month)
-        my_month_total = sum(my_month_comms.mapped('amount'))
+        my_month_comms = my_commissions.filtered(lambda c: c.date >= first_day_month)
+        my_month_total = sum(my_month_comms.mapped('commission_amount'))
 
         # Team metrics
-        team_total = sum(team_commissions.mapped('amount'))
-        team_pending = sum(team_commissions.filtered(lambda c: c.state == 'pending').mapped('amount'))
-        team_members_count = len(set(team_commissions.mapped('salesperson_id')))
+        team_total = sum(team_commissions.mapped('commission_amount'))
+        team_pending = sum(team_commissions.filtered(lambda c: c.payment_status == 'unpaid').mapped('commission_amount'))
+        team_members_count = len(set(team_commissions.mapped('user_id')))
 
         # Pending actions (claims to approve)
         pending_claims = self.env['sale.commission.claim'].search_count([
@@ -100,14 +100,14 @@ class CommissionDashboard(models.TransientModel):
             next_month = current_date + relativedelta(months=1)
 
             month_commissions = self.env['sale.commission'].search([
-                ('salesperson_id', '=', user.id),
-                ('commission_date', '>=', current_date),
-                ('commission_date', '<', next_month)
+                ('user_id', '=', user.id),
+                ('date', '>=', current_date),
+                ('date', '<', next_month)
             ])
 
             monthly_data.append({
                 'month': current_date.strftime('%b %Y'),
-                'amount': sum(month_commissions.mapped('amount')),
+                'amount': sum(month_commissions.mapped('commission_amount')),
                 'count': len(month_commissions)
             })
 
@@ -121,27 +121,27 @@ class CommissionDashboard(models.TransientModel):
 
         for subordinate in subordinates[:10]:  # Top 10
             sub_commissions = self.env['sale.commission'].search([
-                ('salesperson_id', '=', subordinate.id),
-                ('commission_date', '>=', fields.Date.today().replace(day=1))
+                ('user_id', '=', subordinate.id),
+                ('date', '>=', fields.Date.today().replace(day=1))
             ])
             team_performance.append({
                 'name': subordinate.name,
-                'amount': sum(sub_commissions.mapped('amount')),
+                'amount': sum(sub_commissions.mapped('commission_amount')),
                 'count': len(sub_commissions)
             })
 
         team_performance = sorted(team_performance, key=lambda x: x['amount'], reverse=True)
 
-        # Commission by state
+        # Commission by payment status
         my_commissions = self.env['sale.commission'].search([
-            ('salesperson_id', '=', user.id)
+            ('user_id', '=', user.id)
         ])
 
         state_distribution = {
-            'pending': sum(my_commissions.filtered(lambda c: c.state == 'pending').mapped('amount')),
-            'approved': sum(my_commissions.filtered(lambda c: c.state == 'approved').mapped('amount')),
-            'paid': sum(my_commissions.filtered(lambda c: c.state == 'paid').mapped('amount')),
-            'cancelled': sum(my_commissions.filtered(lambda c: c.state == 'cancelled').mapped('amount')),
+            'pending': sum(my_commissions.filtered(lambda c: c.payment_status == 'unpaid').mapped('commission_amount')),
+            'approved': sum(my_commissions.filtered(lambda c: c.payment_status == 'claimed').mapped('commission_amount')),
+            'paid': sum(my_commissions.filtered(lambda c: c.payment_status == 'paid').mapped('commission_amount')),
+            'cancelled': sum(my_commissions.filtered(lambda c: c.payment_status == 'cancelled').mapped('commission_amount')),
         }
 
         return {
@@ -153,8 +153,8 @@ class CommissionDashboard(models.TransientModel):
     def _compute_recent_data(self, user):
         """Get recent commissions and claims"""
         recent_commissions = self.env['sale.commission'].search([
-            ('salesperson_id', '=', user.id)
-        ], limit=10, order='commission_date desc')
+            ('user_id', '=', user.id)
+        ], limit=10, order='date desc')
 
         recent_claims = self.env['sale.commission.claim'].search([
             ('user_id', '=', user.id)
@@ -163,14 +163,14 @@ class CommissionDashboard(models.TransientModel):
         return {
             'commissions': [{
                 'id': c.id,
-                'date': c.commission_date.strftime('%Y-%m-%d') if c.commission_date else '',
-                'amount': c.amount,
-                'state': c.state,
-                'order': c.order_id.name if c.order_id else '',
+                'date': c.date.strftime('%Y-%m-%d') if c.date else '',
+                'amount': c.commission_amount,
+                'state': c.payment_status,
+                'order': c.sale_order_id.name if c.sale_order_id else '',
             } for c in recent_commissions],
             'claims': [{
                 'id': c.id,
-                'date': c.create_date.strftime('%Y-%m-%d'),
+                'date': c.create_date.strftime('%Y-%m-%d') if c.create_date else '',
                 'amount': c.total_amount,
                 'state': c.state,
                 'count': c.commission_count,
