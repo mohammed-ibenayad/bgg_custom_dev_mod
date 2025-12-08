@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Load Chart.js -->
-        <template id="assets_backend" inherit_id="web.assets_backend">
-            <xpath expr="." position="inside">
-                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-            </xpath>
-        </template>
-
         <!-- Dashboard Template -->
         <template id="commission_dashboard_template" name="Commission Dashboard">
             <t t-name="commission.dashboard">
