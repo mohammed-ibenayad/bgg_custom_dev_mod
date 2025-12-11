@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, Constraint
 from odoo.exceptions import ValidationError
 
 
@@ -81,14 +81,9 @@ class SaleCommissionRole(models.Model):
         compute='_compute_commission_count'
     )
 
-    _sql_constraints = [
-        ('code_company_unique',
-         'unique(code, company_id)',
-         'Role code must be unique per company!'),
-        ('name_company_unique',
-         'unique(name, company_id)',
-         'Role name must be unique per company!')
-    ]
+    # Odoo 19: SQL constraints using new Constraint format
+    Constraint('code_company_unique', 'unique(code, company_id)', 'Role code must be unique per company!')
+    Constraint('name_company_unique', 'unique(name, company_id)', 'Role name must be unique per company!')
 
     @api.depends('user_count')
     def _compute_user_count(self):
