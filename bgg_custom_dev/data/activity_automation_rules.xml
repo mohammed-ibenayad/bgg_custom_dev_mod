@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Add Tag on Activity Completion -->
+        <record id="automation_add_tag_activity_completion" model="base.automation">
+            <field name="name">Add Tag on Activity Completion</field>
+            <field name="model_id" ref="mail.model_mail_activity"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Add Tag on Activity Completion - Automation Rule
+# Adds "Call2" tag to calendar event when Call2 activity is marked as done
+
+try:
+    if record.activity_type_id.name == 'Call2' and record.state == 'done':
+        _logger.info("Processing Call2 activity completion for activity ID %s", record.id)
+
+        # Get or create call2 tag
+        Call2_tag = env['calendar.event.type'].search([('name', '=', 'Call2')], limit=1)
+
+        if not Call2_tag:
+            Call2_tag = env['calendar.event.type'].create({'name': 'Call2'})
+            _logger.info("Created new Call2 tag (ID: %s)", Call2_tag.id)
+
+        # Add tag to the calendar event
+        calendar_event = record.calendar_event_id
+
+        if calendar_event:
+            # Check if tag is already added to avoid duplicate
+            if Call2_tag.id not in calendar_event.categ_ids.ids:
+                calendar_event.write({'categ_ids': [(4, Call2_tag.id)]})
+                _logger.info("Added Call2 tag to calendar event ID %s", calendar_event.id)
+            else:
+                _logger.info("Call2 tag already exists on calendar event ID %s", calendar_event.id)
+        else:
+            _logger.warning("No calendar event linked to Call2 activity ID %s", record.id)
+
+except Exception as e:
+    _logger.error("Add Call2 Tag on Activity Completion - Error processing activity ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Create activity for NoShow -->
+        <record id="automation_create_activity_noshow" model="base.automation">
+            <field name="name">Create activity for NoShow</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Create activity for NoShow - Automation Rule
+# Creates or updates a NoShow activity when appointment status is set to no_show
+
+try:
+    if record.appointment_status == 'no_show':
+        _logger.info("Processing NoShow status for calendar event ID %s", record.id)
+
+        noshow_activity_type = env['mail.activity.type'].search([('name', '=', 'NoShow')], limit=1)
+
+        if not noshow_activity_type:
+            _logger.warning("NoShow activity type not found in system for event ID %s", record.id)
+        else:
+            existing_activity = env['mail.activity'].search([
+                ('res_model', '=', 'calendar.event'),
+                ('res_id', '=', record.id),
+                ('activity_type_id', '=', noshow_activity_type.id)
+            ], limit=1)
+
+            # Get the event organizer, ensuring we don't assign to public user
+            user = env.user
+            assigned_user = False
+
+            if record.user_id:
+                assigned_user = record.user_id
+            elif not user._is_public():
+                assigned_user = user
+
+            if assigned_user:
+                activity_values = {
+                    'activity_type_id': noshow_activity_type.id,
+                    'user_id': assigned_user.id,
+                    'res_model_id': env['ir.model']._get('calendar.event').id,
+                    'res_id': record.id,
+                    'calendar_event_id': record.id,
+                    'date_deadline': datetime.datetime.now().date(),
+                    'summary': f'NoShow: {record.name or "Rendez-vous (Etude)"}',
+                }
+
+                if existing_activity:
+                    existing_activity.write(activity_values)
+                    _logger.info("Updated existing NoShow activity (ID %s) for event ID %s", existing_activity.id, record.id)
+                else:
+                    new_activity = env['mail.activity'].create(activity_values)
+                    _logger.info("Created new NoShow activity (ID %s) for event ID %s, assigned to user %s", new_activity.id, record.id, assigned_user.name)
+            else:
+                _logger.warning("No valid user to assign NoShow activity for event ID %s", record.id)
+
+except Exception as e:
+    _logger.error("Create Activity for NoShow - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Update Calendar Event Organizer -->
+        <record id="automation_update_calendar_event_organizer" model="base.automation">
+            <field name="name">Update Calendar Event Organizer</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Update Calendar Event Organizer - Automation Rule
+# Sets the organizer and partner to the currently connected user (if not public)
+
+try:
+    user = env.user  # Get the currently connected user
+
+    if not user._is_public():  # Only proceed if user is not public
+        # Only update if values are different to avoid unnecessary writes
+        update_vals = {}
+
+        if record.user_id != user:
+            update_vals['user_id'] = user.id
+
+        if record.partner_id != user.partner_id:
+            update_vals['partner_id'] = user.partner_id.id
+
+        if update_vals:
+            record.write(update_vals)
+            _logger.info("Updated calendar event organizer to user: %s (ID: %s) for event ID %s", user.name, user.id, record.id)
+    else:
+        _logger.info("Public user detected, skipping organizer update for event ID %s", record.id)
+
+except Exception as e:
+    _logger.error("Update Calendar Event Organizer - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Update Calendar Status When Rescheduled -->
+        <record id="automation_update_calendar_status_rescheduled" model="base.automation">
+            <field name="name">Update Calendar Status When Rescheduled</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Update Calendar Status When Rescheduled - Automation Rule
+# Deletes NoShow activities and posts a chatter note when an event is rescheduled
+
+try:
+    # Find linked no-show activities
+    noshow_activities = env['mail.activity'].search([
+        ('res_model', '=', 'calendar.event'),
+        ('res_id', '=', record.id),
+        ('activity_type_id.name', '=', 'NoShow'),
+        ('state', '!=', 'done')
+    ])
+
+    if noshow_activities:
+        _logger.info("Found %s NoShow activities for event ID %s - deleting them", len(noshow_activities), record.id)
+        noshow_activities.unlink()
+
+        # Get OdooBot partner
+        current_user = env.user.name
+        odoo_bot_partner = env.ref('base.partner_root')
+
+        # Add note to calendar event's chatter as OdooBot
+        record.sudo().message_post(
+            body=f"NoShow activitée terminée automatiquement suite à la replanification du rendez-vous par {current_user}",
+            message_type='comment',
+            author_id=odoo_bot_partner.id,
+            subtype_id=env.ref('mail.mt_note').id
+        )
+        _logger.info("Posted rescheduling note for event ID %s by user %s", record.id, current_user)
+
+except Exception as e:
+    _logger.error("Update Calendar Status when Rescheduled - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Set Clickable Customer Address -->
+        <record id="automation_set_clickable_customer_address" model="base.automation">
+            <field name="name">Set Clickable Customer Address</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Set Clickable Customer Address - Automation Rule
+# Builds a Google Maps clickable link from appointment answer address components
+
+try:
+    if record:
+        # We'll need to find all appointment answers for this calendar event
+        all_answers = env['appointment.answer.input'].search([
+            ('calendar_event_id', '=', record.id)
+        ])
+
+        # Extract address components from answers
+        street = ''
+        zip_code = ''
+        city = ''
+        country = ''
+
+        for answer in all_answers:
+            if answer.question_id.display_name == 'Adresse' and answer.value_text_box:
+                street = answer.value_text_box
+            elif answer.question_id.display_name == 'Code Postale' and answer.value_text_box:
+                zip_code = answer.value_text_box
+            elif answer.question_id.display_name == 'Ville' and answer.value_text_box:
+                city = answer.value_text_box
+            elif answer.question_id.display_name == 'Pays' and answer.value_answer_id:
+                # Get country name from the selection field
+                country = answer.value_answer_id.name
+
+        # Build full address string if we have enough components
+        if street or zip_code or city or country:
+            # Build formatted address
+            address_parts = []
+            if street:
+                address_parts.append(street)
+            if zip_code or city:
+                zip_city = ' '.join(filter(None, [zip_code, city]))
+                if zip_city:
+                    address_parts.append(zip_city)
+            if country:
+                address_parts.append(country)
+
+            full_address = ','.join(address_parts)
+
+            # Create a Google Maps URL
+            encoded_address = full_address.replace(' ', '+')
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
+
+            # Create clickable address with HTML
+            clickable_address = f'<a href="{maps_url}" target="_blank">{full_address}</a>'
+
+            # Only update if the address has changed
+            if record.x_studio_customer_address != clickable_address:
+                # Update the customer_address field on the calendar event
+                record.write({
+                    'x_studio_customer_address': clickable_address
+                })
+                _logger.info("Set clickable address for event ID %s: %s", record.id, full_address)
+
+except Exception as e:
+    _logger.error("Set Clickable Customer Address - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Update Clickable Address & Phone from Client Attendee -->
+        <record id="automation_update_clickable_from_attendee" model="base.automation">
+            <field name="name">Update Clickable Address & Phone from Client Attendee</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Update Clickable Address & Phone from Client Attendee - Automation Rule
+# Syncs address and phone from client (non-internal) attendee to calendar event custom fields
+
+try:
+    if record:
+        # Find client attendees: partners not linked to internal users
+        client_partner = None
+        for attendee in record.attendee_ids:
+            partner = attendee.partner_id
+            if not partner:
+                continue
+
+            # Check if partner is NOT an internal user
+            is_internal = any(
+                user.has_group('base.group_user') for user in partner.user_ids if user.active
+            )
+
+            if not is_internal:
+                client_partner = partner
+                break  # Use the first client found
+
+        # Initialize values
+        new_address_html = False
+        new_phone_html = False
+
+        if client_partner:
+            _logger.info("Processing client partner: %s (ID: %s) for event ID %s", client_partner.name, client_partner.id, record.id)
+
+            # --- Build clickable address ---
+            addr_parts = []
+            if client_partner.street:
+                addr_parts.append(client_partner.street)
+            if client_partner.street2:
+                addr_parts.append(client_partner.street2)
+
+            city_zip = ' '.join(filter(None, [client_partner.zip, client_partner.city]))
+            if city_zip:
+                addr_parts.append(city_zip)
+
+            if client_partner.country_id:
+                addr_parts.append(client_partner.country_id.name)
+
+            if addr_parts:
+                full_addr = ','.join(addr_parts)
+                encoded_addr = full_addr.replace(' ', '+').replace(',', '%2C')
+                maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_addr}"
+                new_address_html = f'<a href="{maps_url}" target="_blank">{full_addr}</a>'
+
+            # --- Build clickable phone ---
+            phone = client_partner.phone
+            if phone:
+                clean_phone = ''.join(c for c in phone if c.isdigit() or c == '+')
+                if clean_phone:
+                    new_phone_html = f'<a href="tel:{clean_phone}">{phone}</a>'
+
+            # Prepare updates
+            update_vals = {}
+            if new_address_html != record.x_studio_customer_address:
+                update_vals['x_studio_customer_address'] = new_address_html
+                _logger.info("Updating customer address from attendee for event ID %s: %s", record.id, full_addr if addr_parts else 'cleared')
+
+            if new_phone_html != record.x_studio_customer_phone:
+                update_vals['x_studio_customer_phone'] = new_phone_html
+                _logger.info("Updating customer phone from attendee for event ID %s: %s", record.id, phone if phone else 'cleared')
+
+            # Apply updates in one write (only if needed)
+            if update_vals:
+                record.write(update_vals)
+
+except Exception as e:
+    _logger.error("Update Clickable Address & Phone from Attendee - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Replace Call Center Emails -->
+        <record id="automation_replace_call_center_emails" model="base.automation">
+            <field name="name">Replace Call Center Emails</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Replace Call Center Emails - Automation Rule
+# Replaces customer attendee emails that match internal user emails with standard call center email
+# Prevents internal user emails from being exposed to customers
+
+try:
+    if record.attendee_ids:
+        standard_call_center_email = 'rdvcallbgg@gmail.com'
+
+        # Get all internal users (employees with portal/internal access)
+        internal_users = env['res.users'].search([
+            ('share', '=', False),  # Internal users (not portal users)
+            ('active', '=', True)
+        ])
+
+        # Get all their emails (normalized to lowercase)
+        internal_user_emails = set()
+        for user in internal_users:
+            if user.email:
+                internal_user_emails.add(user.email.strip().lower())
+            # Also check the partner email if different
+            if user.partner_id and user.partner_id.email:
+                internal_user_emails.add(user.partner_id.email.strip().lower())
+
+        _logger.info("Checking %s attendees against %s internal emails for event ID %s", len(record.attendee_ids), len(internal_user_emails), record.id)
+
+        # Process each attendee
+        for attendee in record.attendee_ids:
+            partner = attendee.partner_id
+
+            if not partner or not partner.email:
+                continue
+
+            # Skip if this partner is an internal user themselves (the organizer)
+            is_internal_user = any(
+                user.has_group('base.group_user') for user in partner.user_ids if user.active
+            )
+            if is_internal_user:
+                continue
+
+            # This is a CUSTOMER attendee - check their email
+            customer_email = partner.email.strip().lower()
+
+            # Skip if already the standard call center email
+            if customer_email == standard_call_center_email.lower():
+                continue
+
+            # Check if customer email matches any internal user email
+            if customer_email in internal_user_emails:
+                # This is an internal user email, replace it
+                original_email = partner.email
+                _logger.warning("Internal user email detected in CUSTOMER: %s (ID: %s) - Email: %s - Replacing with %s", partner.name, partner.id, original_email, standard_call_center_email)
+
+                partner.with_context(
+                    mail_create_nosubscribe=True,
+                    tracking_disable=True
+                ).write({'email': standard_call_center_email})
+
+                _logger.info("Replaced internal email '%s' with '%s' for CUSTOMER: %s", original_email, standard_call_center_email, partner.name)
+
+except Exception as e:
+    _logger.error("Replace Call Center Emails - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+        <!-- Assign Existing Customer To Calendar Event and Opportunity -->
+        <record id="automation_assign_existing_customer" model="base.automation">
+            <field name="name">Assign Existing Customer To Calendar Event and Opportunity</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Assign Existing Customer To Calendar Event and Opportunity - Automation Rule
+# Finds existing customers by phone (last 8 digits), assigns them to event and opportunity
+# Cleans up duplicate customer records when safe to do so
+
+try:
+    if record:
+        phone = None
+
+        # Try to get phone from custom field
+        try:
+            if record.x_studio_customer_phone:
+                phone_text = record.x_studio_customer_phone
+                if 'tel:' in phone_text:
+                    start = phone_text.find('tel:') + 4
+                    end = phone_text.find('"', start)
+                    if end == -1:
+                        end = phone_text.find('>', start)
+                    if end > start:
+                        phone = phone_text[start:end]
+                    else:
+                        phone = phone_text[start:].strip()
+                else:
+                    phone = phone_text
+        except:
+            pass
+
+        # Fallback to partner phone
+        if not phone and record.partner_id:
+            if record.partner_id.phone:
+                phone = record.partner_id.phone
+
+        if phone:
+            # Clean phone - keep only digits
+            clean_phone = ''.join(c for c in phone if c.isdigit())
+
+            if len(clean_phone) >= 8:
+                last_8_digits = clean_phone[-8:]
+                _logger.info("Searching for existing customer with last 8 digits: %s for event ID %s", last_8_digits, record.id)
+
+                # Search for existing customers
+                existing_customers = env['res.partner'].search([
+                    ('phone', 'ilike', last_8_digits)
+                ])
+
+                # Filter out internal users
+                real_customers = existing_customers.filtered(
+                    lambda p: not any(user.has_group('base.group_user') for user in p.user_ids if user.active)
+                )
+
+                if real_customers:
+                    # Sort by creation date - oldest first (most likely the real customer)
+                    real_customers = real_customers.sorted(key=lambda p: p.create_date)
+                    customer = real_customers[0]
+
+                    _logger.info("Found existing customer: %s (ID: %s) for event ID %s", customer.name, customer.id, record.id)
+
+                    # Find potential duplicates to clean up
+                    potential_duplicates = real_customers.filtered(lambda p: p.id != customer.id)
+
+                    # Also check current attendees for duplicates
+                    attendee_partners = [att.partner_id for att in record.attendee_ids if att.partner_id]
+
+                    for attendee_partner in attendee_partners:
+                        # If this attendee is not the main customer and has similar phone
+                        if attendee_partner.id != customer.id:
+                            # Check if it's a duplicate (same last 8 digits)
+                            if attendee_partner.phone:
+                                attendee_phone = attendee_partner.phone
+                                attendee_clean = ''.join(c for c in attendee_phone if c.isdigit())
+                                if len(attendee_clean) >= 8 and attendee_clean[-8:] == last_8_digits:
+                                    if attendee_partner not in potential_duplicates:
+                                        potential_duplicates |= attendee_partner
+
+                    # Check if customer is already an attendee
+                    customer_already_attendee = any(
+                        attendee.partner_id.id == customer.id
+                        for attendee in record.attendee_ids
+                    )
+
+                    # Add customer as attendee if not already
+                    if not customer_already_attendee:
+                        record.write({'partner_ids': [(4, customer.id)]})
+                        _logger.info("Added %s as attendee to event ID %s", customer.name, record.id)
+
+                    # Update opportunity if exists
+                    try:
+                        if record.opportunity_id:
+                            if record.opportunity_id.partner_id.id != customer.id:
+                                record.opportunity_id.write({'partner_id': customer.id})
+                                _logger.info("Updated opportunity partner to: %s for event ID %s", customer.name, record.id)
+                    except:
+                        pass
+
+                    # Search for related opportunities
+                    opportunities = env['crm.lead'].search([('calendar_event_ids', 'in', record.id)])
+                    for opp in opportunities:
+                        if opp.partner_id.id != customer.id:
+                            opp.write({'partner_id': customer.id})
+                            _logger.info("Updated opportunity '%s' to customer: %s", opp.name, customer.name)
+
+                    # Clean up duplicates
+                    for duplicate in potential_duplicates:
+                        _logger.info("Found potential duplicate: %s (ID: %s) for event ID %s", duplicate.name, duplicate.id, record.id)
+
+                        # Remove from attendees if present
+                        duplicate_attendee = record.attendee_ids.filtered(lambda a: a.partner_id.id == duplicate.id)
+                        if duplicate_attendee:
+                            record.write({'partner_ids': [(3, duplicate.id)]})
+                            _logger.info("Removed duplicate %s from attendees", duplicate.name)
+
+                        # Check if safe to delete
+                        other_events = env['calendar.event'].search([
+                            ('partner_id', '=', duplicate.id),
+                            ('id', '!=', record.id)
+                        ])
+
+                        # Check attendees in other events
+                        other_event_attendees = env['calendar.attendee'].search([
+                            ('partner_id', '=', duplicate.id),
+                            ('event_id', '!=', record.id)
+                        ])
+
+                        other_opps = env['crm.lead'].search([('partner_id', '=', duplicate.id)])
+
+                        # Only delete if not used elsewhere
+                        if not other_events and not other_event_attendees and not other_opps:
+                            try:
+                                duplicate_name = duplicate.name
+                                duplicate_id = duplicate.id
+                                duplicate.unlink()
+                                _logger.info("Deleted duplicate partner: %s (ID: %s)", duplicate_name, duplicate_id)
+                            except Exception as delete_error:
+                                _logger.warning("Could not delete duplicate %s (ID: %s): %s", duplicate.name, duplicate.id, str(delete_error))
+                        else:
+                            _logger.info("Duplicate %s is used elsewhere, keeping it", duplicate.name)
+
+                    _logger.info("Successfully assigned existing customer: %s to event ID %s", customer.name, record.id)
+                else:
+                    _logger.info("No existing customer found for phone digits: %s", last_8_digits)
+            else:
+                _logger.warning("Phone number too short (< 8 digits): %s for event ID %s", clean_phone, record.id)
+        else:
+            _logger.info("No phone number found for event ID %s", record.id)
+
+except Exception as e:
+    _logger.error("Assign Existing Customer - Error processing event ID %s: %s", record.id, str(e), exc_info=True)
+]]></field>
+        </record>
+
+    </data>
+</odoo>
