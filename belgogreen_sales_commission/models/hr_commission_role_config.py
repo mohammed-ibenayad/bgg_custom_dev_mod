@@ -56,12 +56,18 @@ class HrCommissionRoleConfig(models.Model):
         default=True
     )
 
-    # SQL constraints (Odoo 19 shows deprecation warning but still works)
-    _sql_constraints = [
-        ('unique_plan_role',
-         'unique(plan_id, role_id)',
-         'Only one percentage configuration per role per plan is allowed!')
-    ]
+    @api.constrains('plan_id', 'role_id')
+    def _check_unique_plan_role(self):
+        """Ensure only one configuration per role per plan"""
+        for record in self:
+            if record.plan_id and record.role_id:
+                duplicate = self.search([
+                    ('plan_id', '=', record.plan_id.id),
+                    ('role_id', '=', record.role_id.id),
+                    ('id', '!=', record.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Only one percentage configuration per role per plan is allowed!'))
 
     @api.constrains('direct_sale_percentage', 'override_percentage')
     def _check_percentages(self):
