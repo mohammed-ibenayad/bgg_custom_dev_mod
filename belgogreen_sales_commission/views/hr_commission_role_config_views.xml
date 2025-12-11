@@ -69,7 +69,7 @@
                     <field name="role_id"/>
                     <filter string="Active" name="active" domain="[('active', '=', True)]"/>
                     <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
-                    <group expand="0" string="Group By">
+                    <group string="Group By">
                         <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
                         <filter string="Role" name="group_role" context="{'group_by': 'role_id'}"/>
                     </group>

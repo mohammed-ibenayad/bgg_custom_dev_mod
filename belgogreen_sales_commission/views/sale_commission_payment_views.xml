@@ -124,7 +124,7 @@
                     <filter string="This Month" name="this_month"
                             domain="[('payment_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
                                      ('payment_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
-                    <group expand="0" string="Group By">
+                    <group string="Group By">
                         <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
                         <filter string="Payment Method" name="group_method" context="{'group_by': 'payment_method'}"/>
                         <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
