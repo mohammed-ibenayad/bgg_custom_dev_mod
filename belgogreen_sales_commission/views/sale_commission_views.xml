@@ -135,7 +135,7 @@
                     <filter string="Last Month" name="last_month"
                             domain="[('date', '&gt;=', (context_today() - relativedelta(months=1, day=1)).strftime('%Y-%m-%d')),
                                      ('date', '&lt;=', (context_today() - relativedelta(months=1, day=31)).strftime('%Y-%m-%d'))]"/>
-                    <group expand="0" string="Group By">
+                    <group>
                         <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
                         <filter string="Role" name="group_role" context="{'group_by': 'role_id'}"/>
                         <filter string="Commission Type" name="group_commission_type" context="{'group_by': 'commission_type'}"/>

@@ -81,14 +81,31 @@ class SaleCommissionRole(models.Model):
         compute='_compute_commission_count'
     )
 
-    _sql_constraints = [
-        ('code_company_unique',
-         'unique(code, company_id)',
-         'Role code must be unique per company!'),
-        ('name_company_unique',
-         'unique(name, company_id)',
-         'Role name must be unique per company!')
-    ]
+    @api.constrains('code', 'company_id')
+    def _check_code_unique(self):
+        """Ensure code is unique per company"""
+        for role in self:
+            if role.code:
+                duplicate = self.search([
+                    ('code', '=', role.code),
+                    ('company_id', '=', role.company_id.id),
+                    ('id', '!=', role.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Role code must be unique per company!'))
+
+    @api.constrains('name', 'company_id')
+    def _check_name_unique(self):
+        """Ensure name is unique per company"""
+        for role in self:
+            if role.name:
+                duplicate = self.search([
+                    ('name', '=', role.name),
+                    ('company_id', '=', role.company_id.id),
+                    ('id', '!=', role.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Role name must be unique per company!'))
 
     @api.depends('user_count')
     def _compute_user_count(self):

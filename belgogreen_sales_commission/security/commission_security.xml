@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <!-- Security Groups -->
+        <!-- Security Groups (Odoo 19: category_id removed) -->
         <record id="group_commission_user" model="res.groups">
             <field name="name">Commission User</field>
-            <field name="category_id" ref="base.module_category_sales_sales"/>
             <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
             <field name="comment">Users can view their own commissions and create claims</field>
         </record>
 
         <record id="group_commission_manager" model="res.groups">
             <field name="name">Commission Manager</field>
-            <field name="category_id" ref="base.module_category_sales_sales"/>
             <field name="implied_ids" eval="[(4, ref('group_commission_user')), (4, ref('sales_team.group_sale_manager'))]"/>
             <field name="comment">Users can manage all commissions, payments, and claims</field>
         </record>

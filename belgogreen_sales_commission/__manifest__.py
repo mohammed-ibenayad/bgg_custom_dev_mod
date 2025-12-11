@@ -33,7 +33,7 @@ Main Features:
     'website': "https://www.belgogreen.com",
 
     'category': 'Sales/Sales',
-    'version': '18.0.2.0',
+    'version': '19.0.0.0',
     'license': 'LGPL-3',
 
     # Dependencies - require Odoo sale_commission module
@@ -77,10 +77,6 @@ Main Features:
             'belgogreen_sales_commission/static/src/scss/commission_dashboard.scss',
         ],
     },
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
     'installable': True,
     'application': True,
     'auto_install': False,
