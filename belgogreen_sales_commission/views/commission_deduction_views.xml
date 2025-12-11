@@ -130,7 +130,7 @@
                             domain="[('date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
                                      ('date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
                     <separator/>
-                    <group expand="0" string="Group By">
+                    <group string="Group By">
                         <filter string="Salesperson" name="group_user" context="{'group_by': 'user_id'}"/>
                         <filter string="Type" name="group_type" context="{'group_by': 'deduction_type'}"/>
                         <filter string="Category" name="group_category" context="{'group_by': 'deduction_category'}"/>
