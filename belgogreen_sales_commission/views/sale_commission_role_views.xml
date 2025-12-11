@@ -138,7 +138,7 @@
                 <filter name="management_roles" string="Management Roles" domain="[('can_manage_subordinates', '=', True)]"/>
                 <filter name="top_level" string="Top Level" domain="[('requires_manager', '=', False)]"/>
 
-                <group string="Group By">
+                <group>
                     <filter name="group_by_company" string="Company" context="{'group_by': 'company_id'}"/>
                     <filter name="group_by_hierarchy" string="Hierarchy Level" context="{'group_by': 'sequence'}"/>
                 </group>

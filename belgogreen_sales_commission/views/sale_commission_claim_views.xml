@@ -174,7 +174,7 @@
                     <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]"/>
                     <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                     <filter string="Rejected" name="rejected" domain="[('state', '=', 'rejected')]"/>
-                    <group string="Group By">
+                    <group>
                         <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
                         <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
                         <filter string="Processed By" name="group_processed" context="{'group_by': 'processed_by'}"/>
