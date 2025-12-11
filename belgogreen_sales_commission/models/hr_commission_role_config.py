@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, Constraint
 from odoo.exceptions import ValidationError
 
 
@@ -56,11 +56,8 @@ class HrCommissionRoleConfig(models.Model):
         default=True
     )
 
-    _sql_constraints = [
-        ('unique_plan_role',
-         'unique(plan_id, role_id)',
-         'Only one percentage configuration per role per plan is allowed!')
-    ]
+    # Odoo 19: SQL constraints using new Constraint format
+    Constraint('unique_plan_role', 'unique(plan_id, role_id)', 'Only one percentage configuration per role per plan is allowed!')
 
     @api.constrains('direct_sale_percentage', 'override_percentage')
     def _check_percentages(self):
