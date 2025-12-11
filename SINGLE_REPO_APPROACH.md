@@ -1,13 +1,27 @@
 # Single Repository, Multiple Modules Approach
 
+⚠️ **ADVANCED USE CASE** - For most users, **separate folders** (see `MODULE_SETUP_GUIDE.md`) is simpler and recommended.
+
 This guide is for keeping **all your modules in one local git repository**, deploying to different upstream branches.
 
-## ✅ When to Use This Approach
+## ⚠️ When to Use This Approach (Advanced)
 
-- You want all modules together locally
-- You're pushing to different upstream branches
-- You don't need separate GitHub forks (origin repos) for each module
-- Simpler local development
+Use single repo approach ONLY if:
+- You don't care about separate GitHub forks (origin repos) for each module
+- You're comfortable with complex git remote management
+- You want to share code/files between modules
+- You understand git well enough to handle conflicts
+
+## ✅ Recommended for Most Users: Separate Folders
+
+**See `MODULE_SETUP_GUIDE.md` for the simpler, recommended approach.**
+
+Benefits of separate folders:
+- ✅ Each module = one folder = one git repo (simple!)
+- ✅ No confusion about which module you're working on
+- ✅ Deploy script works automatically
+- ✅ Independent git histories
+- ✅ Standard development practice
 
 ## Current Structure
 

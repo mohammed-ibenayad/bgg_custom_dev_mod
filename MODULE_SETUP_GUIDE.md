@@ -5,15 +5,51 @@
 This guide explains how to set up multiple Belgogreen modules where:
 - **Upstream** (bsimprovement/belgogreen): Main repo with all modules on separate branches
 - **Origin** (your forks): Separate GitHub repos for each module
-- **Local**: Separate local folders for each module
+- **Local**: **Separate local folders for each module** ← Recommended approach
 
-## Current Module Structure
+## Why Separate Folders? (Recommended)
 
-### Sales Commission Module (Example)
+✅ **Clean separation:** Each module has its own git repository and history
+✅ **Simple git workflow:** One origin per module, no confusion about remotes
+✅ **Independent development:** Changes to one module don't affect others
+✅ **Deploy script works automatically:** Auto-detects module from origin URL
+✅ **Standard practice:** Matches typical open-source development workflows
+✅ **Easy to understand:** Each folder = one module = one git repo
+
+## Recommended Folder Structure
+
 ```
-Local folder: ~/mytools/belgogreen/
-Origin: https://github.com/mohammed-ibenayad/belgogreen_sales_commission_mod.git
+/c/Users/mayad/mytools/
+├── belgogreen/                          ← Sales commission module
+│   ├── belgogreen_sales_commission/     ← Odoo module
+│   ├── deploy_module.sh
+│   ├── setup_new_module.sh
+│   └── .git/                            ← Git repo 1
+│
+├── belgogreen_bgg_custom_dev/          ← Custom dev module
+│   ├── bgg_custom_dev/                  ← Odoo module
+│   ├── deploy_module.sh
+│   ├── setup_new_module.sh
+│   └── .git/                            ← Git repo 2
+│
+└── belgogreen_future_module/           ← Future module
+    ├── future_module/                   ← Odoo module
+    ├── deploy_module.sh
+    └── .git/                            ← Git repo 3
+```
+
+### Example: Sales Commission Module
+```
+Local folder:    /c/Users/mayad/mytools/belgogreen/
+Origin:          https://github.com/mohammed-ibenayad/belgogreen_sales_commission_mod.git
 Upstream branch: belgogreen_sales_commission
+```
+
+### Example: Custom Dev Module
+```
+Local folder:    /c/Users/mayad/mytools/belgogreen_bgg_custom_dev/
+Origin:          https://github.com/mohammed-ibenayad/belgogreen_bgg_custom_dev_mod.git
+Upstream branch: bgg_custom_dev
 ```
 
 ## Setting Up a New Module
@@ -25,18 +61,29 @@ Upstream branch: belgogreen_sales_commission
    - Example: `belgogreen_inventory_management_mod`
    - Example: `belgogreen_hr_payroll_mod`
 
-### Step 2: Create Local Folder
+### Step 2: Create Separate Local Folder
+
+**Important:** Create a NEW separate folder for each module!
 
 ```bash
 # Navigate to your projects directory
-cd ~/mytools/
+cd /c/Users/mayad/mytools/
 
-# Create new folder (without _mod suffix for cleaner local path)
+# Create new SEPARATE folder for this module
+# Pattern: belgogreen_[module_name]
 mkdir belgogreen_inventory_management
 cd belgogreen_inventory_management
 
-# Initialize git
+# Initialize git (this is a NEW independent git repository)
 git init
+```
+
+**Result:** Each module has its own folder and git repository:
+```
+/c/Users/mayad/mytools/
+├── belgogreen/                          ← Module 1 (separate git)
+├── belgogreen_bgg_custom_dev/          ← Module 2 (separate git)
+└── belgogreen_inventory_management/    ← Module 3 (separate git)
 ```
 
 ### Step 3: Set Up Remotes
@@ -74,48 +121,71 @@ git checkout -b main upstream/belgogreen_inventory_management
 git push -u origin main
 ```
 
-### Step 5: Copy Deploy Script
+### Step 5: Copy Scripts from Existing Module
 
 ```bash
-# Copy the deploy script from sales commission module
-cp ~/mytools/belgogreen/deploy_module.sh .
+# Make sure you're in the new module folder
+cd /c/Users/mayad/mytools/belgogreen_inventory_management
 
-# Make it executable
-chmod +x deploy_module.sh
+# Copy scripts from any existing module (e.g., sales commission)
+cp ../belgogreen/deploy_module.sh .
+cp ../belgogreen/setup_new_module.sh .
+
+# Make them executable
+chmod +x deploy_module.sh setup_new_module.sh
+
+# Run the setup script to create module structure
+./setup_new_module.sh
 ```
 
-The script will automatically detect your module name from the origin URL!
+The deploy script will automatically detect your module name from the origin URL!
+
+**Note:** You only need to copy these scripts once per new module. After that, they stay in that module's folder.
 
 ## Workflow for Development
+
+**Important:** Each module folder is independent - navigate to the correct folder first!
 
 ### 1. Work on Claude Branch
 
 When Claude creates a branch (e.g., `claude/feature-xyz`):
 
 ```bash
-# Claude pushes to: origin/claude/feature-xyz
+# Navigate to the specific module folder
+cd /c/Users/mayad/mytools/belgogreen_inventory_management
+
+# Fetch and checkout Claude's branch
 git fetch origin
 git checkout claude/feature-xyz
+
+# Review changes, test, etc.
 ```
 
-### 2. Deploy Using Script
+### 2. Deploy Using Script (Recommended)
 
 ```bash
+# Make sure you're in the correct module folder
+cd /c/Users/mayad/mytools/belgogreen_inventory_management
+
+# Run the deploy script
 ./deploy_module.sh
 ```
 
 The script will:
-1. ✅ Auto-detect module name from origin remote
+1. ✅ Auto-detect module name from origin URL (no manual selection needed!)
 2. ✅ Ask for the Claude branch name
 3. ✅ Merge it into main
 4. ✅ Push to origin/main
-5. ✅ Optionally push to upstream/[MODULE_BRANCH]
+5. ✅ Push to upstream/[MODULE_BRANCH]
 
 ### 3. Manual Push (Alternative)
 
 If you prefer manual control:
 
 ```bash
+# Navigate to module folder
+cd /c/Users/mayad/mytools/belgogreen_inventory_management
+
 # Merge Claude branch
 git checkout main
 git merge claude/feature-xyz
@@ -125,6 +195,24 @@ git push origin main
 
 # Push to upstream module branch
 git push upstream main:belgogreen_inventory_management
+```
+
+### 4. Working on Multiple Modules
+
+Each module is independent:
+
+```bash
+# Work on sales commission
+cd /c/Users/mayad/mytools/belgogreen
+git checkout main
+# make changes, commit, push
+
+# Work on custom dev
+cd /c/Users/mayad/mytools/belgogreen_bgg_custom_dev
+git checkout main
+# make changes, commit, push
+
+# No conflicts, no confusion!
 ```
 
 ## Module Naming Convention

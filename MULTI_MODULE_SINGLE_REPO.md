@@ -1,6 +1,22 @@
 # Multi-Module Single Repository Setup
 
+⚠️ **ADVANCED USE CASE** - For most users, **separate folders** (see `MODULE_SETUP_GUIDE.md`) is simpler and recommended.
+
 This guide shows how to manage multiple Belgogreen modules in a **single local repository**, similar to Odoo.sh workflow.
+
+## ⚠️ Important: Separate Folders is Recommended
+
+**Before using this approach, consider using separate folders instead.**
+
+See `MODULE_SETUP_GUIDE.md` for the recommended approach where:
+- Each module = one folder = one git repo
+- Simple, clean, no confusion
+- Deploy script works automatically
+
+**Use single repo approach ONLY if:**
+- You're comfortable with complex git workflows
+- You need to share files between modules
+- You understand git remote management well
 
 ## Repository Structure
 

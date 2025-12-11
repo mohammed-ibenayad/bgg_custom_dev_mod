@@ -2,11 +2,21 @@
 
 Complete setup in 10 minutes! 🚀
 
+**Approach:** Separate folder for each module (Recommended)
+
 ## Prerequisites
 
 - Git Bash installed on Windows
 - GitHub account with access to mohammed-ibenayad organization
 - Access to bsimprovement/belgogreen upstream repository
+
+## Why Separate Folders?
+
+✅ **Clean isolation:** Each module has its own git repository
+✅ **Simple git workflow:** One origin per module, no confusion
+✅ **Independent history:** Changes to one module don't affect others
+✅ **Deploy script works automatically:** No module selection needed
+✅ **Standard practice:** Matches typical development workflows
 
 ## 5-Step Setup Process
 
@@ -21,15 +31,34 @@ Complete setup in 10 minutes! 🚀
 
 ### Step 2: Set Up Local Directory (1 min)
 
-Open Git Bash and run these commands:
+Open Git Bash and create a **separate folder** for this module:
 
 ```bash
+# Navigate to your projects directory
 cd /c/Users/mayad/mytools/
+
+# Create NEW separate folder for bgg_custom_dev module
 mkdir belgogreen_bgg_custom_dev
 cd belgogreen_bgg_custom_dev
+
+# Initialize git
 git init
+
+# Add your fork as origin
 git remote add origin https://github.com/mohammed-ibenayad/belgogreen_bgg_custom_dev_mod.git
+
+# Add main repo as upstream
 git remote add upstream https://github.com/bsimprovement/belgogreen.git
+
+# Verify remotes
+git remote -v
+```
+
+**Result:** You now have two separate folders:
+```
+/c/Users/mayad/mytools/
+├── belgogreen/                    ← Sales commission module
+└── belgogreen_bgg_custom_dev/    ← Custom dev module (NEW)
 ```
 
 ### Step 3: Fetch from Upstream (1 min)
@@ -50,12 +79,18 @@ git checkout -b main
 
 ### Step 4: Create Module Structure (2 min)
 
-```bash
-# Copy the setup script from sales commission module
-cp ../belgogreen/setup_new_module.sh .
-chmod +x setup_new_module.sh
+Copy scripts from the sales commission folder and create the module:
 
-# Run the script to create module structure
+```bash
+# Make sure you're in the new module folder
+cd /c/Users/mayad/mytools/belgogreen_bgg_custom_dev
+
+# Copy scripts from sales commission module
+cp ../belgogreen/setup_new_module.sh .
+cp ../belgogreen/deploy_module.sh .
+chmod +x setup_new_module.sh deploy_module.sh
+
+# Run the setup script to create module structure
 ./setup_new_module.sh
 ```
 
@@ -63,14 +98,11 @@ chmod +x setup_new_module.sh
 - `bgg_custom_dev/` - Complete Odoo 19 module structure
 - `README.md` - Module documentation
 - `.gitignore` - Git ignore rules
+- `deploy_module.sh` - Deployment automation (copied)
 
 ### Step 5: Commit and Push (2 min)
 
 ```bash
-# Copy deploy script
-cp ../belgogreen/deploy_module.sh .
-chmod +x deploy_module.sh
-
 # Stage all files
 git add .
 
@@ -88,6 +120,8 @@ git push -u origin main
 # Optional: Push to upstream (if you have permissions)
 git push upstream main:bgg_custom_dev
 ```
+
+**Important:** Each module is now in its own folder with its own git repository!
 
 ## Verify Setup
 
@@ -109,22 +143,32 @@ python -m py_compile bgg_custom_dev/__manifest__.py
 
 ## What You Have Now
 
+**Folder Structure:**
 ```
-belgogreen_bgg_custom_dev/
-├── bgg_custom_dev/              ← Your Odoo module
-│   ├── __init__.py
-│   ├── __manifest__.py          ← Version: 19.0.0.0
-│   ├── models/
-│   ├── views/
-│   ├── security/
-│   ├── data/
-│   └── static/
-├── deploy_module.sh             ← Auto-deploy script
-├── README.md
-└── .gitignore
+/c/Users/mayad/mytools/
+├── belgogreen/                          ← Sales commission module
+│   ├── belgogreen_sales_commission/
+│   ├── deploy_module.sh
+│   └── [git → belgogreen_sales_commission_mod]
+│
+└── belgogreen_bgg_custom_dev/          ← Custom dev module (NEW)
+    ├── bgg_custom_dev/                  ← Your Odoo module
+    │   ├── __init__.py
+    │   ├── __manifest__.py              ← Version: 19.0.0.0
+    │   ├── models/
+    │   ├── views/
+    │   ├── security/
+    │   ├── data/
+    │   └── static/
+    ├── deploy_module.sh                 ← Auto-deploy script
+    ├── setup_new_module.sh
+    ├── README.md
+    └── .gitignore
+```
 
-Remotes:
-✓ origin  → mohammed-ibenayad/belgogreen_bgg_custom_dev_mod
+**Git Configuration (belgogreen_bgg_custom_dev):**
+```
+✓ origin   → mohammed-ibenayad/belgogreen_bgg_custom_dev_mod
 ✓ upstream → bsimprovement/belgogreen (branch: bgg_custom_dev)
 ```
 
@@ -132,12 +176,21 @@ Remotes:
 
 ### Making Changes
 
+Each module folder works independently:
+
 ```bash
-# 1. Make your changes
-# 2. Test locally (if you have Odoo)
-# 3. Commit
+# Work on custom dev module
+cd /c/Users/mayad/mytools/belgogreen_bgg_custom_dev
+# Make changes, test, commit
 git add .
 git commit -m "Add feature X"
+git push origin main
+
+# Work on sales commission module
+cd /c/Users/mayad/mytools/belgogreen
+# Make changes, test, commit
+git add .
+git commit -m "Add feature Y"
 git push origin main
 ```
 
@@ -146,16 +199,22 @@ git push origin main
 When Claude creates a branch (e.g., `claude/feature-abc`):
 
 ```bash
+# Navigate to the specific module folder
+cd /c/Users/mayad/mytools/belgogreen_bgg_custom_dev
+
+# Run deploy script
 ./deploy_module.sh
 # Enter: claude/feature-abc
 # Choose: yes to push to upstream
 ```
 
 The script automatically:
-- Detects module name: `bgg_custom_dev`
+- Detects module name: `bgg_custom_dev` (from origin URL)
 - Merges to main
 - Pushes to origin/main
 - Pushes to upstream/bgg_custom_dev
+
+**Key advantage:** No need to specify which module - the script knows based on the folder!
 
 ## Troubleshooting
 
