@@ -3,36 +3,38 @@
     'name': 'BelGoGreen Custom Development',
     'version': '19.0.1.0.0',
     'category': 'Customizations',
-    'summary': 'Custom automation rules and business logic for BelGoGreen',
+    'summary': 'Custom business logic and automation for BelGoGreen',
     'description': """
         BelGoGreen Custom Development Module
         ====================================
 
-        This module includes custom automation rules migrated from Odoo Studio:
+        This module extends core Odoo models with custom business logic.
 
-        Appointment Automations:
-        - Add conjoint as Contact
-        - Update Contact Info
-        - Update Appointment Title
-        - Set Clickable Customer Phone
-        - Set Partner On Behalf
+        Model Extensions:
 
-        Calendar Event Automations:
-        - Update Calendar Event Organizer
-        - Update Calendar Status When Rescheduled
-        - Set Clickable Customer Address
-        - Update Clickable Address & Phone from Client Attendee
-        - Replace Call Center Emails
-        - Assign Existing Customer To Calendar Event and Opportunity
+        **Appointment Management (appointment.answer.input)**:
+        - Automatic spouse contact creation/update
+        - Partner address information updates
+        - Dynamic appointment title building
+        - Clickable phone number generation
+        - Call center partner assignment
 
-        Activity Automations:
-        - Add Tag on Activity Completion
-        - Create activity for NoShow
+        **Calendar Events (calendar.event)**:
+        - Automatic organizer assignment
+        - NoShow activity management on rescheduling
+        - Clickable address and phone links
+        - Client attendee information sync
+        - Internal email protection (call center email replacement)
+        - Customer deduplication by phone number
 
-        Project Automations:
-        - Update Project Folder Name
-        - Set Welcome Call Deadline
-        - Subscribe Admins to FSM Tasks
+        **Activities (mail.activity)**:
+        - Call2 tag assignment on activity completion
+
+        **Project Management (project.project, project.task)**:
+        - Document folder naming from sales orders
+        - Welcome call deadline calculation (order date + 2 days)
+
+        All business logic includes comprehensive logging for debugging and monitoring.
     """,
     'author': 'BelGoGreen',
     'website': 'https://www.belgogreen.com',
@@ -50,12 +52,6 @@
     'data': [
         # Security
         # 'security/ir.model.access.csv',
-
-        # Data - Automation Rules
-        'data/appointment_automation_rules.xml',
-        'data/calendar_automation_rules.xml',
-        'data/activity_automation_rules.xml',
-        'data/project_automation_rules.xml',
 
         # Views
         'views/menu_views.xml',
