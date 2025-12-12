@@ -13,7 +13,8 @@ class CalendarEvent(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Override create to trigger automation rules on new calendar events"""
-        records = super(CalendarEvent, self).create(vals_list)
+        # Mark that we're in create context to avoid interfering with appointment validations
+        records = super(CalendarEvent, self.with_context(skip_organizer_update=True)).create(vals_list)
 
         for record in records:
             self._process_calendar_event(record)
@@ -43,8 +44,16 @@ class CalendarEvent(models.Model):
         """
         Update Calendar Event Organizer - Automation Rule
         Sets the organizer and partner to the currently connected user (if not public)
+
+        NOTE: This is skipped during initial creation to avoid interfering with
+        appointment booking line validations (which require specific resources/users)
         """
         try:
+            # Skip during create to avoid interfering with appointment validations
+            if self.env.context.get('skip_organizer_update'):
+                _logger.info("Skipping organizer update during creation for event ID %s", record.id)
+                return
+
             user = self.env.user
 
             if not user._is_public():
