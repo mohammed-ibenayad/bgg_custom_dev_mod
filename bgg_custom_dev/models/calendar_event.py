@@ -25,8 +25,11 @@ class CalendarEvent(models.Model):
         """Override write to trigger automation rules on updates"""
         result = super(CalendarEvent, self).write(vals)
 
-        for record in self:
-            self._process_calendar_event(record, vals)
+        # Skip automation processing if we're already in an automated update
+        # to prevent infinite recursion
+        if not self.env.context.get('skip_calendar_automation'):
+            for record in self:
+                self._process_calendar_event(record, vals)
 
         return result
 
@@ -67,8 +70,8 @@ class CalendarEvent(models.Model):
                     update_vals['partner_id'] = user.partner_id.id
 
                 if update_vals:
-                    # Use sudo().write to avoid recursion since we're already in write()
-                    record.sudo().write(update_vals)
+                    # Use context flag to prevent recursion
+                    record.sudo().with_context(skip_calendar_automation=True).write(update_vals)
                     _logger.info("Updated calendar event organizer to user: %s (ID: %s) for event ID %s",
                                user.name, user.id, record.id)
             else:
@@ -106,7 +109,7 @@ class CalendarEvent(models.Model):
                 odoo_bot_partner = self.env.ref('base.partner_root')
 
                 # Add note to calendar event's chatter as OdooBot
-                record.sudo().message_post(
+                record.sudo().with_context(skip_calendar_automation=True).message_post(
                     body=f"NoShow activitée terminée automatiquement suite à la replanification du rendez-vous par {current_user}",
                     message_type='comment',
                     author_id=odoo_bot_partner.id,
@@ -171,7 +174,7 @@ class CalendarEvent(models.Model):
                 # Only update if the address has changed
                 if record.x_studio_customer_address != clickable_address:
                     # Update the customer_address field on the calendar event
-                    record.sudo().write({
+                    record.sudo().with_context(skip_calendar_automation=True).write({
                         'x_studio_customer_address': clickable_address
                     })
                     _logger.info("Set clickable address for event ID %s: %s", record.id, full_address)
@@ -251,7 +254,7 @@ class CalendarEvent(models.Model):
 
                 # Apply updates in one write (only if needed)
                 if update_vals:
-                    record.sudo().write(update_vals)
+                    record.sudo().with_context(skip_calendar_automation=True).write(update_vals)
 
         except Exception as e:
             _logger.error("Update Clickable Address & Phone from Attendee - Error processing event ID %s: %s",
@@ -411,7 +414,7 @@ class CalendarEvent(models.Model):
 
                         # Add customer as attendee if not already
                         if not customer_already_attendee:
-                            record.write({'partner_ids': [(4, customer.id)]})
+                            record.with_context(skip_calendar_automation=True).write({'partner_ids': [(4, customer.id)]})
                             _logger.info("Added %s as attendee to event ID %s", customer.name, record.id)
 
                         # Update opportunity if exists
@@ -439,7 +442,7 @@ class CalendarEvent(models.Model):
                             # Remove from attendees if present
                             duplicate_attendee = record.attendee_ids.filtered(lambda a: a.partner_id.id == duplicate.id)
                             if duplicate_attendee:
-                                record.write({'partner_ids': [(3, duplicate.id)]})
+                                record.with_context(skip_calendar_automation=True).write({'partner_ids': [(3, duplicate.id)]})
                                 _logger.info("Removed duplicate %s from attendees", duplicate.name)
 
                             # Check if safe to delete

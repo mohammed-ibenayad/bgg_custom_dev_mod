@@ -221,7 +221,7 @@ class AppointmentAnswerInput(models.Model):
             new_title = sms_icon + '/'.join(filter(None, name_parts))
 
             if new_title and new_title != current_name:
-                record.calendar_event_id.write({'name': new_title})
+                record.calendar_event_id.with_context(skip_calendar_automation=True).write({'name': new_title})
                 _logger.info("Updated appointment title for event ID %s: %s",
                            record.calendar_event_id.id, new_title)
 
@@ -251,7 +251,7 @@ class AppointmentAnswerInput(models.Model):
                 clickable_phone = f'<a href="tel:{clean_phone}">{partner_phone}</a>'
 
                 # Update the customer_tel field on the calendar event
-                record.calendar_event_id.write({
+                record.calendar_event_id.with_context(skip_calendar_automation=True).write({
                     'x_studio_customer_phone': clickable_phone
                 })
 
@@ -303,7 +303,7 @@ class AppointmentAnswerInput(models.Model):
                         # Only update if the field value has changed
                         current_partner = record.calendar_event_id.x_studio_rendez_vous_pris_la_place_de
                         if current_partner != partner:
-                            record.calendar_event_id.write({
+                            record.calendar_event_id.with_context(skip_calendar_automation=True).write({
                                 'x_studio_rendez_vous_pris_la_place_de': partner.id
                             })
                             _logger.info("Set 'rendez-vous pris la place de' to partner: %s (ID: %s) for event ID %s",
@@ -317,7 +317,7 @@ class AppointmentAnswerInput(models.Model):
             # If no answer provided, clear the field
             else:
                 if record.calendar_event_id.x_studio_rendez_vous_pris_la_place_de:
-                    record.calendar_event_id.write({
+                    record.calendar_event_id.with_context(skip_calendar_automation=True).write({
                         'x_studio_rendez_vous_pris_la_place_de': False
                     })
                     _logger.info("Cleared 'rendez-vous pris la place de' field for event ID %s",
