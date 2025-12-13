@@ -40,7 +40,6 @@ class CalendarEvent(models.Model):
         """Process all automation rules for calendar events"""
         # Note: Organizer update removed - organizer is set once at creation and never changes
         self._update_calendar_status_rescheduled(record, vals)
-        self._set_clickable_customer_address(record)
         self._update_clickable_from_attendee(record)
         self._replace_call_center_emails(record)
         self._assign_existing_customer(record)
@@ -124,68 +123,6 @@ class CalendarEvent(models.Model):
 
         except Exception as e:
             _logger.error("Update Calendar Status when Rescheduled - Error processing event ID %s: %s",
-                        record.id, str(e), exc_info=True)
-
-    def _set_clickable_customer_address(self, record):
-        """
-        Set Clickable Customer Address - Automation Rule
-        Builds a Google Maps clickable link from appointment answer address components
-        """
-        try:
-            # We'll need to find all appointment answers for this calendar event
-            all_answers = self.env['appointment.answer.input'].search([
-                ('calendar_event_id', '=', record.id)
-            ])
-
-            # Extract address components from answers
-            street = ''
-            zip_code = ''
-            city = ''
-            country = ''
-
-            for answer in all_answers:
-                if answer.question_id.display_name == 'Adresse' and answer.value_text_box:
-                    street = answer.value_text_box
-                elif answer.question_id.display_name == 'Code Postale' and answer.value_text_box:
-                    zip_code = answer.value_text_box
-                elif answer.question_id.display_name == 'Ville' and answer.value_text_box:
-                    city = answer.value_text_box
-                elif answer.question_id.display_name == 'Pays' and answer.value_answer_id:
-                    # Get country name from the selection field
-                    country = answer.value_answer_id.name
-
-            # Build full address string if we have enough components
-            if street or zip_code or city or country:
-                # Build formatted address
-                address_parts = []
-                if street:
-                    address_parts.append(street)
-                if zip_code or city:
-                    zip_city = ' '.join(filter(None, [zip_code, city]))
-                    if zip_city:
-                        address_parts.append(zip_city)
-                if country:
-                    address_parts.append(country)
-
-                full_address = ','.join(address_parts)
-
-                # Create a Google Maps URL
-                encoded_address = full_address.replace(' ', '+')
-                maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
-
-                # Create clickable address with HTML
-                clickable_address = f'<a href="{maps_url}" target="_blank">{full_address}</a>'
-
-                # Only update if the address has changed
-                if record.x_studio_customer_address != clickable_address:
-                    # Update the customer_address field on the calendar event
-                    record.sudo().with_context(skip_calendar_automation=True).write({
-                        'x_studio_customer_address': clickable_address
-                    })
-                    _logger.info("Set clickable address for event ID %s: %s", record.id, full_address)
-
-        except Exception as e:
-            _logger.error("Set Clickable Customer Address - Error processing event ID %s: %s",
                         record.id, str(e), exc_info=True)
 
     def _update_clickable_from_attendee(self, record):

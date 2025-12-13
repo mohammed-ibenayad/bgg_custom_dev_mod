@@ -35,7 +35,6 @@ class AppointmentAnswerInput(models.Model):
         self._add_conjoint_as_contact(record)
         self._update_contact_info(record)
         self._update_appointment_title(record)
-        self._set_clickable_customer_phone(record)
         self._set_partner_on_behalf(record)
 
     def _add_conjoint_as_contact(self, record):
@@ -227,39 +226,6 @@ class AppointmentAnswerInput(models.Model):
 
         except Exception as e:
             _logger.error("Update Appointment Title - Error processing record ID %s: %s",
-                        record.id, str(e), exc_info=True)
-
-    def _set_clickable_customer_phone(self, record):
-        """
-        Set Clickable Customer Phone - Automation Rule
-        Creates a clickable tel: link from partner phone number and stores in custom field
-        """
-        try:
-            # We need to make sure the record has a partner_id and a calendar_event_id
-            if not (record.partner_id and record.calendar_event_id):
-                return
-
-            # Get phone number from partner
-            partner_phone = record.partner_id.phone
-
-            if partner_phone:
-                # Format the phone number for tel: URI
-                # Remove any spaces, parentheses, or other non-digit characters except +
-                clean_phone = ''.join(c for c in partner_phone if c.isdigit() or c == '+')
-
-                # Create clickable phone number with tel: URI
-                clickable_phone = f'<a href="tel:{clean_phone}">{partner_phone}</a>'
-
-                # Update the customer_tel field on the calendar event
-                record.calendar_event_id.with_context(skip_calendar_automation=True).write({
-                    'x_studio_customer_phone': clickable_phone
-                })
-
-                _logger.info("Set clickable phone link for event ID %s: %s",
-                           record.calendar_event_id.id, partner_phone)
-
-        except Exception as e:
-            _logger.error("Set Clickable Customer Phone - Error processing record ID %s: %s",
                         record.id, str(e), exc_info=True)
 
     def _set_partner_on_behalf(self, record):
