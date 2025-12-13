@@ -69,7 +69,7 @@ class CalendarEvent(models.Model):
                 partner = attendee.partner_id
                 if partner and partner.user_ids:
                     for user in partner.user_ids:
-                        if commercial_group_id in user.groups_id.ids:
+                        if commercial_group_id in user.group_ids.ids:
                             commercial_attendee = partner
                             break
                     if commercial_attendee:
