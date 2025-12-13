@@ -12,11 +12,14 @@ class CalendarEvent(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Override create to trigger automation rules on new calendar events"""
-        # Mark that we're in create context to avoid interfering with appointment validations
-        records = super(CalendarEvent, self.with_context(skip_organizer_update=True)).create(vals_list)
+        """Override create to set organizer and trigger automation rules on new calendar events"""
+        records = super(CalendarEvent, self).create(vals_list)
 
         for record in records:
+            # Set organizer to the user who created the event (if not already set and not public user)
+            self._set_initial_organizer(record)
+
+            # Process other automation rules
             self._process_calendar_event(record)
 
         return records
@@ -35,7 +38,7 @@ class CalendarEvent(models.Model):
 
     def _process_calendar_event(self, record, vals=None):
         """Process all automation rules for calendar events"""
-        self._update_calendar_event_organizer(record)
+        # Note: Organizer update removed - organizer is set once at creation and never changes
         self._update_calendar_status_rescheduled(record, vals)
         self._set_clickable_customer_address(record)
         self._update_clickable_from_attendee(record)
@@ -43,42 +46,34 @@ class CalendarEvent(models.Model):
         self._assign_existing_customer(record)
         self._create_activity_noshow(record)
 
-    def _update_calendar_event_organizer(self, record):
+    def _set_initial_organizer(self, record):
         """
-        Update Calendar Event Organizer - Automation Rule
-        Sets the organizer and partner to the currently connected user (if not public)
-
-        NOTE: This is skipped during initial creation to avoid interfering with
-        appointment booking line validations (which require specific resources/users)
+        Set Initial Organizer on Creation - Automation Rule
+        Sets the organizer to the user who created the event (never changes after creation)
+        Uses create_uid (the user who created the record) as the organizer
         """
         try:
-            # Skip during create to avoid interfering with appointment validations
-            if self.env.context.get('skip_organizer_update'):
-                _logger.info("Skipping organizer update during creation for event ID %s", record.id)
+            # If organizer is already set, don't override it
+            if record.user_id:
+                _logger.info("Organizer already set for event ID %s, skipping", record.id)
                 return
 
-            user = self.env.user
+            # Use the user who created the record as organizer
+            creating_user = record.create_uid
 
-            if not user._is_public():
-                # Only update if values are different to avoid unnecessary writes
-                update_vals = {}
-
-                if record.user_id != user:
-                    update_vals['user_id'] = user.id
-
-                if record.partner_id != user.partner_id:
-                    update_vals['partner_id'] = user.partner_id.id
-
-                if update_vals:
-                    # Use context flag to prevent recursion
-                    record.sudo().with_context(skip_calendar_automation=True).write(update_vals)
-                    _logger.info("Updated calendar event organizer to user: %s (ID: %s) for event ID %s",
-                               user.name, user.id, record.id)
+            if creating_user and not creating_user._is_public():
+                # Set organizer to the creating user
+                record.sudo().with_context(skip_calendar_automation=True).write({
+                    'user_id': creating_user.id,
+                    'partner_id': creating_user.partner_id.id
+                })
+                _logger.info("Set initial organizer to creating user: %s (ID: %s) for event ID %s",
+                           creating_user.name, creating_user.id, record.id)
             else:
-                _logger.info("Public user detected, skipping organizer update for event ID %s", record.id)
+                _logger.info("Creating user is public or not found, skipping organizer setup for event ID %s", record.id)
 
         except Exception as e:
-            _logger.error("Update Calendar Event Organizer - Error processing event ID %s: %s",
+            _logger.error("Set Initial Organizer - Error processing event ID %s: %s",
                         record.id, str(e), exc_info=True)
 
     def _update_calendar_status_rescheduled(self, record, vals=None):
