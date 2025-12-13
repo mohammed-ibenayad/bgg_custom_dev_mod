@@ -106,7 +106,7 @@ class CalendarEvent(models.Model):
                 # Mark activities as done instead of deleting to avoid UI sync errors
                 # This prevents "Record does not exist" errors when the UI tries to refresh
                 current_user = self.env.user.name
-                feedback_message = f"Activitée terminée automatiquement suite à la replanification du rendez-vous par {current_user}"
+                feedback_message = f"❌ Annulée - NoShow plus applicable suite à la replanification du rendez-vous par {current_user}"
 
                 for activity in noshow_activities:
                     activity.action_feedback(feedback=feedback_message)
@@ -126,7 +126,7 @@ class CalendarEvent(models.Model):
 
                 # Add note to calendar event's chatter as OdooBot
                 record.sudo().with_context(skip_calendar_automation=True).message_post(
-                    body=f"NoShow activitée terminée automatiquement suite à la replanification du rendez-vous par {current_user}",
+                    body=f"❌ NoShow activité annulée automatiquement - Rendez-vous replanifié par {current_user}",
                     message_type='comment',
                     author_id=odoo_bot_partner.id,
                     subtype_id=self.env.ref('mail.mt_note').id
