@@ -27,9 +27,6 @@
         - Internal email protection (call center email replacement)
         - Customer deduplication by phone number
 
-        **Activities (mail.activity)**:
-        - Call2 tag assignment on activity completion
-
         **Project Management (project.project, project.task)**:
         - Document folder naming from sales orders
         - Welcome call deadline calculation (order date + 2 days)
