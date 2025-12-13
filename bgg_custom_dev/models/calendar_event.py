@@ -128,18 +128,6 @@ class CalendarEvent(models.Model):
                     })
                     _logger.info("Reset appointment status to 'booked' for event ID %s", record.id)
 
-                # Get OdooBot partner
-                odoo_bot_partner = self.env.ref('base.partner_root')
-
-                # Add note to calendar event's chatter as OdooBot
-                record.sudo().with_context(ctx).message_post(
-                    body=f"❌ NoShow activité annulée automatiquement - Rendez-vous replanifié par {current_user}",
-                    message_type='comment',
-                    author_id=odoo_bot_partner.id,
-                    subtype_id=self.env.ref('mail.mt_note').id
-                )
-                _logger.info("Posted rescheduling note for event ID %s by user %s", record.id, current_user)
-
         except Exception as e:
             _logger.error("Update Calendar Status when Rescheduled - Error processing event ID %s: %s",
                         record.id, str(e), exc_info=True)
