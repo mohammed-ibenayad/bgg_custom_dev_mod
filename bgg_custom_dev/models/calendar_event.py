@@ -100,9 +100,19 @@ class CalendarEvent(models.Model):
             ])
 
             if noshow_activities:
-                _logger.info("Found %s NoShow activities for event ID %s - deleting them",
+                _logger.info("Found %s NoShow activities for event ID %s - marking as done",
                            len(noshow_activities), record.id)
-                noshow_activities.unlink()
+
+                # Mark activities as done instead of deleting to avoid UI sync errors
+                # This prevents "Record does not exist" errors when the UI tries to refresh
+                current_user = self.env.user.name
+                feedback_message = f"❌ Annulée - NoShow plus applicable suite à la replanification du rendez-vous par {current_user}"
+
+                for activity in noshow_activities:
+                    activity.action_feedback(feedback=feedback_message)
+
+                _logger.info("Marked %s NoShow activities as done for event ID %s",
+                           len(noshow_activities), record.id)
 
                 # Reset appointment status to 'booked' since the no_show is no longer relevant
                 if record.appointment_status == 'no_show':
@@ -112,12 +122,11 @@ class CalendarEvent(models.Model):
                     _logger.info("Reset appointment status to 'booked' for event ID %s", record.id)
 
                 # Get OdooBot partner
-                current_user = self.env.user.name
                 odoo_bot_partner = self.env.ref('base.partner_root')
 
                 # Add note to calendar event's chatter as OdooBot
                 record.sudo().with_context(skip_calendar_automation=True).message_post(
-                    body=f"NoShow activitée terminée automatiquement suite à la replanification du rendez-vous par {current_user}",
+                    body=f"❌ NoShow activité annulée automatiquement - Rendez-vous replanifié par {current_user}",
                     message_type='comment',
                     author_id=odoo_bot_partner.id,
                     subtype_id=self.env.ref('mail.mt_note').id
