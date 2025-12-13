@@ -87,6 +87,10 @@ class CalendarEvent(models.Model):
         Deletes NoShow activities and posts a chatter note when an event is rescheduled
         """
         try:
+            # Prevent infinite recursion when processing NoShow activities
+            if self.env.context.get('processing_noshow_reschedule'):
+                return
+
             # Only process if date/time fields changed (indicating reschedule)
             if vals and not any(field in vals for field in ['start', 'stop', 'start_date', 'stop_date']):
                 return
@@ -103,20 +107,23 @@ class CalendarEvent(models.Model):
                 _logger.info("Found %s NoShow activities for event ID %s - marking as done",
                            len(noshow_activities), record.id)
 
+                # Set context flag to prevent recursion during activity processing
+                ctx = dict(self.env.context, processing_noshow_reschedule=True, skip_calendar_automation=True)
+
                 # Mark activities as done instead of deleting to avoid UI sync errors
                 # This prevents "Record does not exist" errors when the UI tries to refresh
                 current_user = self.env.user.name
                 feedback_message = f"❌ Annulée - NoShow plus applicable suite à la replanification du rendez-vous par {current_user}"
 
                 for activity in noshow_activities:
-                    activity.action_feedback(feedback=feedback_message)
+                    activity.with_context(ctx).action_feedback(feedback=feedback_message)
 
                 _logger.info("Marked %s NoShow activities as done for event ID %s",
                            len(noshow_activities), record.id)
 
                 # Reset appointment status to 'booked' since the no_show is no longer relevant
                 if record.appointment_status == 'no_show':
-                    record.sudo().with_context(skip_calendar_automation=True).write({
+                    record.sudo().with_context(ctx).write({
                         'appointment_status': 'booked'
                     })
                     _logger.info("Reset appointment status to 'booked' for event ID %s", record.id)
@@ -125,7 +132,7 @@ class CalendarEvent(models.Model):
                 odoo_bot_partner = self.env.ref('base.partner_root')
 
                 # Add note to calendar event's chatter as OdooBot
-                record.sudo().with_context(skip_calendar_automation=True).message_post(
+                record.sudo().with_context(ctx).message_post(
                     body=f"❌ NoShow activité annulée automatiquement - Rendez-vous replanifié par {current_user}",
                     message_type='comment',
                     author_id=odoo_bot_partner.id,
