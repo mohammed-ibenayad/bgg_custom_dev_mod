@@ -51,24 +51,23 @@ class CalendarEvent(models.Model):
         Set Initial Organizer on Creation - Automation Rule
         Sets the organizer to the user who created the event (never changes after creation)
         Uses create_uid (the user who created the record) as the organizer
+        ALWAYS overrides any organizer set by other modules (like appointments)
         """
         try:
-            # If organizer is already set, don't override it
-            if record.user_id:
-                _logger.info("Organizer already set for event ID %s, skipping", record.id)
-                return
-
             # Use the user who created the record as organizer
             creating_user = record.create_uid
 
             if creating_user and not creating_user._is_public():
-                # Set organizer to the creating user
-                record.sudo().with_context(skip_calendar_automation=True).write({
-                    'user_id': creating_user.id,
-                    'partner_id': creating_user.partner_id.id
-                })
-                _logger.info("Set initial organizer to creating user: %s (ID: %s) for event ID %s",
-                           creating_user.name, creating_user.id, record.id)
+                # Always set organizer to the creating user, even if already set by other modules
+                if record.user_id != creating_user or record.partner_id != creating_user.partner_id:
+                    record.sudo().with_context(skip_calendar_automation=True).write({
+                        'user_id': creating_user.id,
+                        'partner_id': creating_user.partner_id.id
+                    })
+                    _logger.info("Set organizer to creating user: %s (ID: %s) for event ID %s",
+                               creating_user.name, creating_user.id, record.id)
+                else:
+                    _logger.info("Organizer already matches creating user for event ID %s", record.id)
             else:
                 _logger.info("Creating user is public or not found, skipping organizer setup for event ID %s", record.id)
 
