@@ -68,20 +68,34 @@ odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --stop-after-init 
 - `--stop-after-init`: Stop after running tests (don't start server)
 - `-i bgg_custom_dev`: Install module and run its tests
 
-#### Run specific test file
+#### Run specific test class
 
 ```bash
-odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags bgg_custom_dev.test_calendar_event --stop-after-init
+# Run all calendar event tests
+odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags /bgg_custom_dev:TestCalendarEvent --stop-after-init
+
+# Run all appointment answer tests
+odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags /bgg_custom_dev:TestAppointmentAnswerInput --stop-after-init
+```
+
+#### Run specific test method
+
+```bash
+# Run a single test function
+odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags /bgg_custom_dev:TestCalendarEvent.test_organizer_set_on_create --stop-after-init
 ```
 
 #### Run tests with specific tags
 
 ```bash
+# Run all module tests (recommended for CI/CD)
+odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags /bgg_custom_dev --stop-after-init
+
 # Run only post_install tests
 odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags post_install --stop-after-init
 
-# Run specific module tests
-odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags bgg_custom_dev --stop-after-init
+# Run multiple test classes
+odoo-bin -c /path/to/odoo.conf -d test_database --test-enable --test-tags /bgg_custom_dev:TestCalendarEvent,/bgg_custom_dev:TestAppointmentAnswerInput --stop-after-init
 ```
 
 #### Run tests in verbose mode
