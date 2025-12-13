@@ -92,11 +92,11 @@ class CalendarEvent(models.Model):
                 return
 
             # Find linked no-show activities
+            # Note: No need to filter by state - mail.activity table only contains active (not done) activities
             noshow_activities = self.env['mail.activity'].search([
                 ('res_model', '=', 'calendar.event'),
                 ('res_id', '=', record.id),
-                ('activity_type_id.name', '=', 'NoShow'),
-                ('state', '!=', 'done')
+                ('activity_type_id.name', '=', 'NoShow')
             ])
 
             if noshow_activities:
