@@ -2,13 +2,21 @@
 
 import datetime
 import logging
-from odoo import api, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
 
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
+
+    # Computed field: Commercial (sales rep) from attendees
+    x_studio_commercial = fields.Char(
+        string='Commercial',
+        compute='_compute_commercial',
+        store=False,
+        readonly=True
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -35,6 +43,39 @@ class CalendarEvent(models.Model):
                 self._process_calendar_event(record, vals)
 
         return result
+
+    @api.depends('attendee_ids', 'attendee_ids.partner_id', 'appointment_type_id')
+    def _compute_commercial(self):
+        """
+        Compute Commercial field - finds the sales rep (commercial) from attendees
+        Only applies to specific appointment types (IDs: 2, 4, 19, 20)
+        Looks for attendees whose partner has a user in the Commercial group (ID: 59)
+        """
+        # Appointment types where we look for a commercial
+        valid_appointment_types = [2, 4, 19, 20]
+        # Commercial group ID
+        commercial_group_id = 59
+
+        for record in self:
+            # Check if the record has one of the specified appointment types
+            if not record.appointment_type_id or record.appointment_type_id.id not in valid_appointment_types:
+                record.x_studio_commercial = False
+                continue
+
+            commercial_attendee = False
+
+            # Search through attendees for a commercial
+            for attendee in record.attendee_ids:
+                partner = attendee.partner_id
+                if partner and partner.user_ids:
+                    for user in partner.user_ids:
+                        if commercial_group_id in user.groups_id.ids:
+                            commercial_attendee = partner
+                            break
+                    if commercial_attendee:
+                        break
+
+            record.x_studio_commercial = commercial_attendee.name if commercial_attendee else False
 
     def _process_calendar_event(self, record, vals=None):
         """Process all automation rules for calendar events"""
