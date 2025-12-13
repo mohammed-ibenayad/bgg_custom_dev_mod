@@ -104,6 +104,13 @@ class CalendarEvent(models.Model):
                            len(noshow_activities), record.id)
                 noshow_activities.unlink()
 
+                # Reset appointment status to 'booked' since the no_show is no longer relevant
+                if record.appointment_status == 'no_show':
+                    record.sudo().with_context(skip_calendar_automation=True).write({
+                        'appointment_status': 'booked'
+                    })
+                    _logger.info("Reset appointment status to 'booked' for event ID %s", record.id)
+
                 # Get OdooBot partner
                 current_user = self.env.user.name
                 odoo_bot_partner = self.env.ref('base.partner_root')
