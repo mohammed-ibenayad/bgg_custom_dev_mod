@@ -5,6 +5,10 @@ from odoo import api, models
 
 _logger = logging.getLogger(__name__)
 
+# Appointment reference constants for automation rules
+ALL_APPOINTMENT_REFS = ['APT-ENERG-CNT', 'APT-ENERG-COM', 'APT-NISOL-CNT', 'APT-NISOL-COM']
+CALL_CENTER_APPOINTMENT_REFS = ['APT-ENERG-CNT', 'APT-NISOL-CNT']
+
 
 class AppointmentAnswerInput(models.Model):
     _inherit = 'appointment.answer.input'
@@ -41,17 +45,17 @@ class AppointmentAnswerInput(models.Model):
         """
         Add conjoint as Contact - Automation Rule
         Creates or updates spouse contact records based on appointment answers
-        Only applies to appointment types: 2, 4, 19, 20
+        Only applies to appointment types: APT-ENERG-CNT, APT-ENERG-COM, APT-NISOL-CNT, APT-NISOL-COM
         """
         try:
             # Check appointment type restriction
             if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
                 return
 
-            allowed_ids = [2, 4, 19, 20]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
-            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
+            if not record.calendar_event_id.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.calendar_event_id.appointment_type_id.x_appointment_ref not in ALL_APPOINTMENT_REFS:
                 return
 
             if not record.partner_id:
@@ -114,17 +118,17 @@ class AppointmentAnswerInput(models.Model):
         """
         Update Contact Info - Automation Rule
         Updates partner contact information (address, postal code, city, country) from appointment answers
-        Only applies to appointment types: 2, 4, 19, 20
+        Only applies to appointment types: APT-ENERG-CNT, APT-ENERG-COM, APT-NISOL-CNT, APT-NISOL-COM
         """
         try:
             # Check appointment type restriction
             if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
                 return
 
-            allowed_ids = [2, 4, 19, 20]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
-            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
+            if not record.calendar_event_id.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.calendar_event_id.appointment_type_id.x_appointment_ref not in ALL_APPOINTMENT_REFS:
                 return
 
             if not record.partner_id:
@@ -178,7 +182,7 @@ class AppointmentAnswerInput(models.Model):
         Update Appointment Title - Automation Rule
         Builds appointment title from various appointment answer fields
         Format: [SMS Icon]/Client Name/Postal Code/Phone/Need/Seller
-        Only applies to appointment types: 2, 4, 19, 20
+        Only applies to appointment types: APT-ENERG-CNT, APT-ENERG-COM, APT-NISOL-CNT, APT-NISOL-COM
         """
         try:
             if not (record.partner_id and record.calendar_event_id):
@@ -188,10 +192,10 @@ class AppointmentAnswerInput(models.Model):
             if not record.calendar_event_id.appointment_type_id:
                 return
 
-            allowed_ids = [2, 4, 19, 20]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
-            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
+            if not record.calendar_event_id.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.calendar_event_id.appointment_type_id.x_appointment_ref not in ALL_APPOINTMENT_REFS:
                 return
 
             # Initialize empty list with 5 elements
@@ -266,7 +270,7 @@ class AppointmentAnswerInput(models.Model):
         Set Partner On Behalf - Automation Rule
         Sets the "rendez-vous pris à la place de" field based on appointment answer
         Only matches partners with "Call Center" category tag
-        Only applies to appointment types: 2, 19
+        Only applies to appointment types: APT-ENERG-CNT, APT-NISOL-CNT
         """
         try:
             # Only process if this is the relevant question about "on behalf of partner"
@@ -278,10 +282,10 @@ class AppointmentAnswerInput(models.Model):
                 return
 
             # Check appointment type restriction
-            allowed_ids = [2, 19]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
-            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
+            if not record.calendar_event_id.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.calendar_event_id.appointment_type_id.x_appointment_ref not in CALL_CENTER_APPOINTMENT_REFS:
                 return
 
             # For dropdown/selection questions, use value_answer_id instead of value_text_box

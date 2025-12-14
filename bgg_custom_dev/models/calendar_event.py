@@ -6,6 +6,10 @@ from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
+# Appointment reference constants for automation rules
+ALL_APPOINTMENT_REFS = ['APT-ENERG-CNT', 'APT-ENERG-COM', 'APT-NISOL-CNT', 'APT-NISOL-COM']
+CALL_CENTER_APPOINTMENT_REFS = ['APT-ENERG-CNT', 'APT-NISOL-CNT']
+
 
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
@@ -113,17 +117,17 @@ class CalendarEvent(models.Model):
         Sets the organizer to the user who created the event (never changes after creation)
         Uses create_uid (the user who created the record) as the organizer
         ALWAYS overrides any organizer set by other modules (like appointments)
-        Only applies to appointment types: 2, 19
+        Only applies to appointment types: APT-ENERG-CNT, APT-NISOL-CNT
         """
         try:
             # Check appointment type restriction
             if not record.appointment_type_id:
                 return
 
-            allowed_ids = [2, 19]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.appointment_type_id.name or '')
-            if not is_test_mode and record.appointment_type_id.id not in allowed_ids:
+            if not record.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.appointment_type_id.x_appointment_ref not in CALL_CENTER_APPOINTMENT_REFS:
                 return
 
             # Use the user who created the record as organizer
@@ -151,17 +155,17 @@ class CalendarEvent(models.Model):
         """
         Update Calendar Status When Rescheduled - Automation Rule
         Deletes NoShow activities and posts a chatter note when an event is rescheduled
-        Only applies to appointment types: 2, 19
+        Only applies to appointment types: APT-ENERG-CNT, APT-NISOL-CNT
         """
         try:
             # Check appointment type restriction
             if not record.appointment_type_id:
                 return
 
-            allowed_ids = [2, 19]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.appointment_type_id.name or '')
-            if not is_test_mode and record.appointment_type_id.id not in allowed_ids:
+            if not record.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.appointment_type_id.x_appointment_ref not in CALL_CENTER_APPOINTMENT_REFS:
                 return
 
             # Prevent infinite recursion when processing NoShow activities
@@ -291,17 +295,17 @@ class CalendarEvent(models.Model):
         Replace Call Center Emails - Automation Rule
         Replaces customer attendee emails that match internal user emails with standard call center email
         Prevents internal user emails from being exposed to customers
-        Only applies to appointment types: 2, 4, 19, 20
+        Only applies to appointment types: APT-ENERG-CNT, APT-ENERG-COM, APT-NISOL-CNT, APT-NISOL-COM
         """
         try:
             # Check appointment type restriction
             if not record.appointment_type_id:
                 return
 
-            allowed_ids = [2, 4, 19, 20]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.appointment_type_id.name or '')
-            if not is_test_mode and record.appointment_type_id.id not in allowed_ids:
+            if not record.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.appointment_type_id.x_appointment_ref not in ALL_APPOINTMENT_REFS:
                 return
 
             if not record.attendee_ids:
@@ -372,17 +376,17 @@ class CalendarEvent(models.Model):
         Assign Existing Customer To Calendar Event and Opportunity - Automation Rule
         Finds existing customers by phone (last 8 digits), assigns them to event and opportunity
         Cleans up duplicate customer records when safe to do so
-        Only applies to appointment types: 2, 4, 19, 20
+        Only applies to appointment types: APT-ENERG-CNT, APT-ENERG-COM, APT-NISOL-CNT, APT-NISOL-COM
         """
         try:
             # Check appointment type restriction
             if not record.appointment_type_id:
                 return
 
-            allowed_ids = [2, 4, 19, 20]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.appointment_type_id.name or '')
-            if not is_test_mode and record.appointment_type_id.id not in allowed_ids:
+            if not record.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.appointment_type_id.x_appointment_ref not in ALL_APPOINTMENT_REFS:
                 return
 
             phone = None
@@ -538,17 +542,17 @@ class CalendarEvent(models.Model):
         """
         Create activity for NoShow - Automation Rule
         Creates or updates a NoShow activity when appointment status is set to no_show
-        Only applies to appointment types: 2, 19
+        Only applies to appointment types: APT-ENERG-CNT, APT-NISOL-CNT
         """
         try:
             # Check appointment type restriction
             if not record.appointment_type_id:
                 return
 
-            allowed_ids = [2, 19]
-            # In test mode, allow any appointment type with 'Automation' in name
-            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.appointment_type_id.name or '')
-            if not is_test_mode and record.appointment_type_id.id not in allowed_ids:
+            if not record.appointment_type_id.x_appointment_ref:
+                return
+
+            if record.appointment_type_id.x_appointment_ref not in CALL_CENTER_APPOINTMENT_REFS:
                 return
 
             if record.appointment_status != 'no_show':

@@ -57,19 +57,21 @@ class TestCalendarEvent(TransactionCase):
 
         # Create appointment types (only if appointment module is installed)
         cls.appointment_type_1 = None
-        cls.appointment_type_2 = None
+        cls.appointment_type_call_center = None
         cls.appointment_type_commercial = None
         if 'calendar.appointment.type' in cls.env:
             cls.appointment_type_1 = cls.env['calendar.appointment.type'].create({
                 'name': 'Test Appointment Type 1',
             })
-            # Create appointment type with ID 2 (or any ID) for testing automation rules
-            # that require appointment_type_id in [2, 4, 19, 20]
-            cls.appointment_type_2 = cls.env['calendar.appointment.type'].create({
-                'name': 'Test Appointment Type 2 (For Automation)',
+            # Create appointment type for call center automation rules (APT-ENERG-CNT)
+            cls.appointment_type_call_center = cls.env['calendar.appointment.type'].create({
+                'name': 'Test Call Center Appointment',
+                'x_appointment_ref': 'APT-ENERG-CNT',
             })
+            # Create appointment type for commercial automation rules (APT-ENERG-COM)
             cls.appointment_type_commercial = cls.env['calendar.appointment.type'].create({
-                'name': 'Commercial Appointment Type',
+                'name': 'Test Commercial Appointment',
+                'x_appointment_ref': 'APT-ENERG-COM',
             })
 
         # Create NoShow activity type
@@ -127,17 +129,17 @@ class TestCalendarEvent(TransactionCase):
     def test_organizer_overrides_appointment_module(self):
         """Test that organizer is always set to creating user, even if set by other modules"""
         # Skip if appointment module not installed
-        if not self.appointment_type_2:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
         # Create event with user_id already set (simulating appointment module)
-        # Requires appointment_type_id in [2, 19] for organizer automation
+        # Requires appointment type with call center reference for organizer automation
         event = self.env['calendar.event'].with_user(self.test_user_1).create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'user_id': self.test_user_2.id,  # Different user
-            'appointment_type_id': self.appointment_type_2.id,  # Required for automation
+            'appointment_type_id': self.appointment_type_call_center.id,  # Call center appointment type
         })
 
         # Assert organizer is overridden to test_user_1
@@ -329,7 +331,7 @@ class TestCalendarEvent(TransactionCase):
     def test_replace_call_center_emails_for_customers(self):
         """Test that internal user emails are replaced with call center email"""
         # Skip if appointment module not installed
-        if not self.appointment_type_2:
+        if not self.appointment_type_commercial:
             self.skipTest("Appointment module not installed")
 
         # Create customer with internal user email
@@ -339,13 +341,13 @@ class TestCalendarEvent(TransactionCase):
         })
 
         # Create event with this customer
-        # Requires appointment_type_id in [2, 4, 19, 20] for email replacement automation
+        # Requires appointment type with valid reference for email replacement automation
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'partner_ids': [(4, customer_with_internal_email.id)],
-            'appointment_type_id': self.appointment_type_2.id,  # Required for automation
+            'appointment_type_id': self.appointment_type_commercial.id,  # Commercial appointment type
         })
 
         # Assert email replaced
@@ -391,17 +393,17 @@ class TestCalendarEvent(TransactionCase):
     def test_find_existing_customer_by_phone(self):
         """Test that existing customer is found by last 8 digits of phone"""
         # Skip if appointment module not installed
-        if not self.appointment_type_2:
+        if not self.appointment_type_commercial:
             self.skipTest("Appointment module not installed")
 
         # Create event and set phone field in one write to trigger automation
-        # Requires appointment_type_id in [2, 4, 19, 20] for customer assignment automation
+        # Requires appointment type with valid reference for customer assignment automation
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'x_studio_customer_phone': '<a href="tel:0412345678">0412 34 56 78</a>',
-            'appointment_type_id': self.appointment_type_2.id,  # Required for automation
+            'appointment_type_id': self.appointment_type_commercial.id,  # Commercial appointment type
         })
 
         # Refresh to ensure we have latest attendee list
@@ -415,7 +417,7 @@ class TestCalendarEvent(TransactionCase):
     def test_update_opportunity_with_customer(self):
         """Test that related opportunity is updated with found customer"""
         # Skip if appointment module not installed
-        if not self.appointment_type_2:
+        if not self.appointment_type_commercial:
             self.skipTest("Appointment module not installed")
 
         # Create different partner
@@ -431,13 +433,13 @@ class TestCalendarEvent(TransactionCase):
         })
 
         # Create event linked to opportunity
-        # Requires appointment_type_id in [2, 4, 19, 20] for customer assignment automation
+        # Requires appointment type with valid reference for customer assignment automation
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'opportunity_id': opportunity.id,
-            'appointment_type_id': self.appointment_type_2.id,  # Required for automation
+            'appointment_type_id': self.appointment_type_commercial.id,  # Commercial appointment type
         })
 
         # Set phone to match existing customer
