@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class AppointmentType(models.Model):
-    _inherit = 'calendar.appointment.type'
+    _inherit = 'appointment.type'
 
     x_appointment_ref = fields.Char(
         string='Appointment Reference',
