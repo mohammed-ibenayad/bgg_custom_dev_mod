@@ -55,14 +55,16 @@ class TestCalendarEvent(TransactionCase):
             'email': 'internal@company.com',
         })
 
-        # Create appointment types
-        cls.appointment_type_1 = cls.env['calendar.appointment.type'].create({
-            'name': 'Test Appointment Type 1',
-        })
-
-        cls.appointment_type_commercial = cls.env['calendar.appointment.type'].create({
-            'name': 'Commercial Appointment Type',
-        })
+        # Create appointment types (only if appointment module is installed)
+        cls.appointment_type_1 = None
+        cls.appointment_type_commercial = None
+        if 'calendar.appointment.type' in cls.env:
+            cls.appointment_type_1 = cls.env['calendar.appointment.type'].create({
+                'name': 'Test Appointment Type 1',
+            })
+            cls.appointment_type_commercial = cls.env['calendar.appointment.type'].create({
+                'name': 'Commercial Appointment Type',
+            })
 
         # Create NoShow activity type
         cls.noshow_activity_type = cls.env['mail.activity.type'].create({

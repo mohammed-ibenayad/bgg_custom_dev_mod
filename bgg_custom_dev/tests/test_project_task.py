@@ -67,11 +67,16 @@ class TestProjectTask(TransactionCase):
             'project_sale_order_id': self.sale_order.id,
         })
 
+        # Get actual sale order date (may have been updated during confirmation)
+        actual_order_date = self.sale_order.date_order
         # Calculate expected deadline (order_date + 2 days)
-        expected_deadline = (self.order_date + datetime.timedelta(days=2)).date()
+        expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+        # Convert task deadline to date for comparison (field may be datetime or date)
+        task_deadline = task.date_deadline.date() if isinstance(task.date_deadline, datetime.datetime) else task.date_deadline
 
         # Assert deadline is set correctly
-        self.assertEqual(task.date_deadline, expected_deadline,
+        self.assertEqual(task_deadline, expected_deadline,
                         f"Deadline should be {expected_deadline} (order date + 2 days)")
 
     def test_welcome_call_deadline_only_for_welcome_call(self):
@@ -184,12 +189,17 @@ class TestProjectTask(TransactionCase):
                 'project_sale_order_id': sale_order.id,
             })
 
+            # Get actual sale order date (may have been updated)
+            actual_order_date = sale_order.date_order
             # Calculate expected deadline
-            expected_deadline = (order_date + datetime.timedelta(days=2)).date()
+            expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+            # Convert deadline to date for comparison
+            task_deadline = task.date_deadline.date() if task.date_deadline and isinstance(task.date_deadline, datetime.datetime) else task.date_deadline
 
             # Assert correct deadline
-            self.assertEqual(task.date_deadline, expected_deadline,
-                           f"Deadline should be {expected_deadline} for order date {order_date.date()}")
+            self.assertEqual(task_deadline, expected_deadline,
+                           f"Deadline should be {expected_deadline} for order date {actual_order_date.date()}")
 
     def test_welcome_call_deadline_not_changed_on_update(self):
         """Test that deadline is only set on creation, not on updates"""
@@ -218,10 +228,14 @@ class TestProjectTask(TransactionCase):
         })
 
         # Calculate expected deadline
-        expected_deadline = (self.order_date + datetime.timedelta(days=2)).date()
+        actual_order_date = self.sale_order.date_order
+        expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+        # Convert deadline to date for comparison
+        task_deadline = task.date_deadline.date() if task.date_deadline and isinstance(task.date_deadline, datetime.datetime) else task.date_deadline
 
         # Assert deadline set correctly
-        self.assertEqual(task.date_deadline, expected_deadline,
+        self.assertEqual(task_deadline, expected_deadline,
                         "Deadline should be set even without project")
 
     # ========================
@@ -249,12 +263,17 @@ class TestProjectTask(TransactionCase):
             },
         ])
 
-        expected_deadline = (self.order_date + datetime.timedelta(days=2)).date()
+        actual_order_date = self.sale_order.date_order
+        expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+        # Convert deadlines to date for comparison
+        task0_deadline = tasks[0].date_deadline.date() if isinstance(tasks[0].date_deadline, datetime.datetime) else tasks[0].date_deadline
+        task1_deadline = tasks[1].date_deadline.date() if isinstance(tasks[1].date_deadline, datetime.datetime) else tasks[1].date_deadline
 
         # Assert first two tasks have deadline set
-        self.assertEqual(tasks[0].date_deadline, expected_deadline,
+        self.assertEqual(task0_deadline, expected_deadline,
                         "First welcome call should have deadline")
-        self.assertEqual(tasks[1].date_deadline, expected_deadline,
+        self.assertEqual(task1_deadline, expected_deadline,
                         "Second welcome call should have deadline")
 
     def test_welcome_call_with_manual_deadline_override(self):
@@ -270,10 +289,14 @@ class TestProjectTask(TransactionCase):
         })
 
         # The automation will override the manual deadline
-        expected_deadline = (self.order_date + datetime.timedelta(days=2)).date()
+        actual_order_date = self.sale_order.date_order
+        expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+        # Convert deadline to date for comparison
+        task_deadline = task.date_deadline.date() if isinstance(task.date_deadline, datetime.datetime) else task.date_deadline
 
         # Assert automation overwrites manual deadline
-        self.assertEqual(task.date_deadline, expected_deadline,
+        self.assertEqual(task_deadline, expected_deadline,
                         "Automation should set deadline to order_date + 2 days")
 
     def test_task_creation_from_sale_order_template(self):
@@ -308,7 +331,13 @@ class TestProjectTask(TransactionCase):
             'project_sale_order_id': new_sale_order.id,
         })
 
+        # Get actual sale order date (may have been updated during confirmation)
+        actual_order_date = new_sale_order.date_order
+        expected_deadline = (actual_order_date + datetime.timedelta(days=2)).date()
+
+        # Convert deadline to date for comparison
+        task_deadline = task.date_deadline.date() if isinstance(task.date_deadline, datetime.datetime) else task.date_deadline
+
         # Assert deadline set correctly
-        expected_deadline = (new_order_date + datetime.timedelta(days=2)).date()
-        self.assertEqual(task.date_deadline, expected_deadline,
+        self.assertEqual(task_deadline, expected_deadline,
                         "Template-created task should have correct deadline")

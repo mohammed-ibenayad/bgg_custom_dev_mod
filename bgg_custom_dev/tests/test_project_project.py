@@ -18,6 +18,11 @@ class TestProjectProject(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
 
+        # Skip tests if documents module not installed
+        if 'documents.folder' not in cls.env:
+            cls.skipTest(cls, "Documents module not installed")
+            return
+
         # Create test customer
         cls.test_customer = cls.env['res.partner'].create({
             'name': 'Test Customer For Project',

@@ -19,6 +19,11 @@ class TestAppointmentAnswerInput(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
 
+        # Skip tests if appointment module not installed
+        if 'calendar.appointment.type' not in cls.env:
+            cls.skipTest(cls, "Appointment module not installed")
+            return
+
         # Create test partner (customer)
         cls.test_partner = cls.env['res.partner'].create({
             'name': 'Test Customer',
