@@ -41,8 +41,16 @@ class AppointmentAnswerInput(models.Model):
         """
         Add conjoint as Contact - Automation Rule
         Creates or updates spouse contact records based on appointment answers
+        Only applies to appointment types: 2, 4, 19, 20
         """
         try:
+            # Check appointment type restriction
+            if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
+                return
+
+            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
+                return
+
             if not record.partner_id:
                 return
 
@@ -103,8 +111,16 @@ class AppointmentAnswerInput(models.Model):
         """
         Update Contact Info - Automation Rule
         Updates partner contact information (address, postal code, city, country) from appointment answers
+        Only applies to appointment types: 2, 4, 19, 20
         """
         try:
+            # Check appointment type restriction
+            if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
+                return
+
+            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
+                return
+
             if not record.partner_id:
                 return
 
@@ -156,9 +172,17 @@ class AppointmentAnswerInput(models.Model):
         Update Appointment Title - Automation Rule
         Builds appointment title from various appointment answer fields
         Format: [SMS Icon]/Client Name/Postal Code/Phone/Need/Seller
+        Only applies to appointment types: 2, 4, 19, 20
         """
         try:
             if not (record.partner_id and record.calendar_event_id):
+                return
+
+            # Check appointment type restriction
+            if not record.calendar_event_id.appointment_type_id:
+                return
+
+            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
                 return
 
             # Initialize empty list with 5 elements
@@ -233,6 +257,7 @@ class AppointmentAnswerInput(models.Model):
         Set Partner On Behalf - Automation Rule
         Sets the "rendez-vous pris à la place de" field based on appointment answer
         Only matches partners with "Call Center" category tag
+        Only applies to appointment types: 2, 19
         """
         try:
             # Only process if this is the relevant question about "on behalf of partner"
@@ -241,6 +266,10 @@ class AppointmentAnswerInput(models.Model):
 
             # We need to make sure the record has a calendar_event_id
             if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
+                return
+
+            # Check appointment type restriction
+            if record.calendar_event_id.appointment_type_id.id not in [2, 19]:
                 return
 
             # For dropdown/selection questions, use value_answer_id instead of value_text_box

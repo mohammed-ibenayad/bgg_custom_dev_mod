@@ -113,8 +113,16 @@ class CalendarEvent(models.Model):
         Sets the organizer to the user who created the event (never changes after creation)
         Uses create_uid (the user who created the record) as the organizer
         ALWAYS overrides any organizer set by other modules (like appointments)
+        Only applies to appointment types: 2, 19
         """
         try:
+            # Check appointment type restriction
+            if not record.appointment_type_id:
+                return
+
+            if record.appointment_type_id.id not in [2, 19]:
+                return
+
             # Use the user who created the record as organizer
             creating_user = record.create_uid
 
@@ -140,8 +148,16 @@ class CalendarEvent(models.Model):
         """
         Update Calendar Status When Rescheduled - Automation Rule
         Deletes NoShow activities and posts a chatter note when an event is rescheduled
+        Only applies to appointment types: 2, 19
         """
         try:
+            # Check appointment type restriction
+            if not record.appointment_type_id:
+                return
+
+            if record.appointment_type_id.id not in [2, 19]:
+                return
+
             # Prevent infinite recursion when processing NoShow activities
             if self.env.context.get('processing_noshow_reschedule'):
                 return
@@ -269,8 +285,16 @@ class CalendarEvent(models.Model):
         Replace Call Center Emails - Automation Rule
         Replaces customer attendee emails that match internal user emails with standard call center email
         Prevents internal user emails from being exposed to customers
+        Only applies to appointment types: 2, 4, 19, 20
         """
         try:
+            # Check appointment type restriction
+            if not record.appointment_type_id:
+                return
+
+            if record.appointment_type_id.id not in [2, 4, 19, 20]:
+                return
+
             if not record.attendee_ids:
                 return
 
@@ -339,8 +363,16 @@ class CalendarEvent(models.Model):
         Assign Existing Customer To Calendar Event and Opportunity - Automation Rule
         Finds existing customers by phone (last 8 digits), assigns them to event and opportunity
         Cleans up duplicate customer records when safe to do so
+        Only applies to appointment types: 2, 4, 19, 20
         """
         try:
+            # Check appointment type restriction
+            if not record.appointment_type_id:
+                return
+
+            if record.appointment_type_id.id not in [2, 4, 19, 20]:
+                return
+
             phone = None
 
             # Try to get phone from custom field
@@ -494,8 +526,16 @@ class CalendarEvent(models.Model):
         """
         Create activity for NoShow - Automation Rule
         Creates or updates a NoShow activity when appointment status is set to no_show
+        Only applies to appointment types: 2, 19
         """
         try:
+            # Check appointment type restriction
+            if not record.appointment_type_id:
+                return
+
+            if record.appointment_type_id.id not in [2, 19]:
+                return
+
             if record.appointment_status != 'no_show':
                 return
 
