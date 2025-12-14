@@ -278,15 +278,22 @@ class TestCalendarEvent(TransactionCase):
         })
 
         original_phone = event.x_studio_customer_phone
+        self.assertIn('+32412345678', str(original_phone), "Original phone should be set")
 
-        # Change to different customer
+        # Change to different customer (replace all partners with new one)
         event.write({
-            'partner_ids': [(5, 0, 0), (4, self.customer_partner_2.id)],
+            'partner_ids': [(6, 0, [self.customer_partner_2.id])],
         })
 
-        # Assert fields updated
-        self.assertNotEqual(event.x_studio_customer_phone, original_phone,
-                           "Phone should update when customer changes")
+        # Refresh to ensure we have latest values
+        event.invalidate_recordset()
+
+        # Assert fields updated to new customer's phone
+        new_phone = event.x_studio_customer_phone
+        self.assertIn('+32487654321', str(new_phone),
+                     "Phone should update to new customer's phone")
+        self.assertNotEqual(str(new_phone), str(original_phone),
+                           "Phone should be different from original")
 
     # ========================
     # Test 4: Replace Call Center Emails
@@ -350,23 +357,21 @@ class TestCalendarEvent(TransactionCase):
 
     def test_find_existing_customer_by_phone(self):
         """Test that existing customer is found by last 8 digits of phone"""
-        # Create event with phone in custom field (different format)
+        # Create event and set phone field in one write to trigger automation
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'x_studio_customer_phone': '<a href="tel:0412345678">0412 34 56 78</a>',
         })
 
-        # Set custom phone field with same last 8 digits but different format
-        event.x_studio_customer_phone = '<a href="tel:0412345678">0412 34 56 78</a>'
-
-        # Trigger automation
-        event.write({'name': 'Test Event Updated'})
+        # Refresh to ensure we have latest attendee list
+        event.invalidate_recordset()
 
         # Assert existing customer was added as attendee
         attendee_partner_ids = [att.partner_id.id for att in event.attendee_ids]
         self.assertIn(self.customer_partner.id, attendee_partner_ids,
-                     "Existing customer should be added as attendee")
+                     f"Existing customer (ID {self.customer_partner.id}) should be added as attendee. Found: {attendee_partner_ids}")
 
     def test_update_opportunity_with_customer(self):
         """Test that related opportunity is updated with found customer"""
@@ -450,11 +455,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_noshow_activity_created(self):
         """Test that NoShow activity is created when status is no_show"""
-        # Create event
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
+        # Create event with appointment type (required for appointment_status)
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
         })
 
         # Set appointment status to no_show
@@ -473,11 +483,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_noshow_activity_assigned_to_organizer(self):
         """Test that NoShow activity is assigned to event organizer"""
-        # Create event with specific organizer
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
+        # Create event with specific organizer and appointment type
         event = self.env['calendar.event'].with_user(self.test_user_1).create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
         })
 
         # Set appointment status to no_show
@@ -564,12 +579,17 @@ class TestCalendarEvent(TransactionCase):
 
     def test_full_workflow_appointment_lifecycle(self):
         """Test complete workflow: create -> no_show -> reschedule"""
-        # Create event
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
+        # Create event with appointment type
         event = self.env['calendar.event'].create({
             'name': 'Workflow Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'partner_ids': [(4, self.customer_partner.id)],
+            'appointment_type_id': self.appointment_type_1.id,
         })
 
         # Verify clickable fields created
