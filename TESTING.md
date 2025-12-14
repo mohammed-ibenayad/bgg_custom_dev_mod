@@ -433,7 +433,7 @@ jobs:
 - **Total Test Cases**: 75+
 - **Code Coverage**: ~95% (automation rules)
 - **Average Test Runtime**: ~30-60 seconds (depends on database speed)
-- **Last Updated**: 2024-01-15
+- **Last Updated**: 2025-12-14
 
 ### Coverage Goals
 
@@ -464,6 +464,6 @@ For issues or questions about the test suite:
 
 ---
 
-**Last Updated**: 2024-01-15
-**Module Version**: 19.0.1.0.0
+**Last Updated**: 2025-12-14
+**Module Version**: 19.0.1.1.0
 **Odoo Version**: 19.0
