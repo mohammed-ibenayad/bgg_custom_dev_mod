@@ -319,8 +319,8 @@ class CalendarEvent(models.Model):
                 if customer_email in internal_user_emails:
                     # This is an internal user email, replace it
                     original_email = partner.email
-                    _logger.warning("Internal user email detected in CUSTOMER: %s (ID: %s) - Email: %s - Replacing with %s",
-                                  partner.name, partner.id, original_email, standard_call_center_email)
+                    _logger.info("Internal user email detected in CUSTOMER: %s (ID: %s) - Email: %s - Replacing with %s",
+                                partner.name, partner.id, original_email, standard_call_center_email)
 
                     partner.with_context(
                         mail_create_nosubscribe=True,
