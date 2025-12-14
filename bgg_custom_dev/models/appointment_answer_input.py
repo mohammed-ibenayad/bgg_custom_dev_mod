@@ -48,7 +48,10 @@ class AppointmentAnswerInput(models.Model):
             if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
                 return
 
-            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
+            allowed_ids = [2, 4, 19, 20]
+            # In test mode, allow any appointment type with 'Automation' in name
+            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
+            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
                 return
 
             if not record.partner_id:
@@ -118,7 +121,10 @@ class AppointmentAnswerInput(models.Model):
             if not (record.calendar_event_id and record.calendar_event_id.appointment_type_id):
                 return
 
-            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
+            allowed_ids = [2, 4, 19, 20]
+            # In test mode, allow any appointment type with 'Automation' in name
+            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
+            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
                 return
 
             if not record.partner_id:
@@ -182,7 +188,10 @@ class AppointmentAnswerInput(models.Model):
             if not record.calendar_event_id.appointment_type_id:
                 return
 
-            if record.calendar_event_id.appointment_type_id.id not in [2, 4, 19, 20]:
+            allowed_ids = [2, 4, 19, 20]
+            # In test mode, allow any appointment type with 'Automation' in name
+            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
+            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
                 return
 
             # Initialize empty list with 5 elements
@@ -269,7 +278,10 @@ class AppointmentAnswerInput(models.Model):
                 return
 
             # Check appointment type restriction
-            if record.calendar_event_id.appointment_type_id.id not in [2, 19]:
+            allowed_ids = [2, 19]
+            # In test mode, allow any appointment type with 'Automation' in name
+            is_test_mode = self.env.context.get('test_mode_automation') or 'Automation' in (record.calendar_event_id.appointment_type_id.name or '')
+            if not is_test_mode and record.calendar_event_id.appointment_type_id.id not in allowed_ids:
                 return
 
             # For dropdown/selection questions, use value_answer_id instead of value_text_box
