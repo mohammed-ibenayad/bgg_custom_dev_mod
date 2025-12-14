@@ -61,10 +61,10 @@ class TestProjectTask(TransactionCase):
     def test_welcome_call_deadline_set(self):
         """Test deadline set to SO date + 2 days for Welcome call"""
         # Create "Welcom call" task (note the typo - it's intentional per spec)
+        # Sale order link inherited from project's sale_line_id
         task = self.env['project.task'].create({
             'name': 'Welcom call',
             'project_id': self.test_project.id,
-            'project_sale_order_id': self.sale_order.id,
         })
 
         # Get actual sale order date (may have been updated during confirmation)
@@ -85,7 +85,6 @@ class TestProjectTask(TransactionCase):
         task = self.env['project.task'].create({
             'name': 'Other Task',
             'project_id': self.test_project.id,
-            'project_sale_order_id': self.sale_order.id,
         })
 
         # Assert deadline not automatically set
@@ -112,7 +111,6 @@ class TestProjectTask(TransactionCase):
             task = self.env['project.task'].create({
                 'name': name,
                 'project_id': self.test_project.id,
-                'project_sale_order_id': self.sale_order.id,
             })
 
             # Only exact match "Welcom call" should get the deadline
@@ -146,11 +144,16 @@ class TestProjectTask(TransactionCase):
             })],
         })
 
+        # Create project linked to this sale order
+        project_no_date = self.env['project.project'].create({
+            'name': 'Project No Date',
+            'sale_line_id': sale_order_no_date.order_line[0].id,
+        })
+
         # Create task
         task = self.env['project.task'].create({
             'name': 'Welcom call',
-            'project_id': self.test_project.id,
-            'project_sale_order_id': sale_order_no_date.id,
+            'project_id': project_no_date.id,
         })
 
         # Assert task created without error
@@ -177,16 +180,16 @@ class TestProjectTask(TransactionCase):
                 })],
             })
 
-            # Create project
+            # Create project linked to sale order line
             project = self.env['project.project'].create({
                 'name': f'Project {order_date.date()}',
+                'sale_line_id': sale_order.order_line[0].id,
             })
 
-            # Create task
+            # Create task (sale order link will be inherited from project)
             task = self.env['project.task'].create({
                 'name': 'Welcom call',
                 'project_id': project.id,
-                'project_sale_order_id': sale_order.id,
             })
 
             # Get actual sale order date (may have been updated)
@@ -207,7 +210,6 @@ class TestProjectTask(TransactionCase):
         task = self.env['project.task'].create({
             'name': 'Welcom call',
             'project_id': self.test_project.id,
-            'project_sale_order_id': self.sale_order.id,
         })
 
         original_deadline = task.date_deadline
@@ -220,11 +222,11 @@ class TestProjectTask(TransactionCase):
                         "Deadline should not change on update")
 
     def test_welcome_call_without_project(self):
-        """Test welcome call task created without project"""
-        # Create task without project but with sale order
+        """Test welcome call task created without project but with sale line"""
+        # Create task without project but with sale_line_id
         task = self.env['project.task'].create({
             'name': 'Welcom call',
-            'project_sale_order_id': self.sale_order.id,
+            'sale_line_id': self.sale_order.order_line[0].id,
         })
 
         # Calculate expected deadline
@@ -249,17 +251,14 @@ class TestProjectTask(TransactionCase):
             {
                 'name': 'Welcom call',
                 'project_id': self.test_project.id,
-                'project_sale_order_id': self.sale_order.id,
             },
             {
                 'name': 'Welcom call',
                 'project_id': self.test_project.id,
-                'project_sale_order_id': self.sale_order.id,
             },
             {
                 'name': 'Other Task',  # This one shouldn't get the deadline
                 'project_id': self.test_project.id,
-                'project_sale_order_id': self.sale_order.id,
             },
         ])
 
@@ -284,7 +283,6 @@ class TestProjectTask(TransactionCase):
         task = self.env['project.task'].create({
             'name': 'Welcom call',
             'project_id': self.test_project.id,
-            'project_sale_order_id': self.sale_order.id,
             'date_deadline': manual_deadline,
         })
 
@@ -328,7 +326,6 @@ class TestProjectTask(TransactionCase):
         task = self.env['project.task'].create({
             'name': 'Welcom call',
             'project_id': new_project.id,
-            'project_sale_order_id': new_sale_order.id,
         })
 
         # Get actual sale order date (may have been updated during confirmation)
