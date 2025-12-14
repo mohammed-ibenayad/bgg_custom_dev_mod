@@ -145,7 +145,7 @@ class TestProjectProject(TransactionCase):
         self.assertTrue(project.id, "Project should be created successfully")
 
     def test_folder_rename_not_on_update(self):
-        """Test that folder rename only happens on create, not on update"""
+        """Test that folder rename only happens when folder is added, not on other updates"""
         # Create documents folder
         documents_folder = self.env['documents.folder'].create({
             'name': 'Original Folder Name',
@@ -164,13 +164,13 @@ class TestProjectProject(TransactionCase):
         # Manually change folder name
         documents_folder.write({'name': 'Manually Changed Name'})
 
-        # Update project (not a creation)
+        # Update project (not adding/changing documents_folder_id)
         project.write({'name': 'Updated Project Name'})
 
-        # Assert folder name NOT changed back (because it's not a new record)
-        # The automation only runs on create when create_date == write_date
+        # Assert folder name NOT changed back
+        # The automation only triggers when documents_folder_id is being set
         self.assertEqual(documents_folder.name, 'Manually Changed Name',
-                        "Folder name should not change on project update")
+                        "Folder name should not change on unrelated project updates")
 
     def test_folder_name_format_is_correct(self):
         """Test that folder name format matches exactly: 'SO Name - Projet - Customer Name'"""
@@ -261,3 +261,26 @@ class TestProjectProject(TransactionCase):
         expected_name = f"{sale_order.name} - Projet - {self.test_customer.name}"
         self.assertEqual(folder.name, expected_name,
                         "Folder should be renamed even for non-service products")
+
+    def test_folder_added_after_project_creation(self):
+        """Test that folder is renamed when added after project creation via write()"""
+        # Create project without folder first
+        project = self.env['project.project'].create({
+            'name': 'Test Project',
+            'sale_line_id': self.sale_order_line.id,
+        })
+
+        # Verify no folder initially
+        self.assertFalse(project.documents_folder_id,
+                        "Project should have no folder initially")
+
+        # Create folder
+        folder = self.env['documents.folder'].create({'name': 'Added Later Folder'})
+
+        # Add folder to project via write()
+        project.write({'documents_folder_id': folder.id})
+
+        # Assert folder renamed (should trigger via write override)
+        expected_name = f"{self.sale_order.name} - Projet - {self.test_customer.name}"
+        self.assertEqual(folder.name, expected_name,
+                        "Folder should be renamed when added via write()")
