@@ -60,16 +60,17 @@ class TestCalendarEvent(TransactionCase):
         cls.appointment_type_call_center = None
         cls.appointment_type_commercial = None
         if 'appointment.type' in cls.env:
-            cls.appointment_type_1 = cls.env['appointment.type'].create({
+            # Use sudo() to avoid access rights issues in tests
+            cls.appointment_type_1 = cls.env['appointment.type'].sudo().create({
                 'name': 'Test Appointment Type 1',
             })
             # Create appointment type for call center automation rules (APT-ENERG-CNT)
-            cls.appointment_type_call_center = cls.env['appointment.type'].create({
+            cls.appointment_type_call_center = cls.env['appointment.type'].sudo().create({
                 'name': 'Test Call Center Appointment',
                 'x_appointment_ref': 'APT-ENERG-CNT',
             })
             # Create appointment type for commercial automation rules (APT-ENERG-COM)
-            cls.appointment_type_commercial = cls.env['appointment.type'].create({
+            cls.appointment_type_commercial = cls.env['appointment.type'].sudo().create({
                 'name': 'Test Commercial Appointment',
                 'x_appointment_ref': 'APT-ENERG-COM',
             })
@@ -153,15 +154,15 @@ class TestCalendarEvent(TransactionCase):
     def test_reschedule_marks_noshow_done(self):
         """Test that rescheduling marks NoShow activities as done"""
         # Skip if appointment module not installed
-        if not self.appointment_type_1:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
-        # Create event
+        # Create event with call center appointment type
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
-            'appointment_type_id': self.appointment_type_1.id,
+            'appointment_type_id': self.appointment_type_call_center.id,
             'appointment_status': 'no_show',
         })
 
@@ -503,15 +504,15 @@ class TestCalendarEvent(TransactionCase):
     def test_noshow_activity_created(self):
         """Test that NoShow activity is created when status is no_show"""
         # Skip if appointment module not installed
-        if not self.appointment_type_1:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
-        # Create event with appointment type (required for appointment_status)
+        # Create event with call center appointment type (required for NoShow automation)
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
-            'appointment_type_id': self.appointment_type_1.id,
+            'appointment_type_id': self.appointment_type_call_center.id,
         })
 
         # Set appointment status to no_show
@@ -531,15 +532,15 @@ class TestCalendarEvent(TransactionCase):
     def test_noshow_activity_assigned_to_organizer(self):
         """Test that NoShow activity is assigned to event organizer"""
         # Skip if appointment module not installed
-        if not self.appointment_type_1:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
-        # Create event with specific organizer and appointment type
+        # Create event with specific organizer and call center appointment type
         event = self.env['calendar.event'].with_user(self.test_user_1).create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
-            'appointment_type_id': self.appointment_type_1.id,
+            'appointment_type_id': self.appointment_type_call_center.id,
         })
 
         # Set appointment status to no_show
@@ -632,16 +633,16 @@ class TestCalendarEvent(TransactionCase):
     def test_full_workflow_appointment_lifecycle(self):
         """Test complete workflow: create -> no_show -> reschedule"""
         # Skip if appointment module not installed
-        if not self.appointment_type_1:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
-        # Create event with appointment type
+        # Create event with call center appointment type
         event = self.env['calendar.event'].create({
             'name': 'Workflow Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
             'partner_ids': [(4, self.customer_partner.id)],
-            'appointment_type_id': self.appointment_type_1.id,
+            'appointment_type_id': self.appointment_type_call_center.id,
         })
 
         # Verify clickable fields created
