@@ -138,11 +138,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_reschedule_marks_noshow_done(self):
         """Test that rescheduling marks NoShow activities as done"""
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
         # Create event
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
             'appointment_status': 'no_show',
         })
 
@@ -173,11 +178,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_reschedule_resets_appointment_status(self):
         """Test that appointment status is reset to 'booked' on reschedule"""
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
         # Create event with no_show status
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
             'appointment_status': 'no_show',
         })
 
@@ -193,11 +203,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_reschedule_not_triggered_on_other_updates(self):
         """Test that reschedule logic only triggers on date/time changes"""
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
         # Create event with no_show status
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
             'appointment_status': 'no_show',
         })
 
@@ -510,11 +525,16 @@ class TestCalendarEvent(TransactionCase):
 
     def test_noshow_activity_not_created_for_other_status(self):
         """Test that NoShow activity is not created for other statuses"""
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
         # Create event with different status
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
+            'appointment_type_id': self.appointment_type_1.id,
             'appointment_status': 'booked',
         })
 

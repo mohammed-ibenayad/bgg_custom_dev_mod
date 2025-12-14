@@ -99,9 +99,12 @@ class CalendarEvent(models.Model):
         """Process all automation rules for calendar events"""
         # Note: Organizer update removed - organizer is set once at creation and never changes
         self._update_calendar_status_rescheduled(record, vals)
+        # IMPORTANT: _assign_existing_customer must run BEFORE _update_clickable_from_attendee
+        # because it uses x_studio_customer_phone to find customers, and _update_clickable_from_attendee
+        # will clear that field if no client attendees exist yet
+        self._assign_existing_customer(record)
         self._update_clickable_from_attendee(record)
         self._replace_call_center_emails(record)
-        self._assign_existing_customer(record)
         self._create_activity_noshow(record)
 
     def _set_initial_organizer(self, record):
