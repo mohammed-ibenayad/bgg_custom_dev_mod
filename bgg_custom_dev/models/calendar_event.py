@@ -18,6 +18,24 @@ class CalendarEvent(models.Model):
         readonly=True
     )
 
+    # Custom fields for clickable customer information
+    x_studio_customer_address = fields.Html(
+        string='Customer Address',
+        help='Clickable address link to Google Maps'
+    )
+
+    x_studio_customer_phone = fields.Html(
+        string='Customer Phone',
+        help='Clickable phone number with tel: protocol'
+    )
+
+    # Custom field for tracking who made the appointment on behalf of customer
+    x_studio_rendez_vous_pris_la_place_de = fields.Many2one(
+        'res.partner',
+        string='Rendez-vous pris à la place de',
+        help='Partner who made the appointment on behalf of the customer (e.g., Call Center agent)'
+    )
+
     @api.model_create_multi
     def create(self, vals_list):
         """Override create to set organizer and trigger automation rules on new calendar events"""

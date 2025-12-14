@@ -525,6 +525,10 @@ class TestCalendarEvent(TransactionCase):
 
     def test_commercial_not_computed_for_other_types(self):
         """Test that commercial field is not computed for other appointment types"""
+        # Skip if appointment module not installed
+        if not self.appointment_type_1:
+            self.skipTest("Appointment module not installed")
+
         # Create event with non-commercial appointment type
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
