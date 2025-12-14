@@ -59,17 +59,17 @@ class TestCalendarEvent(TransactionCase):
         cls.appointment_type_1 = None
         cls.appointment_type_call_center = None
         cls.appointment_type_commercial = None
-        if 'calendar.appointment.type' in cls.env:
-            cls.appointment_type_1 = cls.env['calendar.appointment.type'].create({
+        if 'appointment.type' in cls.env:
+            cls.appointment_type_1 = cls.env['appointment.type'].create({
                 'name': 'Test Appointment Type 1',
             })
             # Create appointment type for call center automation rules (APT-ENERG-CNT)
-            cls.appointment_type_call_center = cls.env['calendar.appointment.type'].create({
+            cls.appointment_type_call_center = cls.env['appointment.type'].create({
                 'name': 'Test Call Center Appointment',
                 'x_appointment_ref': 'APT-ENERG-CNT',
             })
             # Create appointment type for commercial automation rules (APT-ENERG-COM)
-            cls.appointment_type_commercial = cls.env['calendar.appointment.type'].create({
+            cls.appointment_type_commercial = cls.env['appointment.type'].create({
                 'name': 'Test Commercial Appointment',
                 'x_appointment_ref': 'APT-ENERG-COM',
             })
