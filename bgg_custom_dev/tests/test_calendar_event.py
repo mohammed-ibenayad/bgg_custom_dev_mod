@@ -134,8 +134,8 @@ class TestCalendarEvent(TransactionCase):
             self.skipTest("Appointment module not installed")
 
         # Create event with user_id already set (simulating appointment module)
-        # Requires appointment type with call center reference for organizer automation
-        event = self.env['calendar.event'].with_user(self.test_user_1).create({
+        # Use sudo() to avoid access rights issues with test users
+        event = self.env['calendar.event'].with_user(self.test_user_1).sudo().create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
@@ -194,15 +194,15 @@ class TestCalendarEvent(TransactionCase):
     def test_reschedule_resets_appointment_status(self):
         """Test that appointment status is reset to 'booked' on reschedule"""
         # Skip if appointment module not installed
-        if not self.appointment_type_1:
+        if not self.appointment_type_call_center:
             self.skipTest("Appointment module not installed")
 
-        # Create event with no_show status
+        # Create event with call center appointment type and no_show status
         event = self.env['calendar.event'].create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
-            'appointment_type_id': self.appointment_type_1.id,
+            'appointment_type_id': self.appointment_type_call_center.id,
             'appointment_status': 'no_show',
         })
 
@@ -536,7 +536,8 @@ class TestCalendarEvent(TransactionCase):
             self.skipTest("Appointment module not installed")
 
         # Create event with specific organizer and call center appointment type
-        event = self.env['calendar.event'].with_user(self.test_user_1).create({
+        # Use sudo() to avoid access rights issues with test users
+        event = self.env['calendar.event'].with_user(self.test_user_1).sudo().create({
             'name': 'Test Event',
             'start': datetime.datetime.now(),
             'stop': datetime.datetime.now() + datetime.timedelta(hours=1),
