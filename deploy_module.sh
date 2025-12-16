@@ -95,22 +95,41 @@ fi
 echo -e "\n${GREEN}✅ Successfully merged and pushed to origin!${NC}\n"
 
 # Ask if user wants to push to upstream
-read -p "Do you want to push to upstream (original repo: $module_name branch)? (yes/no): " push_upstream
+read -p "Do you want to push to upstream (original repo)? (yes/no): " push_upstream
 
 if [[ "$push_upstream" == "yes" || "$push_upstream" == "y" ]]; then
     echo -e "\n${YELLOW}Fetching from upstream to check if branch exists...${NC}"
     git fetch upstream
 
-    echo -e "\n${YELLOW}Pushing to upstream:${BLUE}$module_name${NC} branch...${NC}"
-    git push upstream main:$module_name
-
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Error: Failed to push to upstream${NC}"
-        echo -e "${YELLOW}ℹ️  Make sure the branch '$module_name' exists on upstream or you have permission to create it${NC}"
-        exit 1
+    # Auto-detect upstream branch name (try with _o19 suffix first, then without)
+    upstream_branch=""
+    if git rev-parse --verify "upstream/${module_name}_o19" >/dev/null 2>&1; then
+        upstream_branch="${module_name}_o19"
+        echo -e "${BLUE}📍 Detected upstream branch: ${YELLOW}$upstream_branch${NC}"
+    elif git rev-parse --verify "upstream/${module_name}" >/dev/null 2>&1; then
+        upstream_branch="$module_name"
+        echo -e "${BLUE}📍 Detected upstream branch: ${YELLOW}$upstream_branch${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Branch '$module_name' or '${module_name}_o19' not found on upstream${NC}"
+        read -p "Enter the upstream branch name to push to (or press Enter to skip): " upstream_branch
+        if [ -z "$upstream_branch" ]; then
+            echo -e "${BLUE}ℹ️  Skipped pushing to upstream${NC}"
+            upstream_branch=""
+        fi
     fi
 
-    echo -e "\n${GREEN}✅ Successfully pushed to upstream:$module_name!${NC}"
+    if [ -n "$upstream_branch" ]; then
+        echo -e "\n${YELLOW}Pushing to upstream:${BLUE}$upstream_branch${NC} branch...${NC}"
+        git push upstream main:$upstream_branch
+
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Error: Failed to push to upstream${NC}"
+            echo -e "${YELLOW}ℹ️  Make sure you have permission to push to '$upstream_branch'${NC}"
+            exit 1
+        fi
+
+        echo -e "\n${GREEN}✅ Successfully pushed to upstream:$upstream_branch!${NC}"
+    fi
 else
     echo -e "\n${BLUE}ℹ️  Skipped pushing to upstream${NC}"
 fi
@@ -133,7 +152,7 @@ echo -e "${BLUE}Summary:${NC}"
 echo -e "  • Module: ${YELLOW}$module_name${NC}"
 echo -e "  • Merged: ${YELLOW}$claude_branch${NC} → main"
 echo -e "  • Pushed to: origin/main"
-if [[ "$push_upstream" == "yes" || "$push_upstream" == "y" ]]; then
-    echo -e "  • Pushed to: ${YELLOW}upstream/$module_name${NC}"
+if [[ "$push_upstream" == "yes" || "$push_upstream" == "y" ]] && [ -n "$upstream_branch" ]; then
+    echo -e "  • Pushed to: ${YELLOW}upstream/$upstream_branch${NC}"
 fi
 echo ""
