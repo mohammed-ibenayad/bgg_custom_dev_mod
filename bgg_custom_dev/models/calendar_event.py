@@ -34,10 +34,13 @@ class CalendarEvent(models.Model):
     )
 
     # Custom field for tracking who made the appointment on behalf of customer
+    # NOTE: Domain explicitly set to [] to override any Studio-configured domain restrictions
+    # that might cause "Impossible d'utiliser" validation errors
     x_studio_rendez_vous_pris_la_place_de = fields.Many2one(
         'res.partner',
         string='Rendez-vous pris à la place de',
-        help='Partner who made the appointment on behalf of the customer (e.g., Call Center agent)'
+        help='Partner who made the appointment on behalf of the customer (e.g., Call Center agent)',
+        domain=[]  # No restrictions - allow any partner
     )
 
     @api.model_create_multi
