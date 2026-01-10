@@ -677,3 +677,68 @@ class TestCalendarEvent(TransactionCase):
         ])
         self.assertEqual(len(active_activities), 0,
                         "NoShow activity should be done after reschedule")
+
+    # ========================
+    # Test 8: Bug Reproduction - NULL Name Error
+    # ========================
+
+    def test_create_event_without_name_should_fail(self):
+        """
+        Test that reproduces the NULL name bug from production logs.
+
+        This test verifies the bug where calendar events are created without a name field,
+        causing a database constraint violation:
+
+        ERROR: null value in column "name" of relation "calendar_event" violates not-null constraint
+
+        Production scenario:
+        - User creates appointment through appointment module
+        - appointment_type_id = 2 (APT-ENERG-CNT expected)
+        - Name field is NULL in the INSERT query
+        - Database rejects the transaction
+        """
+        from psycopg2 import IntegrityError
+
+        # Skip if appointment module not installed
+        if not self.appointment_type_call_center:
+            self.skipTest("Appointment module not installed")
+
+        # Attempt to create event WITHOUT name field (like in production logs)
+        with self.assertRaises(IntegrityError, msg="Should raise IntegrityError for NULL name"):
+            event = self.env['calendar.event'].create({
+                # 'name': 'Test Event',  # Intentionally omitted to reproduce bug
+                'start': datetime.datetime(2026, 1, 12, 13, 0, 0),
+                'stop': datetime.datetime(2026, 1, 12, 15, 0, 0),
+                'appointment_type_id': self.appointment_type_call_center.id,
+                'appointment_status': 'booked',
+                'res_model': 'res.partner',
+                'res_id': self.customer_partner.id,
+                'description': '<div><strong>Organisé par</strong><br>Test User<br></div>',
+            })
+
+    def test_create_event_with_empty_name_should_fail(self):
+        """
+        Test that even an empty string for name should fail or be handled.
+
+        This verifies edge cases where name might be set to empty string or whitespace.
+        """
+        from psycopg2 import IntegrityError
+
+        # Skip if appointment module not installed
+        if not self.appointment_type_call_center:
+            self.skipTest("Appointment module not installed")
+
+        # Attempt to create event with empty name
+        # Note: Empty string might pass NOT NULL constraint but violates business logic
+        try:
+            event = self.env['calendar.event'].create({
+                'name': '',  # Empty string
+                'start': datetime.datetime(2026, 1, 12, 13, 0, 0),
+                'stop': datetime.datetime(2026, 1, 12, 15, 0, 0),
+                'appointment_type_id': self.appointment_type_call_center.id,
+            })
+            # If it succeeds, at least verify it has SOME name
+            self.assertTrue(event.name, "Event name should not be empty even if created with empty string")
+        except IntegrityError:
+            # This is acceptable - empty names should be rejected
+            pass
